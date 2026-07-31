@@ -4,9 +4,9 @@ spring:
   profiles:
     default: dev
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/invitation}
-    username: ${POSTGRES_USER:invitation}
-    password: ${POSTGRES_PASSWORD:invitation_dev}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/invitation_db}
+    username: ${DB_USER:invitation}
+    password: ${DB_PASSWORD:invitation_dev}
   jpa:
     open-in-view: false
     hibernate:

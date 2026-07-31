@@ -23,6 +23,8 @@ Invitation is the technical foundation for a web application that will create an
 - `.agents/tasks/`: task specifications, in execution order:
   1. [01-create-project-foundation.md](tasks/01-create-project-foundation.md)
   2. [02-initialize-git-baseline.md](tasks/02-initialize-git-baseline.md)
+  3. [03-design-domain-model.md](tasks/03-design-domain-model.md)
+- Domain reference: [domain-model.md](domain-model.md).
 
 ## Validation
 

@@ -1,2 +1,4 @@
-/** Shared technical building blocks. */
+/**
+ * Shared technical building blocks.
+ */
 package com.invitation.shared;

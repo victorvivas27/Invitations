@@ -1,2 +1,4 @@
-/** Invitation domain module placeholder. */
+/**
+ * Invitation domain module placeholder.
+ */
 package com.invitation.invitation;

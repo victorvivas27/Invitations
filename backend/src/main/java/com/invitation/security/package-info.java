@@ -1,2 +1,4 @@
-/** Security-related components. */
+/**
+ * Security-related components.
+ */
 package com.invitation.security;
