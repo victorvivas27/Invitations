@@ -1,0 +1,18 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #3c2946;
+  background: #fff8fc;
+}
+
+body { margin: 0; }
+
+main {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+h1 { font-size: clamp(3rem, 10vw, 6rem); margin: 0; }
+p { font-size: 1.25rem; }

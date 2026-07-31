@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: Invitation
+  profiles:
+    default: dev
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/invitation}
+    username: ${POSTGRES_USER:invitation}
+    password: ${POSTGRES_PASSWORD:invitation_dev}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+server:
+  port: ${BACKEND_PORT:8080}
+
+app:
+  jwt-secret: ${JWT_SECRET:development-only-not-a-real-secret-change-me}
