@@ -95,34 +95,27 @@ jobs:
 
           env_vars: |
             APP_PROFILE=prod
-
             DB_HOST=${{ secrets.DB_HOST }}
             DB_PORT=${{ secrets.DB_PORT }}
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_SSL_MODE=${{ secrets.DB_SSL_MODE }}
-
             DB_POOL_MAX_SIZE=${{ secrets.DB_POOL_MAX_SIZE }}
             DB_POOL_MIN_IDLE=${{ secrets.DB_POOL_MIN_IDLE }}
             DB_POOL_CONNECTION_TIMEOUT_MS=${{ secrets.DB_POOL_CONNECTION_TIMEOUT_MS }}
             DB_POOL_IDLE_TIMEOUT_MS=${{ secrets.DB_POOL_IDLE_TIMEOUT_MS }}
             DB_POOL_MAX_LIFETIME_MS=${{ secrets.DB_POOL_MAX_LIFETIME_MS }}
-
             JPA_DDL_AUTO=${{ secrets.JPA_DDL_AUTO }}
-
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             JWT_ISSUER=${{ secrets.JWT_ISSUER }}
             JWT_EXPIRATION_SECONDS=${{ secrets.JWT_EXPIRATION_SECONDS }}
-
             FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            APP_CORS_ALLOWED_ORIGINS=${{ secrets.APP_CORS_ALLOWED_ORIGINS }}
-
+            APP_CORS_ALLOWED_ORIGINS="${{ secrets.APP_CORS_ALLOWED_ORIGINS }}"
             GMAIL_USER=${{ secrets.GMAIL_USER }}
             GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
             EMAIL_PROVIDER=${{ secrets.EMAIL_PROVIDER }}
             EMAIL_FROM=${{ secrets.EMAIL_FROM }}
-
             ACCOUNT_ACTIVATION_EXPIRATION_SECONDS=${{ secrets.ACCOUNT_ACTIVATION_EXPIRATION_SECONDS }}
             UPLOAD_DIRECTORY=${{ secrets.UPLOAD_DIRECTORY }}
 
