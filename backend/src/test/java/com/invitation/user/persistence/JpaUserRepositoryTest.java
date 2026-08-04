@@ -6,13 +6,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.invitation.user.domain.User;
 import com.invitation.user.mapper.UserPersistenceMapper;
 import com.invitation.user.repository.UserRepository;
+import com.invitation.user.repository.DuplicateUserException;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @DataJpaTest
 @Import({JpaUserRepository.class, UserPersistenceMapper.class})
@@ -53,7 +53,8 @@ class JpaUserRepositoryTest {
         User duplicate = user("ACC-ZYX987WVU654", EMAIL);
 
         assertThatThrownBy(() -> repository.save(duplicate))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(DuplicateUserException.class)
+                .hasMessage("A unique user value already exists");
     }
 
     private static User user(String publicCode, String email) {

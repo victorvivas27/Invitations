@@ -4,7 +4,8 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
-ARG VITE_API_BASE_URL=http://localhost:8080
+ARG VITE_API_BASE_URL
+RUN test -n "$VITE_API_BASE_URL"
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm build
 

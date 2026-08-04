@@ -33,7 +33,7 @@ public final class User {
         firstName = requireText(data.firstName(), "firstName", NAME_MAX_LENGTH);
         lastName = requireText(data.lastName(), "lastName", NAME_MAX_LENGTH);
         email = requireEmail(data.email());
-        passwordHash = requireText(data.passwordHash(), "passwordHash", PASSWORD_HASH_MAX_LENGTH);
+        passwordHash = requirePasswordHash(data.passwordHash(), data.status());
         status = Objects.requireNonNull(data.status(), "status is required");
         createdAt = Objects.requireNonNull(data.createdAt(), "createdAt is required");
         updatedAt = Objects.requireNonNull(data.updatedAt(), "updatedAt is required");
@@ -52,6 +52,27 @@ public final class User {
 
     public static User restore(UserData data) {
         return new User(data);
+    }
+
+    public static User createPending(UUID id, String publicCode, String firstName, String lastName,
+            String email, UUID actorId, Instant now) {
+        return new User(new UserData(id, publicCode, firstName, lastName, email, null,
+                UserStatus.PENDING_ACTIVATION, now, now, actorId, actorId));
+    }
+
+    public User activate(String newPasswordHash, Instant now) {
+        if (status != UserStatus.PENDING_ACTIVATION) {
+            throw new IllegalStateException("Only pending users can be activated");
+        }
+        return new User(new UserData(id, publicCode, firstName, lastName, email, newPasswordHash,
+                UserStatus.ACTIVE, createdAt, now, createdBy, id));
+    }
+
+    private static String requirePasswordHash(String value, UserStatus userStatus) {
+        if (userStatus == UserStatus.PENDING_ACTIVATION && value == null) {
+            return null;
+        }
+        return requireText(value, "passwordHash", PASSWORD_HASH_MAX_LENGTH);
     }
 
     private static String requirePublicCode(String value) {

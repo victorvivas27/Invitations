@@ -17,8 +17,10 @@ backend/build/
 backend/out/
 backend/out/
 backend/out/
+backend/uploads/
 frontend/node_modules/
 frontend/dist/
 frontend/coverage/
 frontend/*.tsbuildinfo
 *.log
+**/recovery-codes.txt

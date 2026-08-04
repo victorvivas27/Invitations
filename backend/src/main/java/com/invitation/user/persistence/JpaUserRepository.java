@@ -3,10 +3,12 @@ package com.invitation.user.persistence;
 import com.invitation.user.domain.User;
 import com.invitation.user.mapper.UserPersistenceMapper;
 import com.invitation.user.repository.UserRepository;
+import com.invitation.user.repository.DuplicateUserException;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Repository
 public class JpaUserRepository implements UserRepository {
@@ -21,12 +23,27 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        return mapper.toDomain(repository.saveAndFlush(mapper.toEntity(user)));
+        try {
+            return mapper.toDomain(repository.saveAndFlush(mapper.toEntity(user)));
+        } catch (DataIntegrityViolationException exception) {
+            throw new DuplicateUserException(exception);
+        }
     }
 
     @Override
     public Optional<User> findById(UUID id) {
         return repository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return repository.findByEmail(email.trim().toLowerCase(Locale.ROOT)).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByPublicCode(String publicCode) {
+        return repository.findByPublicCode(publicCode.trim().toUpperCase(Locale.ROOT))
+                .map(mapper::toDomain);
     }
 
     @Override
