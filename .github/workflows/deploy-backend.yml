@@ -1,0 +1,140 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: southamerica-west1
+  ARTIFACT_REGISTRY_REPOSITORY: invitation-backend
+  IMAGE_NAME: invitation-api
+  CLOUD_RUN_SERVICE: invitation-backend
+
+jobs:
+  deploy:
+    name: Build and deploy backend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Dar permisos a Gradle
+        run: chmod +x gradlew
+
+      - name: Ejecutar pruebas
+        run: ./gradlew test
+
+      - name: Construir backend
+        run: ./gradlew clean bootJar
+
+      - name: Autenticar con Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Configurar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Configurar Docker para Artifact Registry
+        run: |
+          gcloud auth configure-docker \
+            "${GCP_REGION}-docker.pkg.dev" \
+            --quiet
+
+      - name: Definir nombre de la imagen
+        id: image
+        run: |
+          IMAGE_URI="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}"
+          echo "uri=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
+          echo "sha_uri=${IMAGE_URI}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Construir imagen Docker
+        run: |
+          docker build \
+            --tag "${{ steps.image.outputs.sha_uri }}" \
+            --tag "${{ steps.image.outputs.uri }}:latest" \
+            .
+
+      - name: Publicar imagen en Artifact Registry
+        run: |
+          docker push "${{ steps.image.outputs.sha_uri }}"
+          docker push "${{ steps.image.outputs.uri }}:latest"
+
+      - name: Desplegar en Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ env.CLOUD_RUN_SERVICE }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ steps.image.outputs.sha_uri }}
+
+          env_vars: |
+            APP_PROFILE=prod
+
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_SSL_MODE=${{ secrets.DB_SSL_MODE }}
+
+            DB_POOL_MAX_SIZE=${{ secrets.DB_POOL_MAX_SIZE }}
+            DB_POOL_MIN_IDLE=${{ secrets.DB_POOL_MIN_IDLE }}
+            DB_POOL_CONNECTION_TIMEOUT_MS=${{ secrets.DB_POOL_CONNECTION_TIMEOUT_MS }}
+            DB_POOL_IDLE_TIMEOUT_MS=${{ secrets.DB_POOL_IDLE_TIMEOUT_MS }}
+            DB_POOL_MAX_LIFETIME_MS=${{ secrets.DB_POOL_MAX_LIFETIME_MS }}
+
+            JPA_DDL_AUTO=${{ secrets.JPA_DDL_AUTO }}
+
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_ISSUER=${{ secrets.JWT_ISSUER }}
+            JWT_EXPIRATION_SECONDS=${{ secrets.JWT_EXPIRATION_SECONDS }}
+
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            APP_CORS_ALLOWED_ORIGINS=${{ secrets.APP_CORS_ALLOWED_ORIGINS }}
+
+            GMAIL_USER=${{ secrets.GMAIL_USER }}
+            GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+            EMAIL_PROVIDER=${{ secrets.EMAIL_PROVIDER }}
+            EMAIL_FROM=${{ secrets.EMAIL_FROM }}
+
+            ACCOUNT_ACTIVATION_EXPIRATION_SECONDS=${{ secrets.ACCOUNT_ACTIVATION_EXPIRATION_SECONDS }}
+            UPLOAD_DIRECTORY=${{ secrets.UPLOAD_DIRECTORY }}
+
+          flags: >-
+            --allow-unauthenticated
+            --port=8080
+            --memory=512Mi
+            --cpu=1
+            --min-instances=0
+            --max-instances=2
+
+      - name: Mostrar URL desplegada
+        run: |
+          echo "Backend desplegado en:"
+          echo "${{ steps.deploy.outputs.url }}"
