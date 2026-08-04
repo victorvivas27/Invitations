@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.cors.allowed-origins=http://localhost:5173,http://localhost:5174")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
@@ -62,12 +62,13 @@ class AuthenticationSecurityTest {
     }
 
     @Test
-    void registrationPreflightRejectsUnconfiguredDevelopmentPort() throws Exception {
+    void registrationPreflightAllowsSecondConfiguredDevelopmentPort() throws Exception {
         mockMvc.perform(options(REGISTER)
                         .header(ORIGIN, "http://localhost:5174")
                         .header(REQUEST_METHOD, "POST")
                         .header(REQUEST_HEADERS, "content-type"))
-                .andExpect(status().isForbidden());
+                .andExpectAll(status().isOk(),
+                        header().string("Access-Control-Allow-Origin", "http://localhost:5174"));
     }
 
     @Test
