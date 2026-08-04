@@ -19,13 +19,13 @@ describe('CreateInvitationPage', () => {
     vi.restoreAllMocks()
     window.localStorage.clear()
   })
-  it('loads the selected template and six-step progress', () => {
+  it('loads the selected template and seven-step progress', () => {
     renderWizard()
     expect(screen.getByText('Nueva invitación')).toBeInTheDocument()
     expect(
       screen.getByText('Crea una experiencia especial'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Paso 1 de 6')).toBeInTheDocument()
+    expect(screen.getByText('Paso 1 de 7')).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { level: 1, name: 'Información básica' }),
     ).toBeInTheDocument()
@@ -38,7 +38,7 @@ describe('CreateInvitationPage', () => {
     renderWizard()
     await next()
     expect(screen.getAllByText('Este campo es obligatorio.')).toHaveLength(2)
-    expect(screen.getByText('Paso 1 de 6')).toBeInTheDocument()
+    expect(screen.getByText('Paso 1 de 7')).toBeInTheDocument()
     await userEvent.selectOptions(
       screen.getByRole('combobox', { name: 'Tipo de evento' }),
       'Cumpleaños',
@@ -51,7 +51,7 @@ describe('CreateInvitationPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Persona homenajeada' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Paso 2 de 6')).toBeInTheDocument()
+    expect(screen.getByText('Paso 2 de 7')).toBeInTheDocument()
   })
 
   it('updates the invitation preview immediately', async () => {
@@ -108,6 +108,11 @@ describe('CreateInvitationPage', () => {
             }),
             { status: 200, headers: { 'Content-Type': 'application/json' } },
           )
+        if (String(input).endsWith('/api/invitation-images/social'))
+          return new Response(JSON.stringify({ url: 'https://cdn.example.com/share.jpg' }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
         return new Response(
           JSON.stringify({
             publicSlug: 'cumpleanos-de-sofia-a8k3m2',
@@ -160,6 +165,29 @@ describe('CreateInvitationPage', () => {
     expect(
       screen.getByText('Cumpleaños · Cumpleaños de Sofía'),
     ).toBeInTheDocument()
+    await next()
+    await userEvent.type(screen.getByLabelText('Título'), 'Cumpleaños de Sofía')
+    await userEvent.type(
+      screen.getByLabelText('Descripción para compartir'),
+      'Acompáñanos a celebrar este día especial.',
+    )
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+    const OriginalImage = globalThis.Image
+    class LoadedImage {
+      naturalWidth = 1200
+      naturalHeight = 630
+      onload: null | (() => void) = null
+      onerror: null | (() => void) = null
+      set src(_value: string) { queueMicrotask(() => this.onload?.()) }
+    }
+    Object.defineProperty(globalThis, 'Image', { configurable: true, value: LoadedImage })
+    await userEvent.upload(
+      screen.getByLabelText('Imagen para compartir'),
+      new File(['image'], 'share.jpg', { type: 'image/jpeg' }),
+    )
+    Object.defineProperty(globalThis, 'Image', { configurable: true, value: OriginalImage })
+    await screen.findByAltText('Vista previa para compartir')
     expect(
       screen.getByRole('button', { name: 'Crear invitación' }),
     ).toBeEnabled()
@@ -170,9 +198,7 @@ describe('CreateInvitationPage', () => {
       await screen.findByRole('heading', { name: 'Tu invitación está lista' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByDisplayValue(
-        `${window.location.origin}/i/cumpleanos-de-sofia-a8k3m2`,
-      ),
+      screen.getByDisplayValue(/api\/public\/invitations\/cumpleanos-de-sofia-a8k3m2\/share/),
     ).toBeInTheDocument()
     const request = fetchMock.mock.calls.find(([url]) =>
       String(url).endsWith('/api/invitations'),
@@ -192,6 +218,8 @@ describe('CreateInvitationPage', () => {
         address: 'Avenida Principal 123',
         mapsUrl: 'https://maps.app.goo.gl/example',
         message: 'Te esperamos para celebrar.',
+        shareTitle: 'Cumpleaños de Sofía',
+        shareDescription: 'Acompáñanos a celebrar este día especial.',
       }),
     )
     expect(

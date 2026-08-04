@@ -11,6 +11,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         InvitationViewMode viewMode, EventType eventType, String eventName, String honoreeName, Integer honoreeAge,
         LocalDate eventDate, LocalTime eventTime, String venueName, String address,
         String mapsUrl, String heroImageUrl, List<String> galleryImageUrls, String message, String sectionBackgrounds, String contactInfo,
+        String shareTitle, String shareDescription, String shareImageUrl,
         InvitationStatus status, Instant createdAt, Instant updatedAt) {
 
     public Invitation {
@@ -36,6 +37,11 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         message = text(message, "message", 1000);
         sectionBackgrounds = optionalJson(sectionBackgrounds);
         contactInfo = optionalJson(contactInfo, "contactInfo", 3000);
+        shareTitle = shareTitle == null || shareTitle.isBlank() ? eventName : text(shareTitle, "shareTitle", 120);
+        shareDescription = shareDescription == null || shareDescription.isBlank()
+                ? message.substring(0, Math.min(message.length(), 200))
+                : text(shareDescription, "shareDescription", 200);
+        shareImageUrl = optionalText(shareImageUrl, "shareImageUrl", 500);
         Objects.requireNonNull(status, "status is required");
         Objects.requireNonNull(createdAt, "createdAt is required");
         Objects.requireNonNull(updatedAt, "updatedAt is required");

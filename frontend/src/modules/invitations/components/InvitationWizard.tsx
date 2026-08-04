@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { InvitationDraft } from '../types/invitationDraft'
 import { WizardNavigation } from './WizardNavigation'
 import { WizardStepper } from './WizardStepper'
-import { uploadInvitationImage } from '../services/invitations'
+import { uploadInvitationImage, uploadSocialImage } from '../services/invitations'
 import { ImageCropEditor } from './ImageCropEditor'
 import { SectionBackgroundEditor } from './SectionBackgroundEditor'
 import type { InvitationSection } from '../types/invitationDraft'
@@ -61,6 +61,7 @@ export function InvitationWizard({
       3: ['date', 'time'],
       4: ['venueName', 'address'],
       5: ['message'],
+      7: ['shareTitle', 'shareDescription', 'shareImageUrl'],
     }
     for (const field of required[step] ?? []) {
       const value = draft[field]
@@ -85,7 +86,7 @@ export function InvitationWizard({
     return Object.keys(next).length === 0
   }
   const next = () => {
-    if (validate()) setStep((current) => Math.min(6, current + 1))
+    if (validate()) setStep((current) => Math.min(7, current + 1))
   }
   type TextField = Exclude<
     keyof InvitationDraft,
@@ -108,6 +109,8 @@ export function InvitationWizard({
         maxLength={
           name === 'eventName'
             ? 120
+            : name === 'shareTitle'
+              ? 120
             : name === 'honoreeName'
               ? 100
               : name === 'venueName'
@@ -158,6 +161,47 @@ export function InvitationWizard({
       update('galleryImageUrls', [...draft.galleryImageUrls, ...urls])
     } catch {
       setUploadError('No fue posible subir una o más fotos.')
+    } finally {
+      setUploading(false)
+    }
+  }
+  const uploadShareImage = async (files: FileList | null) => {
+    const image = files?.[0]
+    if (!image) return
+    setUploadError('')
+    if (!['image/jpeg', 'image/png'].includes(image.type)) {
+      setUploadError('La imagen para compartir debe ser JPG o PNG.')
+      return
+    }
+    if (image.size > 5 * 1024 * 1024) {
+      setUploadError('La imagen para compartir no puede superar los 5 MB.')
+      return
+    }
+    const dimensions = await new Promise<{ width: number; height: number }>(
+      (resolve, reject) => {
+        const preview = new Image()
+        const objectUrl = URL.createObjectURL(image)
+        preview.onload = () => {
+          URL.revokeObjectURL(objectUrl)
+          resolve({ width: preview.naturalWidth, height: preview.naturalHeight })
+        }
+        preview.onerror = () => {
+          URL.revokeObjectURL(objectUrl)
+          reject(new Error('invalid image'))
+        }
+        preview.src = objectUrl
+      },
+    ).catch(() => null)
+    const ratio = dimensions ? dimensions.width / dimensions.height : 0
+    if (!dimensions || dimensions.width < 600 || dimensions.height < 315 || ratio < 1.7 || ratio > 2.1) {
+      setUploadError('Usa una imagen horizontal de al menos 600 × 315 px y proporción cercana a 1.91:1.')
+      return
+    }
+    setUploading(true)
+    try {
+      update('shareImageUrl', await uploadSocialImage(image))
+    } catch {
+      setUploadError('No fue posible subir la imagen para compartir.')
     } finally {
       setUploading(false)
     }
@@ -504,6 +548,50 @@ export function InvitationWizard({
             </fieldset>
           </>
         )}
+        {step === 7 && (
+          <>
+            <div className="wizard-heading">
+              <span>07</span>
+              <h1>Vista previa al compartir</h1>
+              <p>Configura cómo se verá el enlace en WhatsApp y otras redes.</p>
+            </div>
+            {field('shareTitle', 'Título', 'text', `Te invitamos a ${draft.eventName || 'nuestro evento'}`)}
+            <label className="wizard-field">
+              <span>Descripción</span>
+              <textarea
+                aria-label="Descripción para compartir"
+                value={draft.shareDescription}
+                onChange={(event) => update('shareDescription', event.target.value)}
+                placeholder="Acompáñanos en este día especial. Consulta aquí todos los detalles."
+                rows={4}
+                maxLength={200}
+                aria-invalid={Boolean(errors.shareDescription)}
+              />
+              <small>{draft.shareDescription.length}/200 caracteres</small>
+              {errors.shareDescription && <small className="wizard-error">{errors.shareDescription}</small>}
+            </label>
+            <label className="wizard-field image-upload-field social-image-upload">
+              <span>Imagen para compartir</span>
+              <input
+                aria-label="Imagen para compartir"
+                type="file"
+                accept="image/jpeg,image/png"
+                disabled={uploading}
+                onChange={(event) => void uploadShareImage(event.target.files)}
+              />
+              <small>Recomendado: 1200 × 630 px, JPG o PNG, máximo 5 MB. Mínimo: 600 × 315 px.</small>
+            </label>
+            {draft.shareImageUrl && (
+              <div className="social-share-preview">
+                <img src={draft.shareImageUrl} alt="Vista previa para compartir" />
+                <div><strong>{draft.shareTitle || 'Título de la invitación'}</strong><p>{draft.shareDescription || 'Descripción de la invitación'}</p></div>
+                <button type="button" onClick={() => update('shareImageUrl', '')}>Quitar</button>
+              </div>
+            )}
+            {uploading && <p className="upload-status">Subiendo imagen...</p>}
+            {uploadError && <p className="wizard-error" role="alert">{uploadError}</p>}
+          </>
+        )}
       </div>
       {(
         [
@@ -513,6 +601,7 @@ export function InvitationWizard({
           ['venue'],
           ['gallery', 'message'],
           ['summary'],
+          [],
         ] as InvitationSection[][]
       )[step - 1].map((section) => (
         <SectionBackgroundEditor

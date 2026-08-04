@@ -48,7 +48,8 @@ public class InvitationController {
         CreatedInvitation result = useCase.create(new CreateInvitationCommand(request.templateId(), request.viewMode(),
                 request.eventType(), request.eventName(), request.honoreeName(), request.honoreeAge(),
                 request.eventDate(), request.eventTime(), request.venueName(), request.address(),
-                request.mapsUrl(), request.heroImageUrl(), request.galleryImageUrls(), request.message(), request.sectionBackgrounds(), request.contactInfo()), user);
+                request.mapsUrl(), request.heroImageUrl(), request.galleryImageUrls(), request.message(), request.sectionBackgrounds(), request.contactInfo(),
+                request.shareTitle(), request.shareDescription(), request.shareImageUrl()), user);
         return ResponseEntity.created(URI.create("/api/public/invitations/" + result.publicSlug())).body(result);
     }
 }

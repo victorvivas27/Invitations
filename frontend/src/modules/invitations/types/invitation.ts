@@ -31,6 +31,9 @@ export type CreateInvitationInput = {
   message: string
   sectionBackgrounds?: SectionBackgrounds
   contactInfo?: InvitationContactInfo
+  shareTitle: string
+  shareDescription: string
+  shareImageUrl: string
 }
 export type CreatedInvitation = {
   publicSlug: string

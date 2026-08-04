@@ -91,6 +91,9 @@ export function CreateInvitationPage() {
           message: draft.message.trim(),
           sectionBackgrounds: draft.sectionBackgrounds,
           contactInfo: draft.contactInfo,
+          shareTitle: draft.shareTitle.trim(),
+          shareDescription: draft.shareDescription.trim(),
+          shareImageUrl: draft.shareImageUrl,
         }),
       )
     } catch (error) {

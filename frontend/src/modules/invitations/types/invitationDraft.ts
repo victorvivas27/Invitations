@@ -80,6 +80,9 @@ export type InvitationDraft = {
   message: string
   sectionBackgrounds: SectionBackgrounds
   contactInfo: InvitationContactInfo
+  shareTitle: string
+  shareDescription: string
+  shareImageUrl: string
 }
 
 export const emptyInvitationDraft: InvitationDraft = {
@@ -103,4 +106,7 @@ export const emptyInvitationDraft: InvitationDraft = {
   message: '',
   sectionBackgrounds: defaultSectionBackgrounds(),
   contactInfo: { name: '', whatsapp: '', instagram: '', facebook: '' },
+  shareTitle: '',
+  shareDescription: '',
+  shareImageUrl: '',
 }

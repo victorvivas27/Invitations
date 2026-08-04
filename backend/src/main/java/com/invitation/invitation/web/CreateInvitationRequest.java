@@ -29,4 +29,8 @@ public record CreateInvitationRequest(
         @Size(max = 6) List<@Size(max = 500) String> galleryImageUrls,
         @NotBlank @Size(max = 1000) String message,
         @Size(max = 12000) String sectionBackgrounds,
-        @Size(max = 3000) String contactInfo) { }
+        @Size(max = 3000) String contactInfo,
+        @NotBlank @Size(max = 120) String shareTitle,
+        @NotBlank @Size(max = 200) String shareDescription,
+        @NotBlank @Size(max = 500) @Pattern(regexp = "https?://.+", message = "shareImageUrl must be a valid HTTP URL")
+        String shareImageUrl) { }

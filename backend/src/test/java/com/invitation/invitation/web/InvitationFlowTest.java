@@ -103,7 +103,9 @@ class InvitationFlowTest {
                 {"templateId":"birthday-urban","eventType":"BIRTHDAY",
                  "eventName":" Cumpleaños de Sofía ","honoreeName":" Sofía ","honoreeAge":5,
                  "eventDate":"2027-08-22","eventTime":"17:00","venueName":" Salón Central ",
-                 "address":" Avenida Principal 123 ","message":" Te esperamos para celebrar. "}
+                 "address":" Avenida Principal 123 ","message":" Te esperamos para celebrar. ",
+                 "shareTitle":"Cumpleaños de Sofía","shareDescription":"Acompáñanos a celebrar.",
+                 "shareImageUrl":"https://cdn.example.com/share.jpg"}
                 """;
     }
 }

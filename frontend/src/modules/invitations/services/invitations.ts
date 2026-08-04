@@ -153,10 +153,16 @@ export async function deleteInvitation(publicSlug: string): Promise<void> {
   if (!response.ok) throw await parseError(response)
 }
 export async function uploadInvitationImage(image: File): Promise<string> {
+  return uploadImageAt('/api/invitation-images', image)
+}
+export async function uploadSocialImage(image: File): Promise<string> {
+  return uploadImageAt('/api/invitation-images/social', image)
+}
+async function uploadImageAt(path: string, image: File): Promise<string> {
   const token = getAccessToken()
   const form = new FormData()
   form.append('image', image)
-  const response = await request(`${apiBaseUrl}/api/invitation-images`, {
+  const response = await request(`${apiBaseUrl}${path}`, {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: form,
@@ -167,6 +173,8 @@ export async function uploadInvitationImage(image: File): Promise<string> {
     ? uploaded.url
     : `${apiBaseUrl}${uploaded.url}`
 }
+export const getInvitationShareUrl = (publicSlug: string) =>
+  `${apiBaseUrl}/api/public/invitations/${encodeURIComponent(publicSlug)}/share`
 export async function confirmAttendance(
   publicSlug: string,
   input: {

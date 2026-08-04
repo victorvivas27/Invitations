@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { CreatedInvitation } from '../types/invitation'
+import { getInvitationShareUrl } from '../services/invitations'
 export function InvitationCreationSuccess({
   invitation,
 }: {
@@ -7,7 +8,7 @@ export function InvitationCreationSuccess({
 }) {
   const [copyState, setCopyState] = useState('')
   const shareUrl = new URL(
-    invitation.publicUrl,
+    getInvitationShareUrl(invitation.publicSlug),
     window.location.origin,
   ).toString()
   const copy = async () => {

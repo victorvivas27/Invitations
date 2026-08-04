@@ -36,6 +36,9 @@ public class InvitationJpaEntity {
     @Column(nullable = false, length = 1000) private String message;
     @Column(name = "section_backgrounds", columnDefinition = "TEXT") private String sectionBackgrounds;
     @Column(name = "contact_info", columnDefinition = "TEXT") private String contactInfo;
+    @Column(name = "share_title", length = 120) private String shareTitle;
+    @Column(name = "share_description", length = 200) private String shareDescription;
+    @Column(name = "share_image_url", length = 500) private String shareImageUrl;
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 32) private InvitationStatus status;
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt;
     @Column(name = "updated_at", nullable = false) private Instant updatedAt;
@@ -45,6 +48,7 @@ public class InvitationJpaEntity {
             InvitationViewMode viewMode, EventType eventType, String eventName, String honoreeName, Integer honoreeAge,
             LocalDate eventDate, LocalTime eventTime, String venueName, String address,
             String mapsUrl, String heroImageUrl, String galleryImageUrls, String message, String sectionBackgrounds, String contactInfo,
+            String shareTitle, String shareDescription, String shareImageUrl,
             InvitationStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id; this.publicSlug = publicSlug; this.ownerId = ownerId; this.templateId = templateId;
         this.viewMode = viewMode; this.eventType = eventType; this.eventName = eventName; this.honoreeName = honoreeName;
@@ -53,6 +57,7 @@ public class InvitationJpaEntity {
         this.heroImageUrl = heroImageUrl; this.galleryImageUrls = galleryImageUrls; this.message = message;
         this.sectionBackgrounds = sectionBackgrounds;
         this.contactInfo = contactInfo;
+        this.shareTitle = shareTitle; this.shareDescription = shareDescription; this.shareImageUrl = shareImageUrl;
         this.status = status; this.createdAt = createdAt; this.updatedAt = updatedAt;
     }
     public UUID getId() { return id; } public String getPublicSlug() { return publicSlug; }
@@ -68,5 +73,8 @@ public class InvitationJpaEntity {
     public String getMessage() { return message; } public InvitationStatus getStatus() { return status; }
     public String getSectionBackgrounds() { return sectionBackgrounds; }
     public String getContactInfo() { return contactInfo; }
+    public String getShareTitle() { return shareTitle; }
+    public String getShareDescription() { return shareDescription; }
+    public String getShareImageUrl() { return shareImageUrl; }
     public Instant getCreatedAt() { return createdAt; } public Instant getUpdatedAt() { return updatedAt; }
 }

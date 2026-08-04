@@ -60,7 +60,7 @@
 }
 .wizard-progress ol {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -241,6 +241,34 @@
   color: white;
   background: #0b1220c7;
   padding: 0 14px;
+}
+.social-share-preview {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #f1f5f9;
+}
+.social-share-preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.91 / 1;
+  object-fit: cover;
+}
+.social-share-preview > div { padding: 12px 14px; }
+.social-share-preview strong { color: var(--secondary-dark); }
+.social-share-preview p { margin: 4px 0 0; color: var(--text-muted); font-size: .8rem; }
+.social-share-preview button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  background: #0b1220c7;
 }
 .uploaded-gallery {
   display: grid;

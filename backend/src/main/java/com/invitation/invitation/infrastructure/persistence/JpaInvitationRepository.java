@@ -31,6 +31,7 @@ public class JpaInvitationRepository implements InvitationRepository {
                 value.eventType(), value.eventName(), value.honoreeName(), value.honoreeAge(),
                 value.eventDate(), value.eventTime(), value.venueName(), value.address(), value.mapsUrl(),
                 value.heroImageUrl(), String.join("\n", value.galleryImageUrls()), value.message(), value.sectionBackgrounds(), value.contactInfo(),
+                value.shareTitle(), value.shareDescription(), value.shareImageUrl(),
                 value.status(), value.createdAt(), value.updatedAt());
     }
     private Invitation toDomain(InvitationJpaEntity value) {
@@ -38,7 +39,8 @@ public class JpaInvitationRepository implements InvitationRepository {
                 value.getEventType(), value.getEventName(), value.getHonoreeName(), value.getHonoreeAge(),
                 value.getEventDate(), value.getEventTime(), value.getVenueName(), value.getAddress(),
                 value.getMapsUrl(), value.getHeroImageUrl(), splitImages(value.getGalleryImageUrls()),
-                value.getMessage(), value.getSectionBackgrounds(), value.getContactInfo(), value.getStatus(), value.getCreatedAt(), value.getUpdatedAt());
+                value.getMessage(), value.getSectionBackgrounds(), value.getContactInfo(), value.getShareTitle(), value.getShareDescription(), value.getShareImageUrl(),
+                value.getStatus(), value.getCreatedAt(), value.getUpdatedAt());
     }
     private static List<String> splitImages(String value) {
         return value == null || value.isBlank() ? List.of() : Arrays.stream(value.split("\\n"))

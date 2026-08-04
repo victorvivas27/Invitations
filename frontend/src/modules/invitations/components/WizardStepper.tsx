@@ -5,6 +5,7 @@ const steps = [
   'Lugar',
   'Mensaje',
   'Resumen',
+  'Vista al compartir',
 ]
 
 export function WizardStepper({ currentStep }: { currentStep: number }) {

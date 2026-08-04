@@ -18,6 +18,7 @@ public class GetPublicInvitationService implements GetPublicInvitationUseCase {
                 invitation.eventType(), invitation.eventName(), invitation.honoreeName(),
                 invitation.honoreeAge(), invitation.eventDate(), invitation.eventTime(),
                 invitation.venueName(), invitation.address(), invitation.mapsUrl(),
-                invitation.heroImageUrl(), invitation.galleryImageUrls(), invitation.message(), invitation.sectionBackgrounds(), invitation.contactInfo());
+                invitation.heroImageUrl(), invitation.galleryImageUrls(), invitation.message(), invitation.sectionBackgrounds(), invitation.contactInfo(),
+                invitation.shareTitle(), invitation.shareDescription(), invitation.shareImageUrl());
     }
 }

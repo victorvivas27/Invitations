@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,18 +30,42 @@ public class ImageUploadController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UploadedImage upload(@RequestParam("image") MultipartFile image) throws IOException {
+        return store(image, false);
+    }
+
+    @PostMapping(path = "/social", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UploadedImage uploadSocial(@RequestParam("image") MultipartFile image) throws IOException {
+        return store(image, true);
+    }
+
+    private UploadedImage store(MultipartFile image, boolean social) throws IOException {
         String extension = EXTENSIONS.get(image.getContentType());
         byte[] signature = image.isEmpty() ? new byte[0] : image.getInputStream().readNBytes(12);
         if (image.isEmpty() || extension == null || image.getSize() > MAX_BYTES
                 || !hasExpectedSignature(image.getContentType(), signature)) {
             throw new IllegalArgumentException("Image must be JPG, PNG or WebP and no larger than 5 MB");
         }
+        if (social) validateSocialDimensions(image);
         Files.createDirectories(uploadDirectory);
         String fileName = UUID.randomUUID() + extension;
         Path destination = uploadDirectory.resolve(fileName).normalize();
         if (!destination.getParent().equals(uploadDirectory)) throw new IllegalArgumentException("Invalid image path");
         image.transferTo(destination);
         return new UploadedImage("/uploads/" + fileName);
+    }
+
+    private static void validateSocialDimensions(MultipartFile image) throws IOException {
+        if ("image/webp".equals(image.getContentType())) {
+            throw new IllegalArgumentException("Social image must be JPG or PNG");
+        }
+        BufferedImage decoded = ImageIO.read(image.getInputStream());
+        if (decoded == null || decoded.getWidth() < 600 || decoded.getHeight() < 315) {
+            throw new IllegalArgumentException("Social image must be at least 600 x 315 pixels");
+        }
+        double ratio = (double) decoded.getWidth() / decoded.getHeight();
+        if (ratio < 1.7 || ratio > 2.1) {
+            throw new IllegalArgumentException("Social image aspect ratio must be close to 1.91:1");
+        }
     }
 
     private static boolean hasExpectedSignature(String contentType, byte[] value) {

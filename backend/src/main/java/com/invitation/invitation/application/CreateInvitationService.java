@@ -43,6 +43,7 @@ public class CreateInvitationService implements CreateInvitationUseCase {
                 command.eventType(), command.eventName(), command.honoreeName(), command.honoreeAge(),
                 command.eventDate(), command.eventTime(), command.venueName(), command.address(),
                 command.mapsUrl(), command.heroImageUrl(), command.galleryImageUrls(), command.message(), command.sectionBackgrounds(), command.contactInfo(),
+                command.shareTitle(), command.shareDescription(), command.shareImageUrl(),
                 InvitationStatus.PUBLISHED, now, now);
         Invitation saved = invitations.save(invitation);
         return new CreatedInvitation(saved.publicSlug(), "/i/" + saved.publicSlug(),

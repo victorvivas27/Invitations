@@ -23,7 +23,7 @@ export function WizardNavigation({
           Anterior
         </button>
       )}
-      {step < 6 ? (
+      {step < 7 ? (
         <button type="button" className="wizard-next" onClick={onNext}>
           Siguiente
         </button>

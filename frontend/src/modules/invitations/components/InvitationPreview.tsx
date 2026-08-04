@@ -36,6 +36,9 @@ export function InvitationPreview({
     galleryImageUrls: draft.galleryImageUrls,
     sectionBackgrounds: draft.sectionBackgrounds,
     contactInfo: draft.contactInfo,
+    shareTitle: draft.shareTitle,
+    shareDescription: draft.shareDescription,
+    shareImageUrl: draft.shareImageUrl,
     message:
       draft.message || 'Queremos compartir contigo un día lleno de alegría.',
   }
