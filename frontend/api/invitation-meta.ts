@@ -142,7 +142,6 @@ export default async function invitationMetadata(request: Request) {
 
   let metadata: Metadata = {}
   let status = 200
-  let backendError = ''
 
   try {
     if (!backendUrl) {
@@ -176,9 +175,6 @@ export default async function invitationMetadata(request: Request) {
       metadata = (await upstream.json()) as Metadata
     }
   } catch (error) {
-    backendError =
-      error instanceof Error ? error.message : 'Unknown metadata error'
-
     console.error('Could not load invitation metadata', error)
   }
 
