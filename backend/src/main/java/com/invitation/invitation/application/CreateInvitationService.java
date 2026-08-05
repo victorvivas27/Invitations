@@ -39,7 +39,7 @@ public class CreateInvitationService implements CreateInvitationUseCase {
         }
         String slug = uniqueSlug(command.eventName());
         var now = clock.instant();
-        Invitation invitation = new Invitation(UUID.randomUUID(), slug, owner.getId(), templateId, command.viewMode() == null ? com.invitation.invitation.domain.InvitationViewMode.SCROLL : command.viewMode(),
+        Invitation invitation = new Invitation(command.invitationId() == null ? UUID.randomUUID() : command.invitationId(), slug, owner.getId(), templateId, command.viewMode() == null ? com.invitation.invitation.domain.InvitationViewMode.SCROLL : command.viewMode(),
                 command.eventType(), command.eventName(), command.honoreeName(), command.honoreeAge(),
                 command.eventDate(), command.eventTime(), command.venueName(), command.address(),
                 command.mapsUrl(), command.heroImageUrl(), command.galleryImageUrls(), command.message(), command.sectionBackgrounds(), command.contactInfo(),

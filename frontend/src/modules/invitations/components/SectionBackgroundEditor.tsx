@@ -25,7 +25,7 @@ export function SectionBackgroundEditor({
     if (!file) return
     setUploading(true)
     try {
-      update('imageUrl', await uploadInvitationImage(file))
+      update('imageUrl', await uploadInvitationImage(file, 'DECORATION'))
     } finally {
       setUploading(false)
     }

@@ -74,6 +74,10 @@ const request = async (url: string, init?: RequestInit) => {
   }
 }
 export const clearInvitationSession = clearSession
+const draftInvitationId =
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : '00000000-0000-4000-8000-000000000001'
 export async function createInvitation(
   input: CreateInvitationInput,
 ): Promise<CreatedInvitation> {
@@ -91,6 +95,7 @@ export async function createInvitation(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({
+      invitationId: draftInvitationId,
       ...(viewMode ? { ...input, viewMode } : input),
       ...(input.sectionBackgrounds
         ? { sectionBackgrounds: JSON.stringify(input.sectionBackgrounds) }
@@ -152,16 +157,25 @@ export async function deleteInvitation(publicSlug: string): Promise<void> {
   )
   if (!response.ok) throw await parseError(response)
 }
-export async function uploadInvitationImage(image: File): Promise<string> {
-  return uploadImageAt('/api/invitation-images', image)
+export async function uploadInvitationImage(
+  image: File,
+  context: 'COVER' | 'GALLERY' | 'DECORATION' = 'DECORATION',
+): Promise<string> {
+  return uploadImageAt('/api/invitation-images', image, context)
 }
 export async function uploadSocialImage(image: File): Promise<string> {
   return uploadImageAt('/api/invitation-images/social', image)
 }
-async function uploadImageAt(path: string, image: File): Promise<string> {
+async function uploadImageAt(
+  path: string,
+  image: File,
+  context?: 'COVER' | 'GALLERY' | 'DECORATION',
+): Promise<string> {
   const token = getAccessToken()
   const form = new FormData()
   form.append('image', image)
+  form.append('invitationId', draftInvitationId)
+  if (context) form.append('context', context)
   const response = await request(`${apiBaseUrl}${path}`, {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -169,7 +183,19 @@ async function uploadImageAt(path: string, image: File): Promise<string> {
   })
   if (!response.ok) throw await parseError(response)
   const uploaded = (await response.json()) as { url: string }
-  return new URL(uploaded.url, apiBaseUrl || window.location.origin).toString()
+  return uploaded.url
+}
+export async function deleteUploadedImage(url: string): Promise<void> {
+  if (!url.includes('res.cloudinary.com')) return
+  const token = getAccessToken()
+  const response = await request(
+    `${apiBaseUrl}/api/invitation-images?url=${encodeURIComponent(url)}`,
+    {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  )
+  if (!response.ok) throw await parseError(response)
 }
 export const getInvitationShareUrl = (publicSlug: string) =>
   `/i/${encodeURIComponent(publicSlug)}`

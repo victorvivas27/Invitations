@@ -1,7 +1,10 @@
 package com.invitation.invitation.infrastructure;
 
 import com.invitation.invitation.application.InvitationImageCleaner;
+import com.invitation.invitation.application.ImageStorageService;
 import com.invitation.invitation.domain.Invitation;
+import com.invitation.invitation.infrastructure.persistence.InvitationImageJpaEntity;
+import com.invitation.invitation.infrastructure.persistence.SpringDataInvitationImageRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,9 +23,14 @@ public class FileSystemInvitationImageCleaner implements InvitationImageCleaner 
     private static final Pattern UPLOADED_IMAGE = Pattern.compile(
             "/uploads/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\.(?:jpg|png|webp))");
     private final Path uploadDirectory;
+    private final SpringDataInvitationImageRepository images;
+    private final ImageStorageService storage;
 
-    public FileSystemInvitationImageCleaner(@Value("${app.upload-directory:uploads}") String uploadDirectory) {
+    public FileSystemInvitationImageCleaner(@Value("${app.upload-directory:uploads}") String uploadDirectory,
+            SpringDataInvitationImageRepository images, ImageStorageService storage) {
         this.uploadDirectory = Path.of(uploadDirectory).toAbsolutePath().normalize();
+        this.images = images;
+        this.storage = storage;
     }
 
     @Override
@@ -32,6 +40,7 @@ public class FileSystemInvitationImageCleaner implements InvitationImageCleaner 
         invitation.galleryImageUrls().forEach(value -> collect(value, fileNames));
         collect(invitation.sectionBackgrounds(), fileNames);
         fileNames.forEach(this::deleteSafely);
+        images.findAllByInvitationId(invitation.id()).forEach(this::deleteCloudinarySafely);
     }
 
     private static void collect(String value, Set<String> fileNames) {
@@ -47,6 +56,17 @@ public class FileSystemInvitationImageCleaner implements InvitationImageCleaner 
             Files.deleteIfExists(target);
         } catch (IOException exception) {
             LOGGER.warn("Could not delete invitation image {}", target, exception);
+        }
+    }
+
+    private void deleteCloudinarySafely(InvitationImageJpaEntity image) {
+        try {
+            storage.delete(image.getImagePublicId());
+            images.delete(image);
+        } catch (IOException exception) {
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Could not delete Cloudinary image {}", image.getImagePublicId(), exception);
+            }
         }
     }
 }

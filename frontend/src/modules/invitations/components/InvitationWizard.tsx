@@ -3,6 +3,7 @@ import type { InvitationDraft } from '../types/invitationDraft'
 import { WizardNavigation } from './WizardNavigation'
 import { WizardStepper } from './WizardStepper'
 import {
+  deleteUploadedImage,
   uploadInvitationImage,
   uploadSocialImage,
 } from '../services/invitations'
@@ -161,7 +162,10 @@ export function InvitationWizard({
     setUploading(true)
     setUploadError('')
     try {
-      update('heroImageUrl', await uploadInvitationImage(image))
+      const previous = draft.heroImageUrl
+      const uploaded = await uploadInvitationImage(image, 'COVER')
+      update('heroImageUrl', uploaded)
+      if (previous) await deleteUploadedImage(previous)
     } catch {
       setUploadError('No fue posible subir la foto de portada.')
     } finally {
@@ -173,9 +177,11 @@ export function InvitationWizard({
     setUploading(true)
     setUploadError('')
     try {
-      const available = Math.max(0, 6 - draft.galleryImageUrls.length)
+      const available = Math.max(0, 10 - draft.galleryImageUrls.length)
       const urls = await Promise.all(
-        Array.from(files).slice(0, available).map(uploadInvitationImage),
+        Array.from(files)
+          .slice(0, available)
+          .map((file) => uploadInvitationImage(file, 'GALLERY')),
       )
       update('galleryImageUrls', [...draft.galleryImageUrls, ...urls])
     } catch {
@@ -215,17 +221,26 @@ export function InvitationWizard({
       },
     ).catch(() => null)
     const ratio = dimensions ? dimensions.width / dimensions.height : 0
-    if (
-      !dimensions ||
-      dimensions.width < 600 ||
-      dimensions.height < 315 ||
-      ratio < 1.7 ||
-      ratio > 2.1
-    ) {
+
+    if (!dimensions) {
+      setUploadError('No fue posible leer las dimensiones de la imagen.')
+      return
+    }
+
+    if (dimensions.width < 600 || dimensions.height < 315) {
       setUploadError(
-        'Usa una imagen horizontal de al menos 600 × 315 px y proporción cercana a 1.91:1.',
+        `La imagen seleccionada mide ${dimensions.width} × ${dimensions.height} px. ` +
+        'Debe medir al menos 600 × 315 px. Tamaño recomendado: 1200 × 630 px.',
       )
       return
+    }
+
+    if (ratio < 1.7 || ratio > 2.1) {
+      setUploadError(
+        `La imagen seleccionada mide ${dimensions.width} × ${dimensions.height} px. ` +
+        'Se puede subir, pero puede verse recortada al compartirla. ' +
+        'La proporción recomendada es 1.91:1, por ejemplo 1200 × 630 px.',
+      )
     }
     setUploading(true)
     try {
@@ -423,7 +438,7 @@ export function InvitationWizard({
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 multiple
-                disabled={uploading || draft.galleryImageUrls.length >= 6}
+                disabled={uploading || draft.galleryImageUrls.length >= 10}
                 onChange={(event) => void uploadGallery(event.target.files)}
               />
             </label>
@@ -435,12 +450,15 @@ export function InvitationWizard({
                     <button
                       type="button"
                       aria-label={`Quitar foto ${index + 1}`}
-                      onClick={() =>
+                      onClick={() => {
                         update(
                           'galleryImageUrls',
                           draft.galleryImageUrls.filter((item) => item !== url),
                         )
-                      }
+                        void deleteUploadedImage(url).catch(() =>
+                          setUploadError('La foto se quitó, pero no pudo eliminarse del almacenamiento.'),
+                        )
+                      }}
                     >
                       ×
                     </button>

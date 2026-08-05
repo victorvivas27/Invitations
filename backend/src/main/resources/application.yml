@@ -58,6 +58,12 @@ app:
 
   upload-directory: ${UPLOAD_DIRECTORY:uploads}
 
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+    upload-preset: ${CLOUDINARY_UPLOAD_PRESET:invitations_upload}
+
   account-activation-expiration-seconds: ${ACCOUNT_ACTIVATION_EXPIRATION_SECONDS:86400}
 
   jwt:
