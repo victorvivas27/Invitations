@@ -14,7 +14,7 @@ describe('invitation metadata function', () => {
 
   it('renders escaped Open Graph and Twitter metadata for social crawlers', async () => {
     vi.stubEnv('BACKEND_URL', 'https://backend.example')
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({
         slug: 'fiesta-123',
         shareTitle: 'Cumpleaños de <Theo>',
@@ -29,8 +29,16 @@ describe('invitation metadata function', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('Content-Type')).toContain('text/html')
     expect(response.headers.get('Cache-Control')).toBe(
-      'public, s-maxage=300, stale-while-revalidate=600',
+      'no-store, no-cache, must-revalidate',
     )
+    expect(response.headers.get('Vary')).toBe('User-Agent')
+    expect(response.headers.get('X-Metadata-Slug')).toBe('fiesta-123')
+    expect(response.headers.get('X-Metadata-Title')).toBe(
+      'Cumpleaños de <Theo>',
+    )
+    expect(response.headers.get('X-Social-Bot')).toBe('true')
+    expect(response.headers.get('X-Backend-Configured')).toBe('true')
+    expect(response.headers.get('X-Backend-Error')).toBe('')
     expect(html).toContain('Cumpleaños de &lt;Theo&gt;')
     expect(html).toContain('Ven &amp; celebra &quot;con nosotros&quot;')
     expect(html).toContain(
@@ -46,6 +54,13 @@ describe('invitation metadata function', () => {
     expect(html).toContain('<meta name="twitter:description"')
     expect(html).toContain('<meta name="twitter:image"')
     expect(html).not.toContain('location.replace')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://backend.example/api/public/invitations/fiesta-123',
+      {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      },
+    )
   })
 
   it('redirects normal browsers to the React view after returning metadata', async () => {
@@ -54,14 +69,17 @@ describe('invitation metadata function', () => {
       Response.json({
         shareTitle: 'Fiesta de Theo',
         shareDescription: 'Te esperamos',
-        shareImageUrl: 'https://cdn.example/theo.png',
+        heroImageUrl: 'https://cdn.example/theo.png',
       }),
     )
 
     const html = await (await invitationMetadata(request('Mozilla/5.0'))).text()
 
+    expect(html).toMatch(
+      /location\.replace\(\s*"https:\/\/invitations\.example\/view\/fiesta-123"\s*\)/,
+    )
     expect(html).toContain(
-      'location.replace("https://invitations.example/view/fiesta-123")',
+      '<meta property="og:image" content="https://cdn.example/theo.png">',
     )
   })
 
@@ -74,6 +92,7 @@ describe('invitation metadata function', () => {
     const html = await response.text()
 
     expect(response.status).toBe(200)
+    expect(response.headers.get('X-Backend-Error')).toBe('offline')
     expect(html).toContain('<title>Estás invitado</title>')
     expect(html).toContain(
       'content="https://invitations.example/images/love-letter-icon.png"',
