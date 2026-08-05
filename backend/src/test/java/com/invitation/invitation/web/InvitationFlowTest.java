@@ -105,7 +105,7 @@ class InvitationFlowTest {
                  "eventDate":"2027-08-22","eventTime":"17:00","venueName":" Salón Central ",
                  "address":" Avenida Principal 123 ","message":" Te esperamos para celebrar. ",
                  "shareTitle":"Cumpleaños de Sofía","shareDescription":"Acompáñanos a celebrar.",
-                 "shareImageUrl":"https://cdn.example.com/share.jpg"}
+                 "shareImageUrl":"uploads/share.jpg"}
                 """;
     }
 }

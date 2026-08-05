@@ -53,8 +53,10 @@ public class PublicInvitationController {
     private static String escape(String value) { return HtmlUtils.htmlEscape(value, "UTF-8"); }
     private static String publicImageUrl(String value) {
         if (value == null) return "";
-        if (value.startsWith("http://") || value.startsWith("https://")) return value;
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(value)
+        String normalized = value.trim();
+        if (normalized.startsWith("http://") || normalized.startsWith("https://")) return normalized;
+        String path = normalized.startsWith("/") ? normalized : "/" + normalized;
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(path)
                 .build().encode().toUriString();
     }
     private static String javascriptString(String value) {

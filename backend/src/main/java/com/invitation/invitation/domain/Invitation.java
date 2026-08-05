@@ -43,7 +43,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         shareDescription = shareDescription == null || shareDescription.isBlank()
                 ? message.substring(0, Math.min(message.length(), 200))
                 : text(shareDescription, "shareDescription", 200);
-        shareImageUrl = optionalText(shareImageUrl, "shareImageUrl", 500);
+        shareImageUrl = optionalResource(shareImageUrl, "shareImageUrl", 500);
         Objects.requireNonNull(status, "status is required");
         Objects.requireNonNull(createdAt, "createdAt is required");
         Objects.requireNonNull(updatedAt, "updatedAt is required");
@@ -70,6 +70,13 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
     private static boolean isUploadedImagePath(String value) {
         if (!value.startsWith(UPLOAD_PATH_PREFIX) || value.length() == UPLOAD_PATH_PREFIX.length()) return false;
         return value.substring(UPLOAD_PATH_PREFIX.length()).matches("[A-Za-z0-9._-]+");
+    }
+
+    private static String optionalResource(String value, String field, int maximum) {
+        if (value == null || value.isBlank()) return null;
+        String normalized = value.trim();
+        if (normalized.length() > maximum) throw new IllegalArgumentException(field + " is too long");
+        return normalized;
     }
 
     private static String optionalJson(String value) {
