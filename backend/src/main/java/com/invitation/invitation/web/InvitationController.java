@@ -45,7 +45,7 @@ public class InvitationController {
     @PostMapping
     public ResponseEntity<CreatedInvitation> create(@Valid @RequestBody CreateInvitationRequest request,
             @AuthenticationPrincipal AuthenticatedUser user) {
-        CreatedInvitation result = useCase.create(new CreateInvitationCommand(request.templateId(), request.viewMode(),
+        CreatedInvitation result = useCase.create(new CreateInvitationCommand(request.invitationId(), request.templateId(), request.viewMode(),
                 request.eventType(), request.eventName(), request.honoreeName(), request.honoreeAge(),
                 request.eventDate(), request.eventTime(), request.venueName(), request.address(),
                 request.mapsUrl(), request.heroImageUrl(), request.galleryImageUrls(), request.message(), request.sectionBackgrounds(), request.contactInfo(),

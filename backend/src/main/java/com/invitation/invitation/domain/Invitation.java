@@ -35,7 +35,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         mapsUrl = optionalText(mapsUrl, "mapsUrl", 500);
         heroImageUrl = optionalText(heroImageUrl, "heroImageUrl", 500);
         galleryImageUrls = galleryImageUrls == null ? List.of() : galleryImageUrls.stream()
-                .map(value -> optionalText(value, "galleryImageUrl", 500)).limit(6).toList();
+                .map(value -> optionalText(value, "galleryImageUrl", 500)).limit(10).toList();
         message = text(message, "message", 1000);
         sectionBackgrounds = optionalJson(sectionBackgrounds);
         contactInfo = optionalJson(contactInfo, "contactInfo", 3000);

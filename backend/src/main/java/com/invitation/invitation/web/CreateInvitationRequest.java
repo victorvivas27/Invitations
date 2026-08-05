@@ -11,8 +11,10 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 public record CreateInvitationRequest(
+        UUID invitationId,
         @NotBlank @Size(max = 80) String templateId,
         InvitationViewMode viewMode,
         @NotNull EventType eventType,
@@ -26,7 +28,7 @@ public record CreateInvitationRequest(
         @Size(max = 500) @Pattern(regexp = "https?://.+", message = "mapsUrl must be a valid HTTP URL")
         String mapsUrl,
         @Size(max = 500) String heroImageUrl,
-        @Size(max = 6) List<@Size(max = 500) String> galleryImageUrls,
+        @Size(max = 10) List<@Size(max = 500) String> galleryImageUrls,
         @NotBlank @Size(max = 1000) String message,
         @Size(max = 12000) String sectionBackgrounds,
         @Size(max = 3000) String contactInfo,
