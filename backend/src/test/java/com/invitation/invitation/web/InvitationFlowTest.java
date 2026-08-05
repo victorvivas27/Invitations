@@ -66,6 +66,14 @@ class InvitationFlowTest {
                         jsonPath("$").value(not(hasKey("id"))),
                         jsonPath("$").value(not(hasKey("ownerId"))),
                         jsonPath("$").value(not(hasKey("status"))));
+        mockMvc.perform(get("/api/public/invitations/" + slug + "/metadata"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.slug").value(slug),
+                        jsonPath("$.shareTitle").value("Cumpleaños de Sofía"),
+                        jsonPath("$.shareDescription").value("Acompáñanos a celebrar."),
+                        jsonPath("$.shareImageUrl").value("http://localhost/uploads/share.jpg"),
+                        jsonPath("$.publicUrl").value("http://localhost:5173/i/" + slug),
+                        jsonPath("$").value(not(hasKey("ownerId"))));
     }
 
     @Test
@@ -74,6 +82,8 @@ class InvitationFlowTest {
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/public/invitations/does-not-exist"))
                 .andExpectAll(status().isNotFound(), jsonPath("$.error").value("INVITATION_NOT_FOUND"));
+        mockMvc.perform(get("/api/public/invitations/does-not-exist/metadata"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

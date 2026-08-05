@@ -56,9 +56,7 @@ public class ImageUploadController {
     }
 
     private static void validateSocialDimensions(MultipartFile image) throws IOException {
-        if (IMAGE_WEBP.equals(image.getContentType())) {
-            throw new IllegalArgumentException("Social image must be JPG or PNG");
-        }
+        if (IMAGE_WEBP.equals(image.getContentType())) return;
         BufferedImage decoded = ImageIO.read(image.getInputStream());
         if (decoded == null || decoded.getWidth() < 600 || decoded.getHeight() < 315) {
             throw new IllegalArgumentException("Social image must be at least 600 x 315 pixels");

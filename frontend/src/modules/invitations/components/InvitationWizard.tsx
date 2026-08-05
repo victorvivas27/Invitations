@@ -113,7 +113,7 @@ export function InvitationWizard({
           name === 'eventName'
             ? 120
             : name === 'shareTitle'
-              ? 120
+              ? 70
               : name === 'honoreeName'
                 ? 100
                 : name === 'venueName'
@@ -172,8 +172,8 @@ export function InvitationWizard({
     const image = files?.[0]
     if (!image) return
     setUploadError('')
-    if (!['image/jpeg', 'image/png'].includes(image.type)) {
-      setUploadError('La imagen para compartir debe ser JPG o PNG.')
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(image.type)) {
+      setUploadError('La imagen para compartir debe ser JPG, PNG o WebP.')
       return
     }
     if (image.size > 5 * 1024 * 1024) {
@@ -585,10 +585,10 @@ export function InvitationWizard({
                 }
                 placeholder="Acompáñanos en este día especial. Consulta aquí todos los detalles."
                 rows={4}
-                maxLength={200}
+                maxLength={160}
                 aria-invalid={Boolean(errors.shareDescription)}
               />
-              <small>{draft.shareDescription.length}/200 caracteres</small>
+              <small>{draft.shareDescription.length}/160 caracteres</small>
               {errors.shareDescription && (
                 <small className="wizard-error">
                   {errors.shareDescription}
@@ -600,13 +600,13 @@ export function InvitationWizard({
               <input
                 aria-label="Imagen para compartir"
                 type="file"
-                accept="image/jpeg,image/png"
+                accept="image/jpeg,image/png,image/webp"
                 disabled={uploading}
                 onChange={(event) => void uploadShareImage(event.target.files)}
               />
               <small>
-                Recomendado: 1200 × 630 px, JPG o PNG, máximo 5 MB. Mínimo: 600
-                × 315 px.
+                Recomendado: 1200 × 630 px, JPG, PNG o WebP, máximo 5 MB.
+                Mínimo: 600 × 315 px.
               </small>
             </label>
             {draft.shareImageUrl && (
@@ -622,6 +622,7 @@ export function InvitationWizard({
                   <p>
                     {draft.shareDescription || 'Descripción de la invitación'}
                   </p>
+                  <small>invitations-inky-seven.vercel.app</small>
                 </div>
                 <button
                   type="button"

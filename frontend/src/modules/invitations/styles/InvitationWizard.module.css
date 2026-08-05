@@ -267,6 +267,13 @@
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+.social-share-preview small {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.7rem;
+  text-transform: lowercase;
+}
 .social-share-preview button {
   position: absolute;
   top: 10px;
@@ -639,9 +646,6 @@
 }
 .is-navigation .experience-section h2 {
   font-size: clamp(0.72rem, 1.8vw, 0.95rem);
-}
-.is-navigation .experience-intro p {
-  font-size: clamp(1.35rem, 5vw, 2.4rem);
 }
 .is-navigation .experience-farewell-media {
   height: 55%;

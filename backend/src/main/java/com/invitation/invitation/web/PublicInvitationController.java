@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.util.HtmlUtils;
-import org.springframework.web.util.UriComponentsBuilder;
+import java.nio.charset.StandardCharsets;
+import org.springframework.web.util.UriUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -26,11 +27,18 @@ public class PublicInvitationController {
     @GetMapping("/{slug}")
     public PublicInvitation get(@PathVariable String slug) { return useCase.get(slug); }
 
+    @GetMapping("/{slug}/metadata")
+    public PublicInvitationMetadata metadata(@PathVariable String slug) {
+        PublicInvitation invitation = useCase.get(slug);
+        return new PublicInvitationMetadata(invitation.publicSlug(), invitation.shareTitle(),
+                invitation.shareDescription(), publicImageUrl(invitation.shareImageUrl()),
+                frontendUrl + "/i/" + encodedSlug(slug));
+    }
+
     @GetMapping(value = "/{slug}/share", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> share(@PathVariable String slug) {
         PublicInvitation invitation = useCase.get(slug);
-        String target = frontendUrl + "/view/" + UriComponentsBuilder.newInstance()
-                .pathSegment(slug).build().encode().toUriString();
+        String target = frontendUrl + "/view/" + encodedSlug(slug);
         String title = escape(invitation.shareTitle());
         String description = escape(invitation.shareDescription());
         String image = escape(publicImageUrl(invitation.shareImageUrl()));
@@ -51,6 +59,9 @@ public class PublicInvitationController {
     }
 
     private static String escape(String value) { return HtmlUtils.htmlEscape(value, "UTF-8"); }
+    private static String encodedSlug(String slug) {
+        return UriUtils.encodePathSegment(slug, StandardCharsets.UTF_8);
+    }
     private static String publicImageUrl(String value) {
         if (value == null) return "";
         String normalized = value.trim();

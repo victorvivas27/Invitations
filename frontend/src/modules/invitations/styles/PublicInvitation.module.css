@@ -66,15 +66,28 @@
   font-size: 0.72rem;
   font-weight: 900;
 }
+.experience-cover-copy > :is(p, h1, span),
+.experience-farewell-copy > :is(p, h2, span) {
+  width: 100%;
+  max-width: 900px;
+  margin-inline: auto;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-align: center;
+  text-wrap: pretty;
+}
 .experience-cover-invite {
   margin: 18px 0 8px;
   font-size: clamp(1.05rem, 2.8vw, 1.38rem);
   line-height: 1.35;
 }
 .experience-cover-copy h1 {
-  max-width: 760px;
+  width: 100%;
+  max-width: 900px;
   margin: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: pretty;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(2.6rem, 11vw, 6.2rem);
   font-weight: 500;
@@ -106,8 +119,17 @@
   place-content: center;
   justify-items: center;
   min-height: 52svh;
-  padding: clamp(42px, 8vw, 82px) max(20px, calc((100vw - 820px) / 2));
+  padding: clamp(42px, 8vw, 82px) clamp(20px, 5vw, 64px);
   text-align: center;
+}
+.experience-section > :is(h1, h2, p, strong) {
+  width: 100%;
+  max-width: 900px;
+  margin-inline: auto;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-align: center;
+  text-wrap: pretty;
 }
 .experience-section:nth-child(odd) {
   background: #fff;
@@ -163,13 +185,27 @@
   font-size: 0.75rem;
 }
 .experience-intro p {
-  max-width: 700px;
+  width: 100%;
+  max-width: 900px;
   margin: 0;
+  overflow-wrap: normal;
+  word-break: normal;
   color: var(--secondary-dark);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.55rem, 5vw, 3.2rem);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
   font-style: italic;
   line-height: 1.18;
+  text-wrap: pretty;
+}
+@media (min-width: 600px) {
+  .experience-intro p {
+    font-size: clamp(2.2rem, 5vw, 3rem);
+  }
+}
+@media (min-width: 900px) {
+  .experience-intro p {
+    font-size: clamp(3rem, 4vw, 5rem);
+  }
 }
 .experience-when > strong {
   color: var(--secondary-dark);
@@ -389,11 +425,15 @@
   text-align: center;
 }
 .experience-farewell-copy p {
-  max-width: 560px;
+  width: 100%;
+  max-width: 900px;
   margin: 0;
   font-family: Georgia, serif;
   font-size: clamp(1.25rem, 4vw, 2.2rem);
   font-style: italic;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: pretty;
 }
 .experience-farewell-copy h2 {
   margin: 14px 0;

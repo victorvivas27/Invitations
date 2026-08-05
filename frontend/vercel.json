@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/i/:slug",
-      "destination": "/api/share?slug=:slug"
+      "destination": "/api/invitation-meta?slug=:slug"
     },
     {
       "source": "/(.*)",

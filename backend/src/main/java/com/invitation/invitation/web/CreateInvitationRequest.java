@@ -30,6 +30,6 @@ public record CreateInvitationRequest(
         @NotBlank @Size(max = 1000) String message,
         @Size(max = 12000) String sectionBackgrounds,
         @Size(max = 3000) String contactInfo,
-        @NotBlank @Size(max = 120) String shareTitle,
-        @NotBlank @Size(max = 200) String shareDescription,
+        @NotBlank @Size(max = 70) String shareTitle,
+        @NotBlank @Size(max = 160) String shareDescription,
         @Size(max = 500) String shareImageUrl) { }
