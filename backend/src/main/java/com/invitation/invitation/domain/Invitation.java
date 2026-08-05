@@ -14,6 +14,8 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         String shareTitle, String shareDescription, String shareImageUrl,
         InvitationStatus status, Instant createdAt, Instant updatedAt) {
 
+    private static final String UPLOAD_PATH_PREFIX = "/uploads/";
+
     public Invitation {
         Objects.requireNonNull(id, "id is required");
         publicSlug = text(publicSlug, "publicSlug", 180);
@@ -58,10 +60,16 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         if (value == null || value.isBlank()) return null;
         String normalized = value.trim();
         if (normalized.length() > maximum) throw new IllegalArgumentException(field + " is too long");
-        if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {
+        if (!normalized.startsWith("http://") && !normalized.startsWith("https://")
+                && !isUploadedImagePath(normalized)) {
             throw new IllegalArgumentException(field + " must be a valid HTTP URL");
         }
         return normalized;
+    }
+
+    private static boolean isUploadedImagePath(String value) {
+        if (!value.startsWith(UPLOAD_PATH_PREFIX) || value.length() == UPLOAD_PATH_PREFIX.length()) return false;
+        return value.substring(UPLOAD_PATH_PREFIX.length()).matches("[A-Za-z0-9._-]+");
     }
 
     private static String optionalJson(String value) {

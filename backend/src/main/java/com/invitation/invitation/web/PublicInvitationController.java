@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.util.HtmlUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/public/invitations")
@@ -32,7 +33,7 @@ public class PublicInvitationController {
                 .pathSegment(slug).build().encode().toUriString();
         String title = escape(invitation.shareTitle());
         String description = escape(invitation.shareDescription());
-        String image = escape(invitation.shareImageUrl() == null ? "" : invitation.shareImageUrl());
+        String image = escape(publicImageUrl(invitation.shareImageUrl()));
         String url = escape(target);
         String html = """
                 <!doctype html><html lang="es"><head><meta charset="utf-8">
@@ -50,6 +51,12 @@ public class PublicInvitationController {
     }
 
     private static String escape(String value) { return HtmlUtils.htmlEscape(value, "UTF-8"); }
+    private static String publicImageUrl(String value) {
+        if (value == null) return "";
+        if (value.startsWith("http://") || value.startsWith("https://")) return value;
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(value)
+                .build().encode().toUriString();
+    }
     private static String javascriptString(String value) {
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"")
                 .replace("<", "\\u003c").replace(">", "\\u003e") + "\"";

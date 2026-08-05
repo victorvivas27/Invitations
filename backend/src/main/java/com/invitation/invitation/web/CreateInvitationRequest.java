@@ -32,5 +32,7 @@ public record CreateInvitationRequest(
         @Size(max = 3000) String contactInfo,
         @NotBlank @Size(max = 120) String shareTitle,
         @NotBlank @Size(max = 200) String shareDescription,
-        @NotBlank @Size(max = 500) @Pattern(regexp = "https?://.+", message = "shareImageUrl must be a valid HTTP URL")
+        @NotBlank @Size(max = 500)
+        @Pattern(regexp = "(?:https?://.+|/uploads/[A-Za-z0-9._-]+)",
+                message = "shareImageUrl must be an HTTP URL or an uploaded image path")
         String shareImageUrl) { }
