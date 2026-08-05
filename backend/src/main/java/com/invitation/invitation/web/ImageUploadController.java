@@ -19,9 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/invitation-images")
 public class ImageUploadController {
     private static final long MAX_BYTES = 5L * 1024 * 1024;
+    private static final String IMAGE_WEBP = "image/webp";
     private static final Map<String, String> EXTENSIONS = Map.of(
             MediaType.IMAGE_JPEG_VALUE, ".jpg", MediaType.IMAGE_PNG_VALUE, ".png",
-            "image/webp", ".webp");
+            IMAGE_WEBP, ".webp");
     private final Path uploadDirectory;
 
     public ImageUploadController(@Value("${app.upload-directory:uploads}") String uploadDirectory) {
@@ -55,7 +56,7 @@ public class ImageUploadController {
     }
 
     private static void validateSocialDimensions(MultipartFile image) throws IOException {
-        if ("image/webp".equals(image.getContentType())) {
+        if (IMAGE_WEBP.equals(image.getContentType())) {
             throw new IllegalArgumentException("Social image must be JPG or PNG");
         }
         BufferedImage decoded = ImageIO.read(image.getInputStream());
@@ -81,7 +82,7 @@ public class ImageUploadController {
             }
             return true;
         }
-        return "image/webp".equals(contentType) && value.length >= 12
+        return IMAGE_WEBP.equals(contentType) && value.length >= 12
                 && ascii(value, 0, "RIFF") && ascii(value, 8, "WEBP");
     }
 
