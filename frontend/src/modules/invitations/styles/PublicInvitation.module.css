@@ -539,6 +539,8 @@ section[data-custom-background='true'] span:not(.rsvp-form span),
 section[data-custom-background='true'] dt,
 section[data-custom-background='true'] dd {
   color: var(--section-text-color) !important;
+  -webkit-text-stroke: var(--section-text-outline);
+  text-shadow: var(--section-text-shadow);
 }
 section[data-custom-background='true'].experience-section,
 .is-navigation section[data-custom-background='true'].experience-section {

@@ -19,6 +19,10 @@ export type SectionBackground = {
   textGradientStart: string
   textGradientEnd: string
   textGradientDirection: 'vertical' | 'horizontal' | 'diagonal'
+  textOutline: 'none' | 'auto' | 'white' | 'black'
+  textOutlineWidth: number
+  textShadow: boolean
+  textShadowIntensity: number
 }
 export type InvitationSection =
   'basic' | 'tribute' | 'date' | 'venue' | 'gallery' | 'message' | 'summary'
@@ -48,6 +52,10 @@ export const defaultSectionBackground = (): SectionBackground => ({
   textGradientStart: '#d71920',
   textGradientEnd: '#1557a0',
   textGradientDirection: 'horizontal',
+  textOutline: 'auto',
+  textOutlineWidth: 1,
+  textShadow: true,
+  textShadowIntensity: 35,
 })
 export const defaultSectionBackgrounds = (): SectionBackgrounds => ({
   basic: defaultSectionBackground(),

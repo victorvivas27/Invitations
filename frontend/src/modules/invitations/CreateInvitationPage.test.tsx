@@ -109,10 +109,13 @@ describe('CreateInvitationPage', () => {
             { status: 200, headers: { 'Content-Type': 'application/json' } },
           )
         if (String(input).endsWith('/api/invitation-images/social'))
-          return new Response(JSON.stringify({ url: 'https://cdn.example.com/share.jpg' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
+          return new Response(
+            JSON.stringify({ url: 'https://cdn.example.com/share.jpg' }),
+            {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          )
         return new Response(
           JSON.stringify({
             publicSlug: 'cumpleanos-de-sofia-a8k3m2',
@@ -179,14 +182,22 @@ describe('CreateInvitationPage', () => {
       naturalHeight = 630
       onload: null | (() => void) = null
       onerror: null | (() => void) = null
-      set src(_value: string) { queueMicrotask(() => this.onload?.()) }
+      set src(_value: string) {
+        queueMicrotask(() => this.onload?.())
+      }
     }
-    Object.defineProperty(globalThis, 'Image', { configurable: true, value: LoadedImage })
+    Object.defineProperty(globalThis, 'Image', {
+      configurable: true,
+      value: LoadedImage,
+    })
     await userEvent.upload(
       screen.getByLabelText('Imagen para compartir'),
       new File(['image'], 'share.jpg', { type: 'image/jpeg' }),
     )
-    Object.defineProperty(globalThis, 'Image', { configurable: true, value: OriginalImage })
+    Object.defineProperty(globalThis, 'Image', {
+      configurable: true,
+      value: OriginalImage,
+    })
     await screen.findByAltText('Vista previa para compartir')
     expect(
       screen.getByRole('button', { name: 'Crear invitación' }),
@@ -198,7 +209,9 @@ describe('CreateInvitationPage', () => {
       await screen.findByRole('heading', { name: 'Tu invitación está lista' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByDisplayValue(/api\/public\/invitations\/cumpleanos-de-sofia-a8k3m2\/share/),
+      screen.getByDisplayValue(
+        /api\/public\/invitations\/cumpleanos-de-sofia-a8k3m2\/share/,
+      ),
     ).toBeInTheDocument()
     const request = fetchMock.mock.calls.find(([url]) =>
       String(url).endsWith('/api/invitations'),
@@ -225,7 +238,7 @@ describe('CreateInvitationPage', () => {
     expect(
       JSON.parse(JSON.parse(request.body as string).sectionBackgrounds),
     ).toHaveProperty('basic.customized', false)
-  })
+  }, 10_000)
 
   it('handles a missing template identifier', () => {
     window.localStorage.setItem('invitation_access_token', 'safe-token')

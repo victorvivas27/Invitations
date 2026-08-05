@@ -169,9 +169,7 @@ async function uploadImageAt(path: string, image: File): Promise<string> {
   })
   if (!response.ok) throw await parseError(response)
   const uploaded = (await response.json()) as { url: string }
-  return uploaded.url.startsWith('http')
-    ? uploaded.url
-    : `${apiBaseUrl}${uploaded.url}`
+  return new URL(uploaded.url, apiBaseUrl || window.location.origin).toString()
 }
 export const getInvitationShareUrl = (publicSlug: string) =>
   `${apiBaseUrl}/api/public/invitations/${encodeURIComponent(publicSlug)}/share`

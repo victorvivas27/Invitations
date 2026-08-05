@@ -2,7 +2,10 @@ import { useState } from 'react'
 import type { InvitationDraft } from '../types/invitationDraft'
 import { WizardNavigation } from './WizardNavigation'
 import { WizardStepper } from './WizardStepper'
-import { uploadInvitationImage, uploadSocialImage } from '../services/invitations'
+import {
+  uploadInvitationImage,
+  uploadSocialImage,
+} from '../services/invitations'
 import { ImageCropEditor } from './ImageCropEditor'
 import { SectionBackgroundEditor } from './SectionBackgroundEditor'
 import type { InvitationSection } from '../types/invitationDraft'
@@ -111,15 +114,15 @@ export function InvitationWizard({
             ? 120
             : name === 'shareTitle'
               ? 120
-            : name === 'honoreeName'
-              ? 100
-              : name === 'venueName'
-                ? 150
-                : name === 'address'
-                  ? 250
-                  : name === 'mapsUrl'
-                    ? 500
-                    : undefined
+              : name === 'honoreeName'
+                ? 100
+                : name === 'venueName'
+                  ? 150
+                  : name === 'address'
+                    ? 250
+                    : name === 'mapsUrl'
+                      ? 500
+                      : undefined
         }
         aria-invalid={Boolean(errors[name])}
         aria-describedby={errors[name] ? `${name}-error` : undefined}
@@ -183,7 +186,10 @@ export function InvitationWizard({
         const objectUrl = URL.createObjectURL(image)
         preview.onload = () => {
           URL.revokeObjectURL(objectUrl)
-          resolve({ width: preview.naturalWidth, height: preview.naturalHeight })
+          resolve({
+            width: preview.naturalWidth,
+            height: preview.naturalHeight,
+          })
         }
         preview.onerror = () => {
           URL.revokeObjectURL(objectUrl)
@@ -193,8 +199,16 @@ export function InvitationWizard({
       },
     ).catch(() => null)
     const ratio = dimensions ? dimensions.width / dimensions.height : 0
-    if (!dimensions || dimensions.width < 600 || dimensions.height < 315 || ratio < 1.7 || ratio > 2.1) {
-      setUploadError('Usa una imagen horizontal de al menos 600 × 315 px y proporción cercana a 1.91:1.')
+    if (
+      !dimensions ||
+      dimensions.width < 600 ||
+      dimensions.height < 315 ||
+      ratio < 1.7 ||
+      ratio > 2.1
+    ) {
+      setUploadError(
+        'Usa una imagen horizontal de al menos 600 × 315 px y proporción cercana a 1.91:1.',
+      )
       return
     }
     setUploading(true)
@@ -555,20 +569,31 @@ export function InvitationWizard({
               <h1>Vista previa al compartir</h1>
               <p>Configura cómo se verá el enlace en WhatsApp y otras redes.</p>
             </div>
-            {field('shareTitle', 'Título', 'text', `Te invitamos a ${draft.eventName || 'nuestro evento'}`)}
+            {field(
+              'shareTitle',
+              'Título',
+              'text',
+              `Te invitamos a ${draft.eventName || 'nuestro evento'}`,
+            )}
             <label className="wizard-field">
               <span>Descripción</span>
               <textarea
                 aria-label="Descripción para compartir"
                 value={draft.shareDescription}
-                onChange={(event) => update('shareDescription', event.target.value)}
+                onChange={(event) =>
+                  update('shareDescription', event.target.value)
+                }
                 placeholder="Acompáñanos en este día especial. Consulta aquí todos los detalles."
                 rows={4}
                 maxLength={200}
                 aria-invalid={Boolean(errors.shareDescription)}
               />
               <small>{draft.shareDescription.length}/200 caracteres</small>
-              {errors.shareDescription && <small className="wizard-error">{errors.shareDescription}</small>}
+              {errors.shareDescription && (
+                <small className="wizard-error">
+                  {errors.shareDescription}
+                </small>
+              )}
             </label>
             <label className="wizard-field image-upload-field social-image-upload">
               <span>Imagen para compartir</span>
@@ -579,17 +604,39 @@ export function InvitationWizard({
                 disabled={uploading}
                 onChange={(event) => void uploadShareImage(event.target.files)}
               />
-              <small>Recomendado: 1200 × 630 px, JPG o PNG, máximo 5 MB. Mínimo: 600 × 315 px.</small>
+              <small>
+                Recomendado: 1200 × 630 px, JPG o PNG, máximo 5 MB. Mínimo: 600
+                × 315 px.
+              </small>
             </label>
             {draft.shareImageUrl && (
               <div className="social-share-preview">
-                <img src={draft.shareImageUrl} alt="Vista previa para compartir" />
-                <div><strong>{draft.shareTitle || 'Título de la invitación'}</strong><p>{draft.shareDescription || 'Descripción de la invitación'}</p></div>
-                <button type="button" onClick={() => update('shareImageUrl', '')}>Quitar</button>
+                <img
+                  src={draft.shareImageUrl}
+                  alt="Vista previa para compartir"
+                />
+                <div>
+                  <strong>
+                    {draft.shareTitle || 'Título de la invitación'}
+                  </strong>
+                  <p>
+                    {draft.shareDescription || 'Descripción de la invitación'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => update('shareImageUrl', '')}
+                >
+                  Quitar
+                </button>
               </div>
             )}
             {uploading && <p className="upload-status">Subiendo imagen...</p>}
-            {uploadError && <p className="wizard-error" role="alert">{uploadError}</p>}
+            {uploadError && (
+              <p className="wizard-error" role="alert">
+                {uploadError}
+              </p>
+            )}
           </>
         )}
       </div>

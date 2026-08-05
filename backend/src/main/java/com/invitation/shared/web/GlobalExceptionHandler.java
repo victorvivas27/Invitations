@@ -11,6 +11,7 @@ import com.invitation.invitation.application.DuplicateInvitationGuestException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Clock;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,8 +30,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiError> validation(MethodArgumentNotValidException exception,
             HttpServletRequest request) {
+        String fields = exception.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField()).distinct().sorted()
+                .collect(Collectors.joining(", "));
         return response(HttpStatus.BAD_REQUEST, "Validation failed",
-                "The request contains invalid fields", request);
+                "The request contains invalid fields: " + fields, request);
     }
 
     @ExceptionHandler(InvalidPasswordException.class)

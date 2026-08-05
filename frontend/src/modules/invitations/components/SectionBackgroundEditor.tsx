@@ -249,6 +249,66 @@ export function SectionBackgroundEditor({
               </label>
             </div>
           )}
+          <div className="text-legibility-editor">
+            <strong>Legibilidad del texto</strong>
+            <div className="background-grid">
+              <label>
+                Contorno
+                <select
+                  value={value.textOutline ?? 'auto'}
+                  onChange={(e) =>
+                    update(
+                      'textOutline',
+                      e.target.value as SectionBackground['textOutline'],
+                    )
+                  }
+                >
+                  <option value="auto">Automático</option>
+                  <option value="white">Blanco</option>
+                  <option value="black">Negro</option>
+                  <option value="none">Sin contorno</option>
+                </select>
+              </label>
+              {(value.textOutline ?? 'auto') !== 'none' && (
+                <label>
+                  Grosor: {value.textOutlineWidth ?? 1}px
+                  <input
+                    type="range"
+                    min="1"
+                    max="3"
+                    step="0.5"
+                    value={value.textOutlineWidth ?? 1}
+                    onChange={(e) =>
+                      update('textOutlineWidth', Number(e.target.value))
+                    }
+                  />
+                </label>
+              )}
+              <label className="background-checkbox">
+                <input
+                  type="checkbox"
+                  checked={value.textShadow ?? true}
+                  onChange={(e) => update('textShadow', e.target.checked)}
+                />
+                Sombra suave
+              </label>
+              {(value.textShadow ?? true) && (
+                <label>
+                  Intensidad: {value.textShadowIntensity ?? 35}%
+                  <input
+                    type="range"
+                    min="10"
+                    max="80"
+                    step="5"
+                    value={value.textShadowIntensity ?? 35}
+                    onChange={(e) =>
+                      update('textShadowIntensity', Number(e.target.value))
+                    }
+                  />
+                </label>
+              )}
+            </div>
+          </div>
           <button
             className="background-reset"
             type="button"
