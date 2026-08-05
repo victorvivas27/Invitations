@@ -9,6 +9,7 @@ type Metadata = {
   shareTitle?: string
   shareDescription?: string
   shareImageUrl?: string
+  heroImageUrl?: string
   publicUrl?: string
 }
 
@@ -117,20 +118,30 @@ export default async function invitationMetadata(request: Request) {
   let status = 200
 
   try {
-    if (!backendUrl) throw new Error('BACKEND_URL is not configured')
+    if (!backendUrl) {
+      throw new Error('BACKEND_URL is not configured')
+    }
+
     const upstream = await fetch(
-      `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}/metadata`,
-      { headers: { Accept: 'application/json' } },
+      `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}`,
+      {
+        headers: {
+          Accept: 'application/json',
+        },
+      },
     )
+
     if (upstream.status === 404) {
       status = 404
       metadata = {
         shareTitle: 'Invitación no encontrada',
         shareDescription: 'Esta invitación no existe o ya no está disponible.',
       }
-    } else if (!upstream.ok)
+    } else if (!upstream.ok) {
       throw new Error(`Metadata request failed: ${upstream.status}`)
-    else metadata = (await upstream.json()) as Metadata
+    } else {
+      metadata = (await upstream.json()) as Metadata
+    }
   } catch (error) {
     console.error('Could not load invitation metadata', error)
   }
@@ -138,7 +149,10 @@ export default async function invitationMetadata(request: Request) {
   const html = documentHtml({
     title: cleanText(metadata.shareTitle, FALLBACK_TITLE),
     description: cleanText(metadata.shareDescription, FALLBACK_DESCRIPTION),
-    image: secureImage(metadata.shareImageUrl, fallbackImage),
+    image: secureImage(
+      metadata.shareImageUrl || metadata.heroImageUrl,
+      fallbackImage,
+    ),
     publicUrl,
     appUrl: status === 200 ? appUrl : undefined,
     redirect:
