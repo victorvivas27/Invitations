@@ -209,9 +209,7 @@ describe('CreateInvitationPage', () => {
       await screen.findByRole('heading', { name: 'Tu invitación está lista' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByDisplayValue(
-        /api\/public\/invitations\/cumpleanos-de-sofia-a8k3m2\/share/,
-      ),
+      screen.getByDisplayValue(/\/i\/cumpleanos-de-sofia-a8k3m2/),
     ).toBeInTheDocument()
     const request = fetchMock.mock.calls.find(([url]) =>
       String(url).endsWith('/api/invitations'),

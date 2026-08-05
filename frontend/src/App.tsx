@@ -49,6 +49,7 @@ export default function App() {
           element={<InvitationGuestsPage />}
         />
         <Route path="/i/:slug" element={<PublicInvitationPage />} />
+        <Route path="/view/:slug" element={<PublicInvitationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />

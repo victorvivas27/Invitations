@@ -172,7 +172,7 @@ async function uploadImageAt(path: string, image: File): Promise<string> {
   return new URL(uploaded.url, apiBaseUrl || window.location.origin).toString()
 }
 export const getInvitationShareUrl = (publicSlug: string) =>
-  `${apiBaseUrl}/api/public/invitations/${encodeURIComponent(publicSlug)}/share`
+  `/i/${encodeURIComponent(publicSlug)}`
 export async function confirmAttendance(
   publicSlug: string,
   input: {

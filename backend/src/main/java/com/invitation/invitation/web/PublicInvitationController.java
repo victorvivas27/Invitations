@@ -29,7 +29,7 @@ public class PublicInvitationController {
     @GetMapping(value = "/{slug}/share", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> share(@PathVariable String slug) {
         PublicInvitation invitation = useCase.get(slug);
-        String target = frontendUrl + "/i/" + UriComponentsBuilder.newInstance()
+        String target = frontendUrl + "/view/" + UriComponentsBuilder.newInstance()
                 .pathSegment(slug).build().encode().toUriString();
         String title = escape(invitation.shareTitle());
         String description = escape(invitation.shareDescription());
