@@ -13,6 +13,8 @@ import foundationStyles from './shared/styles/foundation.module.css'
 import templateStyles from './modules/templates/styles/Templates.module.css'
 import invitationWizardStyles from './modules/invitations/styles/InvitationWizard.module.css'
 import publicInvitationStyles from './modules/invitations/styles/PublicInvitation.module.css'
+import './styles/theme.css'
+import { FeedbackProvider } from './shared/components/feedback/FeedbackProvider'
 
 function NotFoundPage() {
   return (
@@ -37,7 +39,7 @@ const applicationStyles = {
 export default function App() {
   void applicationStyles
   return (
-    <BrowserRouter>
+    <FeedbackProvider><BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/activate-account" element={<ActivateAccountPage />} />
@@ -54,6 +56,6 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></FeedbackProvider>
   )
 }

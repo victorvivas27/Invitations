@@ -153,6 +153,7 @@ export function PublicInvitationRenderer({
   preview?: boolean
   viewMode?: 'scroll' | 'navigation'
 }) {
+  const CoverHeading = preview ? 'h2' : 'h1'
   const experienceRef = useRef<HTMLDivElement>(null)
   const [activeChapter, setActiveChapter] = useState('portada')
   const viewMode = selectedViewMode ?? 'scroll'
@@ -312,7 +313,7 @@ export function PublicInvitationRenderer({
             <p className="experience-cover-invite">
               Estamos felices de invitarte al cumple de
             </p>
-            <h1>{invitation.honoreeName}</h1>
+            <CoverHeading>{invitation.honoreeName}</CoverHeading>
             {invitation.honoreeAge !== null && (
               <p className="experience-cover-age">
                 que cumple <strong>{invitation.honoreeAge} años</strong>

@@ -8,7 +8,7 @@ describe('public routes', () => {
     render(<App />)
     expect(
       screen.getByRole('heading', {
-        name: 'Crea invitaciones únicas para momentos inolvidables',
+        name: 'Crea invitaciones digitales que se sienten únicas',
       }),
     ).toBeInTheDocument()
   })

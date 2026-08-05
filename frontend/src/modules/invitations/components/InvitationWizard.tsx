@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { InvitationDraft } from '../types/invitationDraft'
 import { WizardNavigation } from './WizardNavigation'
 import { WizardStepper } from './WizardStepper'
@@ -45,6 +45,7 @@ export function InvitationWizard({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
+  const wizardRef = useRef<HTMLElement>(null)
   const update = <K extends keyof InvitationDraft>(
     field: K,
     value: InvitationDraft[K],
@@ -77,6 +78,11 @@ export function InvitationWizard({
       (!/^\d+$/.test(draft.age) || Number(draft.age) > 150)
     )
       next.age = 'Ingresa una edad válida.'
+    if (step === 3 && draft.date) {
+      const today = new Date()
+      const localToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+      if (draft.date < localToday) next.date = 'La fecha no puede ser anterior a hoy.'
+    }
     if (step === 4 && draft.mapsUrl) {
       try {
         if (!['http:', 'https:'].includes(new URL(draft.mapsUrl).protocol))
@@ -86,6 +92,14 @@ export function InvitationWizard({
       }
     }
     setErrors(next)
+    const firstInvalid = Object.keys(next)[0]
+    if (firstInvalid) window.requestAnimationFrame(() => {
+      const target = wizardRef.current?.querySelector<HTMLElement>(
+        `[name="${firstInvalid}"], [data-field="${firstInvalid}"]`,
+      )
+      target?.focus()
+      target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+    })
     return Object.keys(next).length === 0
   }
   const next = () => {
@@ -104,8 +118,10 @@ export function InvitationWizard({
     <label className="wizard-field">
       <span>{label}</span>
       <input
+        name={name}
         aria-label={label}
         type={type}
+        min={name === 'date' ? new Date().toLocaleDateString('en-CA') : undefined}
         value={draft[name]}
         onChange={(event) => update(name, event.target.value)}
         placeholder={placeholder}
@@ -221,8 +237,9 @@ export function InvitationWizard({
     }
   }
   return (
-    <section className="invitation-wizard" aria-label="Asistente de creación">
+    <section ref={wizardRef} className="invitation-wizard" aria-label="Asistente de creación">
       <WizardStepper currentStep={step} />
+      <p className="required-legend"><span aria-hidden="true">*</span> Campos obligatorios</p>
       {step === 5 && (
         <div
           className="image-position-controls"
@@ -255,6 +272,7 @@ export function InvitationWizard({
             <label className="wizard-field">
               <span>Tipo de evento</span>
               <select
+                name="eventType"
                 aria-label="Tipo de evento"
                 value={draft.eventType}
                 onChange={(event) => update('eventType', event.target.value)}
@@ -308,6 +326,7 @@ export function InvitationWizard({
                   <label className="wizard-field">
                     <select
                       aria-label="Hora"
+                      data-field="time"
                       value={selectedHour}
                       onChange={(event) => updateHour(event.target.value)}
                       aria-invalid={Boolean(errors.time)}
@@ -438,6 +457,7 @@ export function InvitationWizard({
             <label className="wizard-field">
               <span>Mensaje especial</span>
               <textarea
+                name="message"
                 aria-label="Mensaje especial"
                 value={draft.message}
                 onChange={(event) => update('message', event.target.value)}

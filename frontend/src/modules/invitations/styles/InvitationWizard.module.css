@@ -164,6 +164,16 @@
   font-size: 0.82rem;
   font-weight: 800;
 }
+.required-legend { margin: .6rem 0 1rem; color: #6b5b56; font-size: .82rem; text-align: right; }
+.required-legend span { color: #b42318; font-weight: 800; }
+.wizard-field:has([name='eventType']) > span::after,
+.wizard-field:has([name='eventName']) > span::after,
+.wizard-field:has([name='honoreeName']) > span::after,
+.wizard-field:has([name='date']) > span::after,
+.wizard-field:has([name='venueName']) > span::after,
+.wizard-field:has([name='address']) > span::after,
+.wizard-field:has([name='message']) > span::after,
+.wizard-time-field > span::after { content: ' *'; color: #b42318; font-weight: 800; }
 .wizard-field input,
 .wizard-field select,
 .wizard-field textarea {

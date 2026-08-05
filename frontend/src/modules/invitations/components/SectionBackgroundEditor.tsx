@@ -124,6 +124,7 @@ export function SectionBackgroundEditor({
             />
           </label>
           <div className="thematic-images" aria-label="Imágenes temáticas">
+            <span className="thematic-images-label">Fondos incluidos</span>
             {thematicImages.map((url) => (
               <button
                 type="button"

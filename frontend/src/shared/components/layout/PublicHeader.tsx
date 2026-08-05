@@ -5,6 +5,7 @@ import {
   getSessionUser,
   loadSessionUser,
 } from '../../../modules/auth/services/authSession'
+import { ThemeToggle } from './ThemeToggle'
 
 export const APP_NAME = 'Mi Invitación'
 
@@ -102,6 +103,7 @@ export function PublicHeader({
               Iniciar sesión
             </a>
           )}
+          <ThemeToggle />
         </div>
         <button
           className="menu-trigger"
@@ -134,6 +136,7 @@ export function PublicHeader({
             <a href="/#como-funciona" onClick={close}>
               Cómo funciona
             </a>
+            <ThemeToggle />
             {authenticated ? (
               <>
                 {userIndicator}

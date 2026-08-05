@@ -1,240 +1,58 @@
 import { PublicFooter } from '../../shared/components/layout/PublicFooter'
 import { PublicHeader } from '../../shared/components/layout/PublicHeader'
-import { getAccessToken } from '../auth/services/authSession'
-import { EventCategoryCard } from './components/EventCategoryCard'
+import { categoryLabels, invitationTemplates } from '../templates/data/invitationTemplates'
+import { TemplateArtwork } from '../templates/components/TemplateArtwork'
+import { AnimatedSection } from './components/AnimatedSection'
 import { InvitationPreviewCard } from './components/InvitationPreviewCard'
 
-const categories = [
-  [
-    'Cumpleaños',
-    'Celebra cada vuelta al sol con un diseño tan único como su protagonista.',
-    '🎂',
-    '#d71920',
-  ],
-  [
-    'Bautismos',
-    'Comparte este momento especial con una invitación delicada y cercana.',
-    '🕊',
-    '#60a5fa',
-  ],
-  [
-    'Matrimonios',
-    'Anuncia el gran día con elegancia y todos los detalles importantes.',
-    '♡',
-    '#0b3568',
-  ],
-  [
-    'Baby showers',
-    'Da la bienvenida a una nueva historia con ternura y personalidad.',
-    '☁',
-    '#e63946',
-  ],
-  [
-    'Fiestas infantiles',
-    'Color, alegría y diversión para una celebración inolvidable.',
-    '🎈',
-    '#d97706',
-  ],
-  [
-    'Aniversarios',
-    'Vuelve a celebrar los recuerdos y todo lo que aún está por venir.',
-    '✦',
-    '#a90f18',
-  ],
-  [
-    'Otros eventos',
-    'Crea desde una idea flexible para cualquier motivo que quieras compartir.',
-    '✨',
-    '#64748b',
-  ],
-] as const
+const categoryIcons = { birthday: '🎂', baptism: '◇', wedding: '♡', 'baby-shower': '☁', 'kids-party': '✦', anniversary: '∞', graduation: '⌁', other: '✨' } as const
+const categories = Object.entries(categoryLabels)
 const steps = [
-  [
-    '01',
-    'Elige el tipo de evento',
-    'Selecciona una celebración o comienza desde un diseño en blanco.',
-  ],
-  [
-    '02',
-    'Personaliza los detalles',
-    'Agrega nombres, fotos, fecha, hora, lugar y tu mensaje especial.',
-  ],
-  [
-    '03',
-    'Revisa el resultado',
-    'Visualiza cómo se verá la invitación antes de compartirla.',
-  ],
-  [
-    '04',
-    'Comparte con tus invitados',
-    'En una próxima etapa podrás enviar tu enlace por tus canales favoritos.',
-  ],
+  ['01', 'Elige una plantilla', 'Explora diseños reales y encuentra el estilo ideal para tu celebración.'],
+  ['02', 'Personaliza los detalles', 'Agrega nombres, fecha, hora, lugar, mensaje, fotografías y apariencia.'],
+  ['03', 'Revisa tu invitación', 'Mira en tiempo real la misma experiencia que recibirán tus invitados.'],
+  ['04', 'Publica y comparte', 'Obtén una página web con su propio enlace para enviarla a quien quieras.'],
 ] as const
-const features = [
-  'Diseños personalizables',
-  'Fotos y galería',
-  'Fecha y horario',
-  'Ubicación clara',
-  'Mensaje especial',
-  'Confirmación de asistencia',
-  'Diseño adaptable a móvil',
-  'Enlace fácil de compartir',
-]
+const details = ['Nombre y evento', 'Fecha y hora', 'Lugar y mapa', 'Mensaje especial', 'Fotografías y galería', 'Colores y fondos']
+const guestInfo = [
+  ['Fecha, hora y cuenta regresiva', 'Disponible'], ['Dirección y acceso a Google Maps', 'Disponible'],
+  ['Galería de recuerdos', 'Disponible'], ['Confirmación de asistencia', 'Disponible'],
+  ['Música personalizada', 'Próximamente'],
+] as const
+const featured = invitationTemplates.filter((template) => template.isFeatured && template.isAvailable)
 
 export function HomePage() {
-  const authenticated = Boolean(getAccessToken())
-  return (
-    <>
-      <PublicHeader activePage="home" />
-      <main>
-        <section id="inicio" className="hero section-shell">
-          <div className="hero-copy">
-            <span className="pill">Celebra a tu manera</span>
-            <h1>Crea invitaciones únicas para momentos inolvidables</h1>
-            <p>
-              Diseña una invitación digital personalizada con tus fotos, fecha,
-              lugar y todos los detalles de tu celebración.
-            </p>
-            <div className="hero-actions">
-              <a
-                className="primary-cta"
-                href={authenticated ? '/templates' : '/login'}
-              >
-                {authenticated ? 'Crear mi invitación' : 'Iniciar sesión'}
-              </a>
-              <a className="secondary-cta" href="#ejemplo">
-                Ver ejemplo
-              </a>
-            </div>
-            <div className="trust-line">
-              <span>✓ Sin conocimientos de diseño</span>
-              <span>✓ Pensada para móvil</span>
-            </div>
-          </div>
-          <InvitationPreviewCard />
-        </section>
-        <section id="tipos" className="home-section section-shell">
-          <div className="section-intro">
-            <span className="eyebrow">Para cada historia</span>
-            <h2>Una invitación para cada momento</h2>
-            <p>
-              Desde una celebración íntima hasta una gran fiesta, encuentra un
-              punto de partida que se sienta tuyo.
-            </p>
-          </div>
-          <div className="category-grid">
-            {categories.map(([title, description, icon, accent]) => (
-              <EventCategoryCard
-                key={title}
-                title={title}
-                description={description}
-                icon={icon}
-                accent={accent}
-              />
-            ))}
-          </div>
-        </section>
-        <section id="como-funciona" className="home-section soft-section">
-          <div className="section-shell">
-            <div className="section-intro">
-              <span className="eyebrow">Simple desde el inicio</span>
-              <h2>Crea tu invitación en pocos pasos</h2>
-              <p>
-                Una experiencia guiada para concentrarte en lo importante: tu
-                celebración.
-              </p>
-            </div>
-            <div className="steps-grid">
-              {steps.map(([number, title, description]) => (
-                <article className="step-card" key={number}>
-                  <span>{number}</span>
-                  <h3>{title}</h3>
-                  <p>{description}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-        <section id="caracteristicas" className="home-section section-shell">
-          <div className="section-intro">
-            <span className="eyebrow">Todo en un lugar</span>
-            <h2>Todo lo que necesitas para tu evento</h2>
-            <p>
-              Estamos preparando herramientas para que cada detalle se vea y se
-              sienta especial.
-            </p>
-          </div>
-          <div className="features-grid">
-            {features.map((feature) => (
-              <article className="feature-card" key={feature}>
-                <span aria-hidden="true">✓</span>
-                <div>
-                  <h3>{feature}</h3>
-                  <small>Próximamente</small>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-        <section id="ejemplo" className="story-section section-shell">
-          <div className="story-visual" aria-hidden="true">
-            <div className="photo-card photo-one">Tus fotos</div>
-            <div className="photo-card photo-two">Tus colores</div>
-            <div className="swatches">
-              <i />
-              <i />
-              <i />
-              <i />
-            </div>
-          </div>
-          <div>
-            <span className="eyebrow">Hecha por ti</span>
-            <h2>Haz que refleje la personalidad de tu celebración</h2>
-            <p>
-              Combina colores, tipografías, imágenes, estilos y textos para
-              contar tu historia desde el primer vistazo.
-            </p>
-            <ul>
-              <li>Una imagen principal que emocione</li>
-              <li>Galería para tus mejores recuerdos</li>
-              <li>Lugar y referencias fáciles de encontrar</li>
-            </ul>
-          </div>
-        </section>
-        <section className="concept-grid section-shell">
-          <article>
-            <span aria-hidden="true">⌖</span>
-            <h2>Todos llegan sin complicaciones</h2>
-            <p>
-              Comparte el lugar, la dirección y las referencias de forma clara.
-              La integración con mapas estará disponible próximamente.
-            </p>
-          </article>
-          <article>
-            <span aria-hidden="true">♡</span>
-            <h2>Organiza mejor tu celebración</h2>
-            <p>
-              En una próxima etapa podrás recibir confirmaciones de asistencia y
-              saber quiénes participarán.
-            </p>
-          </article>
-        </section>
-        <section className="final-cta section-shell">
-          <span aria-hidden="true">✦</span>
-          <h2>Tu próxima celebración comienza aquí</h2>
-          <p>
-            Crea una invitación especial y comparte cada detalle con las
-            personas que más quieres.
-          </p>
-          <a
-            className="primary-cta light"
-            href={authenticated ? '/templates' : '/login'}
-          >
-            {authenticated ? 'Comenzar ahora' : 'Iniciar sesión'}
-          </a>
-        </section>
-      </main>
-      <PublicFooter />
-    </>
-  )
+  return <><PublicHeader activePage="home"/><main className="redesigned-home">
+    <section id="inicio" className="home-hero home-section section-shell">
+      <div className="hero-orb orb-one" aria-hidden="true"/><div className="hero-orb orb-two" aria-hidden="true"/>
+      <AnimatedSection className="hero-copy" direction="left">
+        <span className="pill">Una página especial para tu evento</span>
+        <h1>Crea invitaciones digitales que se sienten únicas</h1>
+        <p>Diseña una invitación web personalizada, agrega todos los detalles de tu evento y compártela fácilmente mediante un enlace.</p>
+        <div className="hero-actions"><a className="primary-cta" href="/templates">Crear mi invitación</a><a className="secondary-cta" href="/templates">Ver plantillas</a></div>
+        <div className="trust-line"><span>✓ Vista previa en tiempo real</span><span>✓ Lista para cualquier dispositivo</span></div>
+      </AnimatedSection>
+      <AnimatedSection className="hero-demo" direction="scale" delay={260}><InvitationPreviewCard/></AnimatedSection>
+    </section>
+
+    <AnimatedSection as="section" className="home-section section-shell" direction="up">
+      <div className="section-intro"><span className="eyebrow">Qué puedes crear</span><h2>Una invitación para cada historia</h2><p>Elige una categoría del catálogo y empieza con una plantilla preparada para tu evento.</p></div>
+      <div className="category-grid">{categories.map(([id, label], index) => <AnimatedSection as="article" className="category-card" direction="scale" delay={index * 90} key={id}><a href={`/templates?category=${id}`}><span className="category-icon" aria-hidden="true">{categoryIcons[id as keyof typeof categoryIcons]}</span><h3>{label}</h3><p>Explorar plantillas <span aria-hidden="true">→</span></p></a></AnimatedSection>)}</div>
+    </AnimatedSection>
+
+    <section id="como-funciona" className="home-section soft-section"><AnimatedSection className="section-shell"><div className="section-intro"><span className="eyebrow">Así de simple</span><h2>De una idea a un enlace en cuatro pasos</h2><p>El flujo real te acompaña desde la elección del diseño hasta la publicación.</p></div><div className="steps-grid">{steps.map(([number,title,description], index)=><AnimatedSection as="article" className="step-card" direction={index % 2 ? 'right':'left'} delay={index*110} key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></AnimatedSection>)}</div></AnimatedSection></section>
+
+    <AnimatedSection as="section" className="home-section personalization-section section-shell" direction="left">
+      <div><span className="eyebrow">Tu invitación, a tu manera</span><h2>Personaliza cada detalle mientras ves el resultado</h2><p>El editor guiado mantiene la información y la vista previa lado a lado, para que cada decisión se vea al instante.</p><div className="detail-pills">{details.map((detail)=><span key={detail}>{detail}</span>)}</div></div>
+      <div className="wizard-mock" aria-label="Resumen de opciones del editor"><div><span>Paso 3 de 7</span><strong>Fecha y hora</strong><label>Fecha<input value="23 / 01 / 2027" readOnly/></label><label>Hora<input value="17:00" readOnly/></label></div><div className="mini-live-preview"><span>Vista previa</span><strong>Emilia</strong><small>Sábado 23 · 17:00</small></div></div>
+    </AnimatedSection>
+
+    <section className="home-section responsive-section"><AnimatedSection className="section-shell responsive-copy"><span className="eyebrow">Una URL, todas las pantallas</span><h2>La misma invitación en teléfono, tablet y computador</h2><p>Tus invitados consultan la página completa desde cualquier dispositivo, sin descargar archivos ni instalar aplicaciones.</p><div className="device-stage" aria-label="Invitación adaptable a distintos dispositivos"><div className="device desktop"><span>miinvitacion.cl/i/emilia</span><b>Emilia</b></div><div className="device tablet"><b>Emilia</b><small>23 ENE</small></div><div className="device phone"><b>Emilia</b><small>17:00</small></div></div></AnimatedSection></section>
+
+    <AnimatedSection as="section" className="home-section guest-section section-shell" direction="right"><div><span className="eyebrow">Todo claro para tus invitados</span><h2>La información importante, reunida en una experiencia</h2><p>La invitación publicada no es una imagen: es una página interactiva que informa, orienta y recibe respuestas.</p></div><div className="guest-feature-list">{guestInfo.map(([label,status],index)=><AnimatedSection as="article" direction="up" delay={index*90} key={label}><span aria-hidden="true">{status === 'Disponible' ? '✓':'＋'}</span><strong>{label}</strong><small className={status === 'Próximamente' ? 'is-soon':''}>{status}</small></AnimatedSection>)}</div></AnimatedSection>
+
+    <AnimatedSection as="section" className="home-section section-shell featured-section"><div className="section-intro"><span className="eyebrow">Plantillas destacadas</span><h2>Diseños reales para empezar hoy</h2><p>Estas plantillas pertenecen al catálogo actual y abren directamente el flujo de creación.</p></div><div className="home-template-grid">{featured.map((template,index)=><AnimatedSection as="article" className="home-template-card" direction="scale" delay={index*130} key={template.id}><TemplateArtwork template={template}/><div><span>{categoryLabels[template.category]}</span><h3>{template.name}</h3><p>{template.description}</p><a href={`/invitations/create?template=${template.id}`}>Usar esta plantilla <span aria-hidden="true">→</span></a></div></AnimatedSection>)}</div></AnimatedSection>
+
+    <AnimatedSection as="section" className="home-section final-cta section-shell" direction="scale"><span aria-hidden="true">✦</span><h2>Tu próxima invitación puede empezar aquí</h2><p>Elige una plantilla, personaliza los detalles y comparte un enlace creado especialmente para tu evento.</p><a className="primary-cta light" href="/templates">Crear mi invitación</a></AnimatedSection>
+  </main><PublicFooter/></>
 }

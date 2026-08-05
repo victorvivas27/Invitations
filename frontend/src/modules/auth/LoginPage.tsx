@@ -1,90 +1,30 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PublicHeader } from '../../shared/components/layout/PublicHeader'
+import { FieldError } from '../../shared/components/feedback/FieldError'
 import { login, LoginError } from './services/authSession'
-
-const safeReturnTo = () => {
-  const value = new URLSearchParams(window.location.search).get('returnTo')
-  return value?.startsWith('/') && !value.startsWith('//')
-    ? value
-    : '/templates'
-}
-const registrationUrl = () =>
-  `/register?returnTo=${encodeURIComponent(safeReturnTo())}`
-
+const safeReturnTo = () => { const value = new URLSearchParams(window.location.search).get('returnTo'); return value?.startsWith('/') && !value.startsWith('//') ? value : '/templates' }
+const registrationUrl = () => `/register?returnTo=${encodeURIComponent(safeReturnTo())}`
+type Errors = Partial<Record<'email' | 'password' | 'form', string>>
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState(''), [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false), [errors, setErrors] = useState<Errors>({})
+  const refs = { email: useRef<HTMLInputElement>(null), password: useRef<HTMLInputElement>(null) }
+  const update = (field: 'email' | 'password', value: string) => { if (field === 'email') setEmail(value); else setPassword(value); setErrors((current) => ({ ...current, [field]: undefined, form: undefined })) }
   const submit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (submitting) return
-    setSubmitting(true)
-    setError('')
-    try {
-      await login(email, password)
-      window.location.assign(safeReturnTo())
-    } catch (failure) {
-      setError(
-        failure instanceof LoginError
-          ? failure.message
-          : 'No fue posible iniciar sesión.',
-      )
-      setSubmitting(false)
-    }
+    event.preventDefault(); if (submitting) return
+    const next: Errors = {}
+    if (!email.trim()) next.email = 'El correo electrónico es obligatorio.'
+    else if (!emailPattern.test(email.trim())) next.email = 'Ingresa un correo electrónico válido.'
+    if (!password) next.password = 'La contraseña es obligatoria.'
+    if (Object.keys(next).length) { setErrors(next); (next.email ? refs.email : refs.password).current?.focus(); return }
+    setSubmitting(true); setErrors({})
+    try { await login(email, password); window.location.assign(safeReturnTo()) }
+    catch (failure) { const message = failure instanceof LoginError ? failure.message : 'No fue posible iniciar sesión.'; setErrors(failure instanceof LoginError && failure.kind === 'credentials' ? { email: message } : { form: message }); setSubmitting(false); (failure instanceof LoginError && failure.kind === 'credentials' ? refs.email : refs.password).current?.focus() }
   }
-  return (
-    <>
-      <PublicHeader />
-      <main className="login-shell section-shell">
-        <section className="login-card">
-          <span className="pill">Acceso seguro</span>
-          <h1>Inicia sesión para crear tu invitación</h1>
-          <p>
-            Tu cuenta permite asociar y conservar las invitaciones que
-            publiques.
-          </p>
-          <form onSubmit={submit}>
-            <label>
-              <span>Correo electrónico</span>
-              <input
-                type="email"
-                autoComplete="email"
-                required
-                maxLength={254}
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </label>
-            <label>
-              <span>Contraseña</span>
-              <input
-                type="password"
-                autoComplete="current-password"
-                required
-                maxLength={72}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </label>
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-            <button className="primary-cta" type="submit" disabled={submitting}>
-              {submitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </button>
-          </form>
-          <div className="account-prompt">
-            <span>¿Todavía no tienes una cuenta?</span>
-            <a href={registrationUrl()}>Crear cuenta</a>
-          </div>
-          <a className="login-back" href="/">
-            Volver al inicio
-          </a>
-        </section>
-      </main>
-    </>
-  )
+  return <><PublicHeader /><main className="login-shell section-shell"><section className="login-card"><span className="pill">Acceso seguro</span><h1>Inicia sesión para crear tu invitación</h1><p>Tu cuenta permite asociar y conservar las invitaciones que publiques.</p>
+    <form onSubmit={submit} noValidate><label><span>Correo electrónico</span><input ref={refs.email} aria-label="Correo electrónico" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(e) => update('email', e.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'login-email-error' : undefined}/><FieldError id="login-email-error" message={errors.email}/></label>
+    <label><span>Contraseña</span><input ref={refs.password} type="password" autoComplete="current-password" required maxLength={72} value={password} onChange={(e) => update('password', e.target.value)} aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? 'login-password-error' : undefined}/><FieldError id="login-password-error" message={errors.password}/></label>
+    {errors.form && <p className="form-error" role="alert">{errors.form}</p>}<button className="primary-cta" type="submit" disabled={submitting}>{submitting ? 'Iniciando sesión…' : 'Iniciar sesión'}</button></form>
+    <div className="account-prompt"><span>¿Todavía no tienes una cuenta?</span><a href={registrationUrl()}>Crear cuenta</a></div><a className="login-back" href="/">Volver al inicio</a></section></main></>
 }

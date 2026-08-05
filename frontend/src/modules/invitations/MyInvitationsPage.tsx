@@ -8,6 +8,8 @@ import {
   InvitationApiError,
 } from './services/invitations'
 import type { OwnedInvitation } from './types/invitation'
+import { AppModal } from '../../shared/components/feedback/AppModal'
+import { useFeedback } from '../../shared/components/feedback/FeedbackProvider'
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('es-CL', {
@@ -23,6 +25,8 @@ export function MyInvitationsPage() {
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState('')
   const [deleteError, setDeleteError] = useState('')
+  const [pendingDelete, setPendingDelete] = useState<OwnedInvitation | null>(null)
+  const { toast } = useFeedback()
   const load = () => {
     setLoading(true)
     setError('')
@@ -41,8 +45,6 @@ export function MyInvitationsPage() {
     if (getAccessToken()) load()
   }, [])
   const remove = async (invitation: OwnedInvitation) => {
-    if (!window.confirm(`¿Eliminar definitivamente "${invitation.eventName}"?`))
-      return
     setDeleting(invitation.publicSlug)
     setDeleteError('')
     try {
@@ -50,6 +52,8 @@ export function MyInvitationsPage() {
       setInvitations((current) =>
         current.filter((item) => item.publicSlug !== invitation.publicSlug),
       )
+      setPendingDelete(null)
+      toast('Invitación eliminada correctamente.', 'success')
     } catch (failure) {
       setDeleteError(
         failure instanceof InvitationApiError
@@ -144,7 +148,10 @@ export function MyInvitationsPage() {
                     className="delete-invitation"
                     type="button"
                     disabled={deleting === invitation.publicSlug}
-                    onClick={() => void remove(invitation)}
+                    onClick={() => {
+                      setDeleteError('')
+                      setPendingDelete(invitation)
+                    }}
                   >
                     {deleting === invitation.publicSlug
                       ? 'Eliminando...'
@@ -154,6 +161,24 @@ export function MyInvitationsPage() {
               </article>
             ))}
           </section>
+        )}
+        <AppModal
+          open={Boolean(pendingDelete)}
+          variant="confirm"
+          title="Eliminar invitación"
+          description={`Esta acción eliminará permanentemente la invitación “${pendingDelete?.eventName ?? ''}”. Esta acción no se puede deshacer.`}
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          loading={Boolean(deleting)}
+          dismissible={false}
+          onCancel={() => !deleting && setPendingDelete(null)}
+          onConfirm={() => pendingDelete && void remove(pendingDelete)}
+        />
+        {deleteError && (
+          <AppModal open variant="error" title="No pudimos eliminar la invitación"
+            description={deleteError} confirmLabel="Reintentar" cancelLabel="Cerrar"
+            onCancel={() => { setDeleteError(''); setPendingDelete(null) }}
+            onConfirm={() => pendingDelete && void remove(pendingDelete)} />
         )}
       </main>
     </>
