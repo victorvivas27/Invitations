@@ -32,13 +32,6 @@ describe('invitation metadata function', () => {
       'no-store, no-cache, must-revalidate',
     )
     expect(response.headers.get('Vary')).toBe('User-Agent')
-    expect(response.headers.get('X-Metadata-Slug')).toBe('fiesta-123')
-    expect(response.headers.get('X-Metadata-Title')).toBe(
-      'Cumpleaños de <Theo>',
-    )
-    expect(response.headers.get('X-Social-Bot')).toBe('true')
-    expect(response.headers.get('X-Backend-Configured')).toBe('true')
-    expect(response.headers.get('X-Backend-Error')).toBe('')
     expect(html).toContain('Cumpleaños de &lt;Theo&gt;')
     expect(html).toContain('Ven &amp; celebra &quot;con nosotros&quot;')
     expect(html).toContain(
@@ -92,7 +85,6 @@ describe('invitation metadata function', () => {
     const html = await response.text()
 
     expect(response.status).toBe(200)
-    expect(response.headers.get('X-Backend-Error')).toBe('offline')
     expect(html).toContain('<title>Estás invitado</title>')
     expect(html).toContain(
       'content="https://invitations.example/images/love-letter-icon.png"',

@@ -207,19 +207,12 @@ export default async function invitationMetadata(request: Request) {
     redirect: status === 200 && !isSocialBot,
   })
 
-  return new Response(html, {
-    status,
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-      Vary: 'User-Agent',
-
-      // Encabezados temporales para diagnóstico.
-      'X-Metadata-Slug': slug,
-      'X-Metadata-Title': title,
-      'X-Social-Bot': String(isSocialBot),
-      'X-Backend-Configured': String(Boolean(backendUrl)),
-      'X-Backend-Error': backendError,
-    },
-  })
+return new Response(html, {
+  status,
+  headers: {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store, no-cache, must-revalidate',
+    Vary: 'User-Agent',
+  },
+})
 }
