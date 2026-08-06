@@ -11,7 +11,10 @@ const observers: FakeIntersectionObserver[] = []
 
 class FakeIntersectionObserver {
   readonly observed = new Set<Element>()
-  constructor(private readonly callback: Callback) {
+  constructor(
+    private readonly callback: Callback,
+    readonly options?: IntersectionObserverInit,
+  ) {
     observers.push(this)
   }
   observe(element: Element) {
@@ -28,12 +31,22 @@ class FakeIntersectionObserver {
   }
 }
 
-function Harness() {
+function Harness({
+  preview = false,
+  viewMode = 'scroll',
+}: {
+  preview?: boolean
+  viewMode?: 'scroll' | 'navigation'
+}) {
   const experience = useRef<HTMLDivElement>(null)
-  useInvitationAnimations(experience, true, 'scroll', 'key')
+  useInvitationAnimations(experience, preview, viewMode, 'key')
   return (
     <div ref={experience}>
-      <section className="experience-animate" data-testid="chapter" />
+      <div className="experience-chapters" data-testid="chapters">
+        <section data-reveal="group" data-testid="chapter">
+          <h2>Reserva este momento</h2>
+        </section>
+      </div>
     </div>
   )
 }
@@ -71,5 +84,20 @@ describe('useInvitationAnimations', () => {
     observer.emit(chapter, true)
     observer.emit(chapter, false)
     expect(chapter).toHaveClass('is-visible')
+  })
+
+  it('watches the viewport while the invitation scrolls vertically', () => {
+    render(<Harness />)
+    expect(observers[0].options?.root).toBeNull()
+  })
+
+  it('watches the horizontal carousel in navigation mode', () => {
+    const { getByTestId } = render(<Harness viewMode="navigation" />)
+    expect(observers[0].options?.root).toBe(getByTestId('chapters'))
+  })
+
+  it('watches the preview container inside the wizard', () => {
+    const { container } = render(<Harness preview />)
+    expect(observers[0].options?.root).toBe(container.firstElementChild)
   })
 })

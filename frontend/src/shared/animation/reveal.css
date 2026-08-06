@@ -1,0 +1,90 @@
+/* Sistema de apariciones al entrar en pantalla.
+ *
+ * Contrato:
+ *   1. Un contenedor recibe .motion-ready. Esa clase la añade useRevealGroup
+ *      solo después de confirmar que IntersectionObserver existe, así que sin
+ *      JavaScript nada se oculta y el contenido se ve completo.
+ *   2. Los elementos a animar se marcan con data-reveal:
+ *        item   el elemento entra por sí mismo
+ *        group  entran sus hijos directos, escalonados
+ *        media  entra la imagen que contiene
+ *   3. Al entrar en pantalla el observer añade .is-visible.
+ *
+ * Restricciones que este archivo centraliza (cambiar aquí, no en cada sección):
+ *   - Solo se animan opacity y translateY. Nunca font-size, font-weight,
+ *     line-height ni letter-spacing.
+ *   - Ningún bloque grande se escala: el zoom aparente y el texto borroso en
+ *     móvil venían de ahí. Solo las imágenes admiten una escala mínima.
+ *   - Duraciones entre 700ms y 1.2s; escalonado entre 80ms y 150ms.
+ */
+:root {
+  --reveal-duration: 900ms;
+  --reveal-duration-media: 1100ms;
+  --reveal-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --reveal-distance: 24px;
+  --reveal-stagger: 110ms;
+  --reveal-image-scale: 0.98;
+}
+
+.motion-ready [data-reveal='item'],
+.motion-ready [data-reveal='group'] > * {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) ease-out var(--reveal-delay, 0ms),
+    transform var(--reveal-duration) var(--reveal-easing)
+      var(--reveal-delay, 0ms);
+}
+.motion-ready [data-reveal='media'] > img {
+  opacity: 0;
+  /* La única escala del sistema, y solo sobre la imagen: crece hasta su tamaño
+     real sin arrastrar texto. */
+  transform: scale(var(--reveal-image-scale));
+  transition:
+    opacity var(--reveal-duration-media) ease-out,
+    transform var(--reveal-duration-media) var(--reveal-easing);
+}
+.motion-ready [data-reveal='item'].is-visible,
+.motion-ready [data-reveal='group'].is-visible > *,
+.motion-ready [data-reveal='media'].is-visible > img {
+  opacity: 1;
+  transform: none;
+}
+
+/* Escalonado. Se resuelve fijando --reveal-delay, que la transición de arriba ya
+   consume, en lugar de declarar otra transition por posición. Un style en línea
+   puede sobrescribirlo cuando la cantidad de hijos es dinámica. */
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(2) {
+  --reveal-delay: var(--reveal-stagger);
+}
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(3) {
+  --reveal-delay: calc(var(--reveal-stagger) * 2);
+}
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(4) {
+  --reveal-delay: calc(var(--reveal-stagger) * 3);
+}
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(5) {
+  --reveal-delay: calc(var(--reveal-stagger) * 4);
+}
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(6) {
+  --reveal-delay: calc(var(--reveal-stagger) * 5);
+}
+.motion-ready [data-reveal='group'].is-visible > *:nth-child(n + 7) {
+  --reveal-delay: calc(var(--reveal-stagger) * 6);
+}
+
+/* Un control que el usuario está pulsando no se mueve bajo su dedo. */
+.motion-ready [data-reveal] :is(a, button):active {
+  transition: none;
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready [data-reveal='item'],
+  .motion-ready [data-reveal='group'] > *,
+  .motion-ready [data-reveal='media'] > img {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

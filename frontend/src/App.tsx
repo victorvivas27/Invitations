@@ -9,6 +9,7 @@ import {
 } from './modules/invitations'
 import { TemplatesPage } from './modules/templates'
 import './styles/globals.css'
+import './shared/animation/reveal.css'
 import foundationStyles from './shared/styles/foundation.module.css'
 import templateStyles from './modules/templates/styles/Templates.module.css'
 import invitationWizardStyles from './modules/invitations/styles/InvitationWizard.module.css'

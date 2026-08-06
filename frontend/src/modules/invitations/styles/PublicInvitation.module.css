@@ -150,23 +150,30 @@
   padding-block: 10px;
   background: #eaf0f6;
 }
+/* Separación entre secciones: una medida relativa al ancho de la pantalla en vez
+   de centímetros, que en un teléfono resultaban desproporcionados. El espacio va
+   solo debajo, así cada sección conserva su propio fondo y la última no arrastra
+   un hueco final. */
+.is-scroll .experience-chapter:not(:last-child) {
+  margin-bottom: clamp(3rem, 8vw, 6rem);
+}
 .is-scroll .experience-cover {
   width: min(calc(100% - 16px), 1180px);
-  margin: 0 auto 1.4cm;
+  margin-inline: auto;
   border-radius: clamp(18px, 4vw, 30px);
   box-shadow: 0 16px 46px #1118271f;
 }
 .is-scroll .experience-section {
   width: min(calc(100% - 16px), 1080px);
   min-height: 48svh;
-  margin: 0 auto 1.4cm;
+  margin-inline: auto;
   border: 1px solid #ffffffb8;
   border-radius: clamp(20px, 4vw, 30px);
   box-shadow: 0 14px 38px #11182714;
 }
 .is-scroll .experience-farewell {
   width: min(calc(100% - 16px), 1180px);
-  margin: 0 auto;
+  margin-inline: auto;
   border-radius: clamp(20px, 4vw, 30px);
   box-shadow: 0 16px 46px #11182724;
 }
@@ -803,166 +810,9 @@ section[data-custom-background='true'].experience-farewell
   .is-scroll .experience-farewell {
     width: min(calc(100% - 32px), 1180px);
   }
-  .is-scroll .experience-cover {
-    margin-bottom: 2cm;
-  }
   .is-scroll .experience-section {
     width: min(calc(100% - 40px), 1080px);
-    margin: 0 auto 2cm;
   }
-}
-/* Las apariciones usan solo opacidad y desplazamiento: escalar un bloque que
-   ocupa casi toda la pantalla del teléfono se percibe como zoom de la página y
-   además desenfoca el texto mientras dura la transición. */
-.motion-ready .experience-animate {
-  opacity: 0;
-  transform: translateY(44px);
-  transition:
-    opacity 1.4s ease-out,
-    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-animate.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.motion-ready .experience-cover-media {
-  transform: none;
-  transition: opacity 0.8s ease;
-}
-.motion-ready .experience-cover-media img {
-  transform: scale(1.035);
-  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-cover-media.is-visible img {
-  transform: scale(1);
-}
-.motion-ready .experience-cover-copy,
-.motion-ready .experience-cover-copy.is-visible {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-/* El encadenado de la portada se resuelve con transition-delay. Antes convivían
-   una transición y un @keyframes sobre las mismas propiedades: el keyframes se
-   reiniciaba cada vez que la portada volvía a entrar en pantalla, algo que en
-   móvil ocurre constantemente y hacía "saltar" el texto. */
-.motion-ready .experience-cover-copy > * {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.55s ease,
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-cover-copy.is-visible > * {
-  opacity: 1;
-  transform: translateY(0);
-}
-.motion-ready .experience-cover-copy.is-visible > span {
-  transition-delay: 1.35s;
-}
-.motion-ready .experience-cover-copy.is-visible > .experience-cover-invite {
-  transition-delay: 1.65s;
-}
-.motion-ready .experience-cover-copy.is-visible > h1 {
-  transition-delay: 1.95s;
-}
-.motion-ready .experience-cover-copy.is-visible > .experience-cover-age {
-  transition-delay: 2.25s;
-}
-.motion-ready .experience-cover-copy.is-visible > a {
-  transition-delay: 2.55s;
-}
-.motion-ready .experience-gallery figure {
-  opacity: 0;
-  transform: translateY(24px) rotate(-1deg);
-  transition:
-    opacity 1.5s ease-out var(--reveal-delay, 0ms),
-    transform 1.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
-}
-.motion-ready .experience-gallery.is-visible figure {
-  opacity: 1;
-  transform: translateY(0) rotate(0);
-}
-.motion-ready .countdown > div {
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 1.2s ease-out,
-    transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-when.is-visible .countdown > div {
-  opacity: 1;
-  transform: none;
-}
-.motion-ready .experience-when.is-visible .countdown > div:nth-child(2) {
-  transition-delay: 90ms;
-}
-.motion-ready .experience-when.is-visible .countdown > div:nth-child(3) {
-  transition-delay: 180ms;
-}
-.motion-ready .experience-farewell-media img {
-  transform: scale(1.025);
-  transition: transform 1.8s ease-out;
-}
-.motion-ready .experience-farewell-media.is-visible img {
-  transform: scale(1);
-}
-.motion-ready .experience-farewell-copy,
-.motion-ready .experience-farewell-copy.is-visible {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-.motion-ready .experience-farewell-copy > * {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.55s ease,
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-farewell-copy.is-visible > * {
-  opacity: 1;
-  transform: translateY(0);
-}
-.motion-ready .experience-farewell-copy.is-visible > p {
-  transition-delay: 1.35s;
-}
-.motion-ready .experience-farewell-copy.is-visible > h2 {
-  transition-delay: 1.8s;
-}
-.motion-ready .experience-farewell-copy.is-visible > span {
-  transition-delay: 2.25s;
-}
-.motion-ready .experience-section.experience-animate > * {
-  opacity: 0;
-  transform: translateY(34px);
-  transition:
-    opacity 1.3s ease-out,
-    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.motion-ready .experience-section.experience-animate.is-visible > * {
-  opacity: 1;
-  transform: none;
-}
-.motion-ready
-  .experience-section.experience-animate.is-visible
-  > *:nth-child(2) {
-  transition-delay: 150ms;
-}
-.motion-ready
-  .experience-section.experience-animate.is-visible
-  > *:nth-child(3) {
-  transition-delay: 300ms;
-}
-.motion-ready
-  .experience-section.experience-animate.is-visible
-  > *:nth-child(4) {
-  transition-delay: 450ms;
-}
-.motion-ready
-  .experience-section.experience-animate.is-visible
-  > *:nth-child(5) {
-  transition-delay: 600ms;
 }
 @media (min-width: 700px) {
   .experience-gallery > div {
@@ -991,40 +841,21 @@ section[data-custom-background='true'].experience-farewell
   min-height: 100% !important;
   height: 100%;
 }
-@media (prefers-reduced-motion: no-preference) {
+/* El rebote de la llamada a la acción queda solo para punteros finos. En una
+   pantalla táctil el botón se movía justo cuando el invitado iba a pulsarlo, y
+   ahí no existe el paso previo de hover donde detenerlo. */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .experience-cover-copy > a {
     animation: public-bob 2.2s ease-in-out infinite;
+  }
+  .experience-cover-copy > a:active,
+  .experience-cover-copy > a:focus-visible {
+    animation-play-state: paused;
   }
   @keyframes public-bob {
     50% {
       transform: translateY(7px);
     }
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .motion-ready .experience-animate,
-  .motion-ready .experience-gallery figure,
-  .motion-ready .countdown > div,
-  .motion-ready .experience-cover-media img,
-  .motion-ready .experience-farewell-media img {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .motion-ready .experience-section.experience-animate > * {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .motion-ready .experience-cover-copy > * {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .motion-ready .experience-farewell-copy > * {
-    opacity: 1;
-    transform: none;
-    transition: none;
   }
 }
 

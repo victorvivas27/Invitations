@@ -311,14 +311,14 @@ export function PublicInvitationRenderer({
           background={invitation.sectionBackgrounds?.basic}
         >
           {invitation.heroImageUrl && (
-            <div className="experience-cover-media experience-animate">
+            <div className="experience-cover-media" data-reveal="media">
               <img
                 src={invitation.heroImageUrl}
                 alt={`Foto principal de ${invitation.honoreeName}`}
               />
             </div>
           )}
-          <div className="experience-cover-copy experience-animate">
+          <div className="experience-cover-copy" data-reveal="group">
             <p className="experience-cover-invite">
               Estamos felices de invitarte al cumple de
             </p>
@@ -341,16 +341,18 @@ export function PublicInvitationRenderer({
         </SectionBackground>
         <SectionBackground
           id="frase"
-          className="experience-section experience-intro experience-animate experience-chapter"
+          className="experience-section experience-intro experience-chapter"
           background={invitation.sectionBackgrounds?.tribute}
+          reveal="group"
         >
           <span className="experience-number">01</span>
           <p>{invitation.message}</p>
         </SectionBackground>
         <SectionBackground
           id="fecha"
-          className="experience-section experience-when experience-animate experience-chapter"
+          className="experience-section experience-when experience-chapter"
           background={invitation.sectionBackgrounds?.date}
+          reveal="group"
         >
           <span className="experience-number">02</span>
           <h2>Reserva este momento</h2>
@@ -373,8 +375,9 @@ export function PublicInvitationRenderer({
         </SectionBackground>
         <SectionBackground
           id="lugar"
-          className="experience-section experience-place experience-animate experience-chapter"
+          className="experience-section experience-place experience-chapter"
           background={invitation.sectionBackgrounds?.venue}
+          reveal="group"
         >
           <span className="experience-number">03</span>
           <h2>Aquí te esperamos con cariño</h2>
@@ -393,21 +396,15 @@ export function PublicInvitationRenderer({
         {gallery.length > 0 && (
           <SectionBackground
             id="fotos"
-            className="experience-section experience-gallery experience-animate experience-chapter"
+            className="experience-section experience-gallery experience-chapter"
             background={invitation.sectionBackgrounds?.gallery}
+            reveal="group"
           >
             <span className="experience-number">04</span>
             <h2>Momentos que guardamos</h2>
             <div>
               {gallery.map((url, index) => (
-                <figure
-                  key={url}
-                  style={
-                    {
-                      '--reveal-delay': `${index * 150}ms`,
-                    } as React.CSSProperties
-                  }
-                >
+                <figure key={url}>
                   <img
                     src={url}
                     alt={`Recuerdo ${index + 1} de ${invitation.honoreeName}`}
@@ -421,8 +418,9 @@ export function PublicInvitationRenderer({
         )}
         <SectionBackground
           id="confirmar"
-          className="experience-section experience-rsvp experience-animate experience-chapter"
+          className="experience-section experience-rsvp experience-chapter"
           background={invitation.sectionBackgrounds?.message}
+          reveal="group"
         >
           <span className="experience-number">05</span>
           <h2>Confirma tu presencia</h2>
@@ -440,7 +438,7 @@ export function PublicInvitationRenderer({
           background={invitation.sectionBackgrounds?.summary}
         >
           {finalImage && (
-            <div className="experience-farewell-media experience-animate">
+            <div className="experience-farewell-media" data-reveal="media">
               <img
                 src={finalImage}
                 alt={`Recuerdo especial de ${invitation.honoreeName}`}
@@ -448,7 +446,7 @@ export function PublicInvitationRenderer({
               />
             </div>
           )}
-          <div className="experience-farewell-copy experience-animate">
+          <div className="experience-farewell-copy" data-reveal="group">
             <p>Gracias por acompañarnos en este día tan especial.</p>
             <h2>¡Te esperamos!</h2>
             <span>✦</span>

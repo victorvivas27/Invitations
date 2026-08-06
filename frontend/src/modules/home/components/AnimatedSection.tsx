@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
+import { useRevealed } from '../../../shared/animation'
 
 type Props = {
   children: React.ReactNode
@@ -16,28 +17,7 @@ export function AnimatedSection({
   as: Tag = 'div',
 }: Props) {
   const ref = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(
-    () => typeof IntersectionObserver === 'undefined',
-  )
-  useEffect(() => {
-    const node = ref.current
-    if (!node || !('IntersectionObserver' in window)) {
-      setVisible(true)
-      return
-    }
-    // Una sola aparición: al devolver el bloque a su estado oculto cuando salía
-    // del viewport, en móvil la animación se repetía en cada scroll.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return
-        setVisible(true)
-        observer.disconnect()
-      },
-      { threshold: 0.18, rootMargin: '0px 0px -5% 0px' },
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+  const visible = useRevealed(ref)
   return (
     <Tag
       ref={ref as React.Ref<never>}
