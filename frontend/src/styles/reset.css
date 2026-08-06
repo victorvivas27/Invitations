@@ -4,6 +4,10 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
+  /* Safari y Chrome móvil inflan el texto por su cuenta ("font boosting")
+     y la página se ve con zoom respecto a escritorio. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 body {
   margin: 0;
@@ -26,4 +30,20 @@ button:focus-visible,
 input:focus-visible {
   outline: 3px solid rgba(215, 25, 32, 0.35);
   outline-offset: 3px;
+}
+/* En pantallas táctiles Safari hace zoom al enfocar un campo con texto menor a
+   16px y no vuelve a la escala original: el resto del scroll queda ampliado.
+   El piso de 16px evita ese zoom sin bloquear el gesto de pinch del usuario. */
+@media (pointer: coarse) {
+  input:not(
+    [type='checkbox'],
+    [type='radio'],
+    [type='range'],
+    [type='file'],
+    [type='color']
+  ),
+  select,
+  textarea {
+    font-size: max(16px, 1rem) !important;
+  }
 }

@@ -112,6 +112,7 @@
   border-radius: 999px;
   color: #fff;
   background: #0a1830a6;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 26px #0611264d;
   font-size: clamp(0.92rem, 2.8vw, 1.08rem);
@@ -322,9 +323,13 @@ section[data-custom-background='true'] .countdown span {
     transform 0.2s ease,
     filter 0.2s ease;
 }
-.experience-place > a:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
+/* Solo punteros reales: al tocar en un móvil el :hover queda fijo y el botón se
+   ve desplazado hasta que se toca otro elemento. */
+@media (hover: hover) and (pointer: fine) {
+  .experience-place > a:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
 }
 .experience-gallery {
   padding-inline: max(16px, calc((100vw - 1100px) / 2));
@@ -385,6 +390,7 @@ section[data-custom-background='true'] .countdown span {
   color: #eaf1fb;
   color-scheme: dark;
   background: linear-gradient(168deg, #16294a, #0a1424);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   box-shadow: 0 22px 52px #08112159;
   text-align: left;
@@ -483,9 +489,11 @@ section[data-custom-background='true'] .countdown span {
     transform 0.2s ease,
     filter 0.2s ease;
 }
-.rsvp-form > button:hover:not(:disabled) {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .rsvp-form > button:hover:not(:disabled) {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+  }
 }
 .rsvp-form > button:disabled {
   opacity: 0.62;
@@ -686,10 +694,12 @@ section[data-custom-background='true'] .rsvp-success {
     transform 0.2s ease,
     border-color 0.2s ease;
 }
-.invitation-footer nav a:hover {
-  border-color: #ffffff70;
-  background: #ffffff1a;
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .invitation-footer nav a:hover {
+    border-color: #ffffff70;
+    background: #ffffff1a;
+    transform: translateY(-2px);
+  }
 }
 .invitation-footer svg {
   flex: none;
@@ -756,6 +766,7 @@ section[data-custom-background='true'].experience-section::before {
   border: 1px solid #ffffff73;
   border-radius: clamp(16px, 3vw, 24px);
   background: rgba(255, 255, 255, 0);
+  -webkit-backdrop-filter: blur(2px) saturate(1);
   backdrop-filter: blur(2px) saturate(1);
   box-shadow:
     inset 0 1px 0 #ffffff75,
@@ -783,6 +794,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid #ffffff66;
   border-radius: clamp(16px, 3vw, 24px);
   background: rgba(8, 18, 36, 0.042) !important;
+  -webkit-backdrop-filter: blur(2px) saturate(1.04);
   backdrop-filter: blur(2px) saturate(1.04);
   box-shadow: inset 0 1px 0 #ffffff52;
 }
@@ -799,17 +811,19 @@ section[data-custom-background='true'].experience-farewell
     margin: 0 auto 2cm;
   }
 }
+/* Las apariciones usan solo opacidad y desplazamiento: escalar un bloque que
+   ocupa casi toda la pantalla del teléfono se percibe como zoom de la página y
+   además desenfoca el texto mientras dura la transición. */
 .motion-ready .experience-animate {
   opacity: 0;
-  transform: translateY(44px) scale(0.97);
+  transform: translateY(44px);
   transition:
     opacity 1.4s ease-out,
     transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .motion-ready .experience-animate.is-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
-  animation: invitation-reveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform: translateY(0);
 }
 .motion-ready .experience-cover-media {
   transform: none;
@@ -828,6 +842,10 @@ section[data-custom-background='true'].experience-farewell
   transform: none;
   transition: none;
 }
+/* El encadenado de la portada se resuelve con transition-delay. Antes convivían
+   una transición y un @keyframes sobre las mismas propiedades: el keyframes se
+   reiniciaba cada vez que la portada volvía a entrar en pantalla, algo que en
+   móvil ocurre constantemente y hacía "saltar" el texto. */
 .motion-ready .experience-cover-copy > * {
   opacity: 0;
   transform: translateY(18px);
@@ -838,37 +856,36 @@ section[data-custom-background='true'].experience-farewell
 .motion-ready .experience-cover-copy.is-visible > * {
   opacity: 1;
   transform: translateY(0);
-  animation: invitation-text-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .motion-ready .experience-cover-copy.is-visible > span {
-  animation-delay: 1.35s;
+  transition-delay: 1.35s;
 }
 .motion-ready .experience-cover-copy.is-visible > .experience-cover-invite {
-  animation-delay: 1.65s;
+  transition-delay: 1.65s;
 }
 .motion-ready .experience-cover-copy.is-visible > h1 {
-  animation-delay: 1.95s;
+  transition-delay: 1.95s;
 }
 .motion-ready .experience-cover-copy.is-visible > .experience-cover-age {
-  animation-delay: 2.25s;
+  transition-delay: 2.25s;
 }
 .motion-ready .experience-cover-copy.is-visible > a {
-  animation-delay: 2.55s;
+  transition-delay: 2.55s;
 }
 .motion-ready .experience-gallery figure {
   opacity: 0;
-  transform: translateY(24px) rotate(-1deg) scale(0.97);
+  transform: translateY(24px) rotate(-1deg);
   transition:
     opacity 1.5s ease-out var(--reveal-delay, 0ms),
     transform 1.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
 }
 .motion-ready .experience-gallery.is-visible figure {
   opacity: 1;
-  transform: translateY(0) rotate(0) scale(1);
+  transform: translateY(0) rotate(0);
 }
 .motion-ready .countdown > div {
   opacity: 0;
-  transform: translateY(14px) scale(0.94);
+  transform: translateY(14px);
   transition:
     opacity 1.2s ease-out,
     transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -906,26 +923,15 @@ section[data-custom-background='true'].experience-farewell
 .motion-ready .experience-farewell-copy.is-visible > * {
   opacity: 1;
   transform: translateY(0);
-  animation: invitation-text-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .motion-ready .experience-farewell-copy.is-visible > p {
-  animation-delay: 1.35s;
+  transition-delay: 1.35s;
 }
 .motion-ready .experience-farewell-copy.is-visible > h2 {
-  animation-delay: 1.8s;
+  transition-delay: 1.8s;
 }
 .motion-ready .experience-farewell-copy.is-visible > span {
-  animation-delay: 2.25s;
-}
-@keyframes invitation-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(44px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  transition-delay: 2.25s;
 }
 .motion-ready .experience-section.experience-animate > * {
   opacity: 0;
@@ -957,16 +963,6 @@ section[data-custom-background='true'].experience-farewell
   .experience-section.experience-animate.is-visible
   > *:nth-child(5) {
   transition-delay: 600ms;
-}
-@keyframes invitation-text-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 @media (min-width: 700px) {
   .experience-gallery > div {
@@ -1044,6 +1040,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid rgba(217, 224, 234, 0.8);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow-medium);
 }
@@ -1153,6 +1150,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid rgba(217, 224, 234, 0.8);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-small);
 }
@@ -1211,6 +1209,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid rgba(217, 224, 234, 0.8);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   text-align: center;
   box-shadow: var(--shadow-small);
@@ -1250,9 +1249,11 @@ section[data-custom-background='true'].experience-farewell
   font-weight: 850;
   cursor: pointer;
 }
-.delete-invitation:hover {
-  color: white;
-  background: var(--error);
+@media (hover: hover) and (pointer: fine) {
+  .delete-invitation:hover {
+    color: white;
+    background: var(--error);
+  }
 }
 .delete-invitation:disabled {
   opacity: 0.55;
@@ -1306,6 +1307,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid rgba(217, 224, 234, 0.8);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-small);
   text-align: center;
@@ -1333,6 +1335,7 @@ section[data-custom-background='true'].experience-farewell
   border: 1px solid rgba(217, 224, 234, 0.8);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-small);
 }

@@ -15,26 +15,39 @@ export async function mapApiError(response: Response): Promise<ApiErrorResult> {
   } catch {
     body = null
   }
-  const data = body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+  const data =
+    body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
   const rawErrors = data.errors
   const fieldErrors: Record<string, string> = {}
   if (rawErrors && typeof rawErrors === 'object') {
-    for (const [field, value] of Object.entries(rawErrors as Record<string, unknown>)) {
+    for (const [field, value] of Object.entries(
+      rawErrors as Record<string, unknown>,
+    )) {
       if (typeof value === 'string') fieldErrors[field] = value
-      else if (Array.isArray(value) && typeof value[0] === 'string') fieldErrors[field] = value[0]
+      else if (Array.isArray(value) && typeof value[0] === 'string')
+        fieldErrors[field] = value[0]
     }
   }
-  const code = typeof data.code === 'string' ? data.code : typeof data.error === 'string' ? data.error : ''
+  const code =
+    typeof data.code === 'string'
+      ? data.code
+      : typeof data.error === 'string'
+        ? data.error
+        : ''
   const supplied = typeof data.message === 'string' ? data.message : ''
-  const safeSupplied = supplied && !/validation failed|unexpected|internal|trace|exception/i.test(supplied)
+  const safeSupplied =
+    supplied &&
+    !/validation failed|unexpected|internal|trace|exception/i.test(supplied)
   return {
     status: response.status,
     fieldErrors,
     message:
       safeMessages[code] ??
-      (safeSupplied ? supplied : response.status >= 500
-        ? 'Ocurrió un problema inesperado. Inténtalo nuevamente.'
-        : 'No pudimos completar la solicitud. Revisa los datos e inténtalo nuevamente.'),
+      (safeSupplied
+        ? supplied
+        : response.status >= 500
+          ? 'Ocurrió un problema inesperado. Inténtalo nuevamente.'
+          : 'No pudimos completar la solicitud. Revisa los datos e inténtalo nuevamente.'),
   }
 }
 

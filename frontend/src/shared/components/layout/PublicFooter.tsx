@@ -12,8 +12,15 @@ export function PublicFooter() {
       setSignatureVisible(true)
       return
     }
+    // Una sola aparición: la firma queda al final de la página y en un teléfono
+    // entra y sale del viewport constantemente, así que la animación se
+    // repetía en cada scroll.
     const observer = new IntersectionObserver(
-      ([entry]) => setSignatureVisible(entry.isIntersecting),
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        setSignatureVisible(true)
+        observer.disconnect()
+      },
       { threshold: 0.35 },
     )
     observer.observe(node)
@@ -36,7 +43,9 @@ export function PublicFooter() {
         className={`creator-signature${signatureVisible ? ' is-visible' : ''}`}
         aria-label="Autor del proyecto"
       >
-        <span className="creator-monogram" aria-hidden="true">VJ</span>
+        <span className="creator-monogram" aria-hidden="true">
+          VJ
+        </span>
         <span className="creator-copy">
           <small>Diseño y desarrollo</small>
           <strong>Creado por Victor Javier Vivas</strong>
@@ -46,7 +55,9 @@ export function PublicFooter() {
           </a>
         </span>
         <span className="creator-web" aria-hidden="true">
-          <i /><i /><i />
+          <i />
+          <i />
+          <i />
         </span>
       </div>
     </footer>
