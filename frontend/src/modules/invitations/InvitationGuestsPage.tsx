@@ -1,11 +1,37 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
-import { PublicHeader } from '../../shared/components/layout/PublicHeader'
+import { Link, Navigate, useParams } from 'react-router-dom'
+import { AppLayout } from '../../shared/components/layout/AppLayout'
+import { Skeleton } from '../../shared/components/feedback/Skeleton'
 import { getAccessToken } from '../auth/services/authSession'
 import {
   getInvitationGuests,
   type InvitationGuest,
 } from './services/invitations'
+
+function GuestsSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Cargando invitados">
+      <section className="guest-summary">
+        {[0, 1, 2].map((index) => (
+          <div key={index}>
+            <Skeleton className="skeleton-metric" />
+            <Skeleton className="skeleton-line" width="70%" />
+          </div>
+        ))}
+      </section>
+      <section className="guest-list">
+        {[0, 1].map((index) => (
+          <article key={index} className="is-skeleton">
+            <Skeleton className="skeleton-pill" />
+            <Skeleton className="skeleton-title" />
+            <Skeleton className="skeleton-line" width="45%" />
+            <Skeleton className="skeleton-row" />
+          </article>
+        ))}
+      </section>
+    </div>
+  )
+}
 
 export function InvitationGuestsPage() {
   const { slug = '' } = useParams()
@@ -37,80 +63,72 @@ export function InvitationGuestsPage() {
       />
     )
   return (
-    <>
-      <PublicHeader activePage="my-invitations" />
-      <main className="guests-page section-shell">
-        <a className="guests-back" href="/my-invitations">
-          ← Mis invitaciones
-        </a>
-        <header>
-          <span className="pill">Confirmaciones</span>
-          <h1>Invitados</h1>
-          <p>Revisa quiénes asistirán y los mensajes que dejaron.</p>
-        </header>
-        {loading ? (
-          <section className="my-invitations-state">
-            <span className="loader" />
-            <p>Cargando invitados...</p>
+    <AppLayout
+      activePage="my-invitations"
+      className="guests-page section-shell"
+    >
+      <Link className="guests-back" to="/my-invitations">
+        ← Mis invitaciones
+      </Link>
+      <header>
+        <span className="pill">Confirmaciones</span>
+        <h1>Invitados</h1>
+        <p>Revisa quiénes asistirán y los mensajes que dejaron.</p>
+      </header>
+      {loading ? (
+        <GuestsSkeleton />
+      ) : error ? (
+        <section className="my-invitations-state" role="alert">
+          <h2>No pudimos cargar la lista</h2>
+          <p>{error}</p>
+        </section>
+      ) : (
+        <>
+          <section className="guest-summary" aria-label="Resumen de invitados">
+            <div>
+              <strong>{summary.people}</strong>
+              <span>Personas confirmadas</span>
+            </div>
+            <div>
+              <strong>{summary.confirmations}</strong>
+              <span>Respuestas positivas</span>
+            </div>
+            <div>
+              <strong>{summary.declined}</strong>
+              <span>No asistirán</span>
+            </div>
           </section>
-        ) : error ? (
-          <section className="my-invitations-state" role="alert">
-            <h2>No pudimos cargar la lista</h2>
-            <p>{error}</p>
-          </section>
-        ) : (
-          <>
-            <section
-              className="guest-summary"
-              aria-label="Resumen de invitados"
-            >
-              <div>
-                <strong>{summary.people}</strong>
-                <span>Personas confirmadas</span>
-              </div>
-              <div>
-                <strong>{summary.confirmations}</strong>
-                <span>Respuestas positivas</span>
-              </div>
-              <div>
-                <strong>{summary.declined}</strong>
-                <span>No asistirán</span>
-              </div>
+          {guests.length === 0 ? (
+            <section className="my-invitations-state">
+              <h2>Todavía no hay respuestas</h2>
+              <p>Las confirmaciones aparecerán aquí.</p>
             </section>
-            {guests.length === 0 ? (
-              <section className="my-invitations-state">
-                <h2>Todavía no hay respuestas</h2>
-                <p>Las confirmaciones aparecerán aquí.</p>
-              </section>
-            ) : (
-              <section className="guest-list" aria-label="Lista de invitados">
-                {guests.map((guest) => (
-                  <article key={`${guest.name}-${guest.respondedAt}`}>
-                    <span
-                      className={guest.attending ? 'guest-yes' : 'guest-no'}
-                    >
-                      {guest.attending ? 'Asistirá' : 'No asistirá'}
-                    </span>
-                    <h2>{guest.name}</h2>
-                    <p>
-                      {guest.attending
-                        ? `${guest.guestCount} ${guest.guestCount === 1 ? 'persona' : 'personas'}`
-                        : 'Sin asistentes'}
-                    </p>
-                    {guest.message && <blockquote>{guest.message}</blockquote>}
-                    <small>
-                      {new Intl.DateTimeFormat('es-CL', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      }).format(new Date(guest.respondedAt))}
-                    </small>
-                  </article>
-                ))}
-              </section>
-            )}
-          </>
-        )}
-      </main>
-    </>
+          ) : (
+            <section className="guest-list" aria-label="Lista de invitados">
+              {guests.map((guest) => (
+                <article key={`${guest.name}-${guest.respondedAt}`}>
+                  <span className={guest.attending ? 'guest-yes' : 'guest-no'}>
+                    {guest.attending ? 'Asistirá' : 'No asistirá'}
+                  </span>
+                  <h2>{guest.name}</h2>
+                  <p>
+                    {guest.attending
+                      ? `${guest.guestCount} ${guest.guestCount === 1 ? 'persona' : 'personas'}`
+                      : 'Sin asistentes'}
+                  </p>
+                  {guest.message && <blockquote>{guest.message}</blockquote>}
+                  <small>
+                    {new Intl.DateTimeFormat('es-CL', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    }).format(new Date(guest.respondedAt))}
+                  </small>
+                </article>
+              ))}
+            </section>
+          )}
+        </>
+      )}
+    </AppLayout>
   )
 }

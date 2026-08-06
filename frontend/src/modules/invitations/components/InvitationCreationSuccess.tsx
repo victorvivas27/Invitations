@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { CreatedInvitation } from '../types/invitation'
 import { getInvitationShareUrl } from '../services/invitations'
 export function InvitationCreationSuccess({
@@ -40,13 +41,16 @@ export function InvitationCreationSuccess({
           />
         </label>
         <div className="success-actions">
-          <a className="primary-cta" href={invitation.publicUrl}>
+          <Link
+            className="primary-cta"
+            to={getInvitationShareUrl(invitation.publicSlug)}
+          >
             Ver invitación
-          </a>
+          </Link>
           <button type="button" className="secondary-cta" onClick={copy}>
             Copiar enlace
           </button>
-          <a href="/templates">Volver a plantillas</a>
+          <Link to="/templates">Volver a plantillas</Link>
         </div>
         <p className="copy-status" aria-live="polite">
           {copyState}

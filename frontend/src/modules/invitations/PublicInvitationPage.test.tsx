@@ -42,7 +42,7 @@ describe('PublicInvitationPage', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Sofía' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('sábado, 22 de agosto de 2026')).toBeInTheDocument()
+    expect(screen.getByText('Sábado, 22 de Agosto de 2026')).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'Abrir en Google Maps' }),
     ).toHaveAttribute('href', invitation.mapsUrl)

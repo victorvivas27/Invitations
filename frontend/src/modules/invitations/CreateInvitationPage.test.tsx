@@ -1,15 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { CreateInvitationPage } from './CreateInvitationPage'
 
+const renderAt = (url: string) =>
+  render(
+    <MemoryRouter initialEntries={[url]}>
+      <CreateInvitationPage />
+    </MemoryRouter>,
+  )
 const renderWizard = () => {
   window.localStorage.setItem('invitation_access_token', 'safe-token')
-  window.history.pushState(
-    {},
-    '',
-    '/invitations/create?template=birthday-urban',
-  )
-  return render(<CreateInvitationPage />)
+  return renderAt('/invitations/create?template=birthday-urban')
 }
 const next = () =>
   userEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
@@ -240,8 +242,7 @@ describe('CreateInvitationPage', () => {
 
   it('handles a missing template identifier', () => {
     window.localStorage.setItem('invitation_access_token', 'safe-token')
-    window.history.pushState({}, '', '/invitations/create?template=missing')
-    render(<CreateInvitationPage />)
+    renderAt('/invitations/create?template=missing')
     expect(
       screen.getByRole('heading', {
         name: 'La plantilla seleccionada no existe.',

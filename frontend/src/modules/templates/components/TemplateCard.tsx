@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { categoryLabels, styleLabels } from '../data/invitationTemplates'
 import type { InvitationTemplate } from '../types/invitationTemplate'
 import { TemplateArtwork } from './TemplateArtwork'
@@ -36,12 +37,12 @@ export function TemplateCard({
             Vista previa
           </button>
           {template.isAvailable ? (
-            <a
+            <Link
               className="use-action"
-              href={`/invitations/create?template=${encodeURIComponent(template.id)}`}
+              to={`/invitations/create?template=${encodeURIComponent(template.id)}`}
             >
               Usar plantilla
-            </a>
+            </Link>
           ) : (
             <button type="button" className="use-action" disabled>
               Usar plantilla
