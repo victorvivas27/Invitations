@@ -82,7 +82,8 @@ export function InvitationWizard({
     if (step === 3 && draft.date) {
       const today = new Date()
       const localToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-      if (draft.date < localToday) next.date = 'La fecha no puede ser anterior a hoy.'
+      if (draft.date < localToday)
+        next.date = 'La fecha no puede ser anterior a hoy.'
     }
     if (step === 4 && draft.mapsUrl) {
       try {
@@ -94,13 +95,14 @@ export function InvitationWizard({
     }
     setErrors(next)
     const firstInvalid = Object.keys(next)[0]
-    if (firstInvalid) window.requestAnimationFrame(() => {
-      const target = wizardRef.current?.querySelector<HTMLElement>(
-        `[name="${firstInvalid}"], [data-field="${firstInvalid}"]`,
-      )
-      target?.focus()
-      target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
-    })
+    if (firstInvalid)
+      window.requestAnimationFrame(() => {
+        const target = wizardRef.current?.querySelector<HTMLElement>(
+          `[name="${firstInvalid}"], [data-field="${firstInvalid}"]`,
+        )
+        target?.focus()
+        target?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+      })
     return Object.keys(next).length === 0
   }
   const next = () => {
@@ -122,7 +124,9 @@ export function InvitationWizard({
         name={name}
         aria-label={label}
         type={type}
-        min={name === 'date' ? new Date().toLocaleDateString('en-CA') : undefined}
+        min={
+          name === 'date' ? new Date().toLocaleDateString('en-CA') : undefined
+        }
         value={draft[name]}
         onChange={(event) => update(name, event.target.value)}
         placeholder={placeholder}
@@ -230,7 +234,7 @@ export function InvitationWizard({
     if (dimensions.width < 600 || dimensions.height < 315) {
       setUploadError(
         `La imagen seleccionada mide ${dimensions.width} × ${dimensions.height} px. ` +
-        'Debe medir al menos 600 × 315 px. Tamaño recomendado: 1200 × 630 px.',
+          'Debe medir al menos 600 × 315 px. Tamaño recomendado: 1200 × 630 px.',
       )
       return
     }
@@ -238,8 +242,8 @@ export function InvitationWizard({
     if (ratio < 1.7 || ratio > 2.1) {
       setUploadError(
         `La imagen seleccionada mide ${dimensions.width} × ${dimensions.height} px. ` +
-        'Se puede subir, pero puede verse recortada al compartirla. ' +
-        'La proporción recomendada es 1.91:1, por ejemplo 1200 × 630 px.',
+          'Se puede subir, pero puede verse recortada al compartirla. ' +
+          'La proporción recomendada es 1.91:1, por ejemplo 1200 × 630 px.',
       )
     }
     setUploading(true)
@@ -252,9 +256,15 @@ export function InvitationWizard({
     }
   }
   return (
-    <section ref={wizardRef} className="invitation-wizard" aria-label="Asistente de creación">
+    <section
+      ref={wizardRef}
+      className="invitation-wizard"
+      aria-label="Asistente de creación"
+    >
       <WizardStepper currentStep={step} />
-      <p className="required-legend"><span aria-hidden="true">*</span> Campos obligatorios</p>
+      <p className="required-legend">
+        <span aria-hidden="true">*</span> Campos obligatorios
+      </p>
       {step === 5 && (
         <div
           className="image-position-controls"
@@ -456,7 +466,9 @@ export function InvitationWizard({
                           draft.galleryImageUrls.filter((item) => item !== url),
                         )
                         void deleteUploadedImage(url).catch(() =>
-                          setUploadError('La foto se quitó, pero no pudo eliminarse del almacenamiento.'),
+                          setUploadError(
+                            'La foto se quitó, pero no pudo eliminarse del almacenamiento.',
+                          ),
                         )
                       }}
                     >

@@ -123,12 +123,15 @@ export function PublicHeader({
           ☰
         </button>
       </nav>
+      {/* pointerdown y no mousedown: iOS Safari no emite eventos de ratón al
+          tocar un div sin comportamiento interactivo, así que en el teléfono no
+          se podía cerrar el menú tocando fuera. */}
       {open && (
-        <div className="menu-overlay" onMouseDown={close}>
+        <div className="menu-overlay" onPointerDown={close}>
           <div
             id="mobile-menu"
             className="mobile-menu"
-            onMouseDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
           >
             <button
               ref={closeButton}

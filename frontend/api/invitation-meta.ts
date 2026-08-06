@@ -14,8 +14,7 @@ type Metadata = {
 }
 
 const FALLBACK_TITLE = 'Estás invitado'
-const FALLBACK_DESCRIPTION =
-  'Acompáñanos a celebrar un momento muy especial.'
+const FALLBACK_DESCRIPTION = 'Acompáñanos a celebrar un momento muy especial.'
 
 const SOCIAL_BOT =
   /facebookexternalhit|facebot|whatsapp|twitterbot|linkedinbot|telegrambot|discordbot|slackbot/i
@@ -148,8 +147,7 @@ export default async function invitationMetadata(request: Request) {
       throw new Error('BACKEND_URL is not configured')
     }
 
-    const upstreamUrl =
-      `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}`
+    const upstreamUrl = `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}`
 
     const upstream = await fetch(upstreamUrl, {
       headers: {
@@ -162,8 +160,7 @@ export default async function invitationMetadata(request: Request) {
       status = 404
       metadata = {
         shareTitle: 'Invitación no encontrada',
-        shareDescription:
-          'Esta invitación no existe o ya no está disponible.',
+        shareDescription: 'Esta invitación no existe o ya no está disponible.',
       }
     } else if (!upstream.ok) {
       const responseText = await upstream.text()
@@ -183,14 +180,10 @@ export default async function invitationMetadata(request: Request) {
 
   const title = cleanText(metadata.shareTitle, FALLBACK_TITLE)
 
-  const description = cleanText(
-    metadata.shareDescription,
-    FALLBACK_DESCRIPTION,
-  )
+  const description = cleanText(metadata.shareDescription, FALLBACK_DESCRIPTION)
 
   const image = secureImage(
-    metadata.shareImageUrl?.trim() ||
-      metadata.heroImageUrl?.trim(),
+    metadata.shareImageUrl?.trim() || metadata.heroImageUrl?.trim(),
     fallbackImage,
   )
 
@@ -203,12 +196,12 @@ export default async function invitationMetadata(request: Request) {
     redirect: status === 200 && !isSocialBot,
   })
 
-return new Response(html, {
-  status,
-  headers: {
-    'Content-Type': 'text/html; charset=utf-8',
-    'Cache-Control': 'no-store, no-cache, must-revalidate',
-    Vary: 'User-Agent',
-  },
-})
+  return new Response(html, {
+    status,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      Vary: 'User-Agent',
+    },
+  })
 }

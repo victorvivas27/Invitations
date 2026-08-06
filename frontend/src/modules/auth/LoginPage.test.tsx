@@ -6,7 +6,11 @@ import { LoginPage } from './LoginPage'
 describe('LoginPage', () => {
   afterEach(() => vi.restoreAllMocks())
   it('shows an accessible real login form', () => {
-    render(<MemoryRouter><LoginPage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    )
     expect(
       screen.getByRole('heading', {
         name: 'Inicia sesión para crear tu invitación',
@@ -26,7 +30,11 @@ describe('LoginPage', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(null, { status: 401 }),
     )
-    render(<MemoryRouter><LoginPage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    )
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Correo electrónico' }),
       'user@example.com',

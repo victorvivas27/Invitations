@@ -6,7 +6,11 @@ import { RegisterPage } from './RegisterPage'
 describe('RegisterPage', () => {
   afterEach(() => vi.restoreAllMocks())
   it('offers the fields required by the existing backend registration', () => {
-    render(<MemoryRouter><RegisterPage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>,
+    )
     expect(
       screen.getByRole('heading', { name: 'Crea tu cuenta' }),
     ).toBeInTheDocument()
@@ -22,7 +26,11 @@ describe('RegisterPage', () => {
   })
   it('rejects mismatched passwords before calling the backend', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch')
-    render(<MemoryRouter><RegisterPage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>,
+    )
     await userEvent.type(screen.getByLabelText('Nombre'), 'Ana')
     await userEvent.type(screen.getByLabelText('Apellido'), 'Pérez')
     await userEvent.type(
@@ -44,7 +52,11 @@ describe('RegisterPage', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(null, { status: 409 }),
     )
-    render(<MemoryRouter><RegisterPage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>,
+    )
     await userEvent.type(screen.getByLabelText('Nombre'), 'Ana')
     await userEvent.type(screen.getByLabelText('Apellido'), 'Pérez')
     await userEvent.type(

@@ -10,6 +10,7 @@
   z-index: 30;
   border-bottom: 1px solid rgba(234, 223, 240, 0.75);
   background: rgba(246, 248, 252, 0.86);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
 }
 .public-nav {
@@ -94,7 +95,12 @@
   inset: 0;
   z-index: 40;
   background: rgba(17, 24, 39, 0.32);
+  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
+  /* body.menu-open { overflow: hidden } no bloquea el scroll en Safari iOS:
+     sin esto la página de fondo seguía desplazándose bajo el menú. */
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 .mobile-menu {
   width: min(86vw, 320px);
@@ -103,6 +109,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 20px;
+  overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   background: white;
   box-shadow: 24px 0 60px rgba(17, 24, 39, 0.18);
 }
@@ -677,14 +686,18 @@
       transform 0.22s ease,
       box-shadow 0.22s ease;
   }
-  .category-card:hover,
-  .feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-  }
-  .primary-cta:hover,
-  .secondary-cta:hover {
-    transform: translateY(-2px);
+  /* (hover: hover) deja fuera las pantallas táctiles: allí el :hover se queda
+     activo después del toque y la tarjeta permanece elevada. */
+  @media (hover: hover) and (pointer: fine) {
+    .category-card:hover,
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+    .primary-cta:hover,
+    .secondary-cta:hover {
+      transform: translateY(-2px);
+    }
   }
   .mobile-menu {
     animation: menu-in 0.22s ease-out;
@@ -751,13 +764,16 @@ body {
 }
 .public-header {
   background: rgba(255, 255, 255, 0.94);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
 }
-.desktop-links a:hover,
-.mobile-menu a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-underline-offset: 5px;
+@media (hover: hover) and (pointer: fine) {
+  .desktop-links a:hover,
+  .mobile-menu a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
 }
 .nav-cta,
 .primary-cta {
@@ -849,14 +865,17 @@ body {
 .concept-grid article {
   border: 1px solid rgba(217, 224, 234, 0.7);
   background: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-small);
 }
-.category-card:hover,
-.feature-card:hover {
-  border-color: var(--color-secondary);
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-4px);
+@media (hover: hover) and (pointer: fine) {
+  .category-card:hover,
+  .feature-card:hover {
+    border-color: var(--color-secondary);
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-4px);
+  }
 }
 .soft-section {
   color: var(--color-text-inverse);
@@ -871,6 +890,7 @@ body {
 .step-card {
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 .step-card > span {
