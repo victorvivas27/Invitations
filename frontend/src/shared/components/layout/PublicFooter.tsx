@@ -1,31 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
+import { useRevealed } from '../../animation'
 import { APP_NAME } from './PublicHeader'
 
 export function PublicFooter() {
   const signatureRef = useRef<HTMLDivElement>(null)
-  const [signatureVisible, setSignatureVisible] = useState(
-    () => typeof IntersectionObserver === 'undefined',
-  )
-  useEffect(() => {
-    const node = signatureRef.current
-    if (!node || !('IntersectionObserver' in window)) {
-      setSignatureVisible(true)
-      return
-    }
-    // Una sola aparición: la firma queda al final de la página y en un teléfono
-    // entra y sale del viewport constantemente, así que la animación se
-    // repetía en cada scroll.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return
-        setSignatureVisible(true)
-        observer.disconnect()
-      },
-      { threshold: 0.35 },
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+  const signatureVisible = useRevealed(signatureRef)
   return (
     <footer className="public-footer">
       <div>

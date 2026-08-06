@@ -1,4 +1,5 @@
 import type { CSSProperties, PropsWithChildren } from 'react'
+import type { RevealKind } from '../../../shared/animation'
 import type { SectionBackground as Background } from '../types/invitationDraft'
 
 const gradients = {
@@ -67,11 +68,14 @@ export function sectionBackgroundStyle(background?: Background): CSSProperties {
 export function SectionBackground({
   background,
   children,
+  reveal,
   ...props
 }: PropsWithChildren<{
   background?: Background
   id: string
   className: string
+  /** Forma de aparición al entrar en pantalla; ver reveal.css. */
+  reveal?: RevealKind
 }>) {
   const textDirection =
     background?.textGradientDirection === 'vertical'
@@ -95,6 +99,7 @@ export function SectionBackground({
   return (
     <section
       {...props}
+      data-reveal={reveal}
       data-custom-background={background?.customized ? 'true' : undefined}
       data-background-type={
         background?.customized ? background.type : undefined
