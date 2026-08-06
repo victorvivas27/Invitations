@@ -10,12 +10,13 @@ import com.invitation.user.application.port.RegisterUserUseCase;
 import com.invitation.user.domain.User;
 import com.invitation.user.repository.DuplicateUserException;
 import com.invitation.user.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RegisterUserService implements RegisterUserUseCase {
@@ -28,11 +29,24 @@ public class RegisterUserService implements RegisterUserUseCase {
     private final Clock clock;
 
     public RegisterUserService(UserRepository repository, PasswordHasher passwordHasher,
-            PublicUserCodeGenerator codeGenerator, Clock clock) {
+                               PublicUserCodeGenerator codeGenerator, Clock clock) {
         this.repository = repository;
         this.passwordHasher = passwordHasher;
         this.codeGenerator = codeGenerator;
         this.clock = clock;
+    }
+
+    private static void validatePassword(String password) {
+        if (password == null || password.length() < 8
+                || password.chars().noneMatch(Character::isLetter)
+                || password.chars().noneMatch(Character::isDigit)) {
+            throw new InvalidPasswordException();
+        }
+    }
+
+    private static RegisteredUser toResult(User user) {
+        return new RegisteredUser(user.getPublicCode(), user.getFirstName(), user.getLastName(),
+                user.getEmail(), user.getStatus(), user.getCreatedAt());
     }
 
     @Override
@@ -63,18 +77,5 @@ public class RegisterUserService implements RegisterUserUseCase {
             }
         }
         throw new IllegalStateException("Unable to allocate a public account code");
-    }
-
-    private static void validatePassword(String password) {
-        if (password == null || password.length() < 8
-                || password.chars().noneMatch(Character::isLetter)
-                || password.chars().noneMatch(Character::isDigit)) {
-            throw new InvalidPasswordException();
-        }
-    }
-
-    private static RegisteredUser toResult(User user) {
-        return new RegisteredUser(user.getPublicCode(), user.getFirstName(), user.getLastName(),
-                user.getEmail(), user.getStatus(), user.getCreatedAt());
     }
 }

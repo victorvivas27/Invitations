@@ -1,8 +1,13 @@
 package com.invitation.user.repository;
 
-/** Persistence-level unique conflict without leaking database details. */
+import java.io.Serial;
+
+/**
+ * Persistence-level unique conflict without leaking database details.
+ */
 public class DuplicateUserException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public DuplicateUserException(Throwable cause) {

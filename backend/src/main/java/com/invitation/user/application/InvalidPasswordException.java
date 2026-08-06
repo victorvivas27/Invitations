@@ -1,8 +1,13 @@
 package com.invitation.user.application;
 
-/** Raised when a password does not satisfy the initial registration policy. */
+import java.io.Serial;
+
+/**
+ * Raised when a password does not satisfy the initial registration policy.
+ */
 public class InvalidPasswordException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public InvalidPasswordException() {

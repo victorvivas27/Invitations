@@ -1,9 +1,9 @@
 package com.invitation.user.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class BcryptPasswordHasherTest {
 
@@ -14,7 +14,7 @@ class BcryptPasswordHasherTest {
 
         String hash = hasher.hash("Password1");
 
-        assertThat(new boolean[] {"Password1".equals(hash), hasher.matches("Password1", hash)})
+        assertThat(new boolean[]{"Password1".equals(hash), hasher.matches("Password1", hash)})
                 .containsExactly(false, true);
     }
 }

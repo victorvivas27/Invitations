@@ -1,13 +1,5 @@
 package com.invitation.invitation.web;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -30,9 +28,22 @@ class InvitationFlowTest {
     private static final String CREATE = "/api/invitations";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
     private String token;
+
+    private static String validBody() {
+        return """
+                {"templateId":"birthday-urban","eventType":"BIRTHDAY",
+                 "eventName":" Cumpleaños de Sofía ","honoreeName":" Sofía ","honoreeAge":5,
+                 "eventDate":"2027-08-22","eventTime":"17:00","venueName":" Salón Central ",
+                 "address":" Avenida Principal 123 ","message":" Te esperamos para celebrar. ",
+                 "shareTitle":"Cumpleaños de Sofía","shareDescription":"Acompáñanos a celebrar.",
+                 "shareImageUrl":"uploads/share.jpg"}
+                """;
+    }
 
     @BeforeEach
     void authenticate() throws Exception {
@@ -42,7 +53,7 @@ class InvitationFlowTest {
                         {"firstName":"Ana","lastName":"Pérez","email":"%s","password":"Password1"}
                         """.formatted(email))).andExpect(status().isCreated());
         MvcResult login = mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"%s\",\"password\":\"Password1\"}".formatted(email)))
+                        .content("{\"email\":\"%s\",\"password\":\"Password1\"}".formatted(email)))
                 .andExpect(status().isOk()).andReturn();
         token = objectMapper.readTree(login.getResponse().getContentAsString()).get("token").asText();
     }
@@ -50,7 +61,7 @@ class InvitationFlowTest {
     @Test
     void createsAndReadsPublishedInvitationWithoutExposingInternalData() throws Exception {
         MvcResult creation = mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
-                .contentType(MediaType.APPLICATION_JSON).content(validBody()))
+                        .contentType(MediaType.APPLICATION_JSON).content(validBody()))
                 .andExpectAll(status().isCreated(), jsonPath("$.status").value("PUBLISHED"),
                         jsonPath("$.eventName").value("Cumpleaños de Sofía"),
                         jsonPath("$.publicSlug").value(org.hamcrest.Matchers.matchesPattern(
@@ -90,8 +101,8 @@ class InvitationFlowTest {
     void rejectsUnknownAndUpcomingTemplates() throws Exception {
         for (String template : new String[]{"unknown", "anniversary-night"}) {
             mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(validBody().replace("birthday-urban", template)))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(validBody().replace("birthday-urban", template)))
                     .andExpect(status().isBadRequest());
         }
     }
@@ -99,23 +110,12 @@ class InvitationFlowTest {
     @Test
     void rejectsPastDatesAndInvalidAges() throws Exception {
         mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(validBody().replace("2027-08-22", "2020-01-01")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody().replace("2027-08-22", "2020-01-01")))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(validBody().replace("\"honoreeAge\":5", "\"honoreeAge\":151")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody().replace("\"honoreeAge\":5", "\"honoreeAge\":151")))
                 .andExpect(status().isBadRequest());
-    }
-
-    private static String validBody() {
-        return """
-                {"templateId":"birthday-urban","eventType":"BIRTHDAY",
-                 "eventName":" Cumpleaños de Sofía ","honoreeName":" Sofía ","honoreeAge":5,
-                 "eventDate":"2027-08-22","eventTime":"17:00","venueName":" Salón Central ",
-                 "address":" Avenida Principal 123 ","message":" Te esperamos para celebrar. ",
-                 "shareTitle":"Cumpleaños de Sofía","shareDescription":"Acompáñanos a celebrar.",
-                 "shareImageUrl":"uploads/share.jpg"}
-                """;
     }
 }

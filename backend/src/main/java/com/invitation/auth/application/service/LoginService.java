@@ -12,9 +12,10 @@ import com.invitation.user.application.port.PasswordHasher;
 import com.invitation.user.domain.User;
 import com.invitation.user.domain.UserStatus;
 import com.invitation.user.repository.UserRepository;
-import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
 
 @Service
 public class LoginService implements LoginUseCase {
@@ -23,7 +24,7 @@ public class LoginService implements LoginUseCase {
     private final TokenGenerator tokenGenerator;
 
     public LoginService(UserRepository repository, PasswordHasher passwordHasher,
-            TokenGenerator tokenGenerator) {
+                        TokenGenerator tokenGenerator) {
         this.repository = repository;
         this.passwordHasher = passwordHasher;
         this.tokenGenerator = tokenGenerator;

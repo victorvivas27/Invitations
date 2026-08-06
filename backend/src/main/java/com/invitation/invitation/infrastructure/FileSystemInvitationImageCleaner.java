@@ -1,10 +1,15 @@
 package com.invitation.invitation.infrastructure;
 
-import com.invitation.invitation.application.InvitationImageCleaner;
 import com.invitation.invitation.application.ImageStorageService;
+import com.invitation.invitation.application.InvitationImageCleaner;
 import com.invitation.invitation.domain.Invitation;
 import com.invitation.invitation.infrastructure.persistence.InvitationImageJpaEntity;
 import com.invitation.invitation.infrastructure.persistence.SpringDataInvitationImageRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,10 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 @Component
 public class FileSystemInvitationImageCleaner implements InvitationImageCleaner {
@@ -27,10 +28,16 @@ public class FileSystemInvitationImageCleaner implements InvitationImageCleaner 
     private final ImageStorageService storage;
 
     public FileSystemInvitationImageCleaner(@Value("${app.upload-directory:uploads}") String uploadDirectory,
-            SpringDataInvitationImageRepository images, ImageStorageService storage) {
+                                            SpringDataInvitationImageRepository images, ImageStorageService storage) {
         this.uploadDirectory = Path.of(uploadDirectory).toAbsolutePath().normalize();
         this.images = images;
         this.storage = storage;
+    }
+
+    private static void collect(String value, Set<String> fileNames) {
+        if (value == null) return;
+        Matcher matcher = UPLOADED_IMAGE.matcher(value);
+        while (matcher.find()) fileNames.add(matcher.group(1));
     }
 
     @Override
@@ -41,12 +48,6 @@ public class FileSystemInvitationImageCleaner implements InvitationImageCleaner 
         collect(invitation.sectionBackgrounds(), fileNames);
         fileNames.forEach(this::deleteSafely);
         images.findAllByInvitationId(invitation.id()).forEach(this::deleteCloudinarySafely);
-    }
-
-    private static void collect(String value, Set<String> fileNames) {
-        if (value == null) return;
-        Matcher matcher = UPLOADED_IMAGE.matcher(value);
-        while (matcher.find()) fileNames.add(matcher.group(1));
     }
 
     private void deleteSafely(String fileName) {

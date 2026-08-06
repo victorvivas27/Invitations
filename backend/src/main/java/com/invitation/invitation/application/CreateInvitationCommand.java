@@ -2,13 +2,17 @@ package com.invitation.invitation.application;
 
 import com.invitation.invitation.domain.EventType;
 import com.invitation.invitation.domain.InvitationViewMode;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
-public record CreateInvitationCommand(UUID invitationId, String templateId, InvitationViewMode viewMode, EventType eventType, String eventName,
-        String honoreeName, Integer honoreeAge, LocalDate eventDate, LocalTime eventTime,
-        String venueName, String address, String mapsUrl, String heroImageUrl,
-        List<String> galleryImageUrls, String message, String sectionBackgrounds, String contactInfo,
-        String shareTitle, String shareDescription, String shareImageUrl) { }
+public record CreateInvitationCommand(UUID invitationId, String templateId, InvitationViewMode viewMode,
+                                      EventType eventType, String eventName,
+                                      String honoreeName, Integer honoreeAge, LocalDate eventDate, LocalTime eventTime,
+                                      String venueName, String address, String mapsUrl, String heroImageUrl,
+                                      List<String> galleryImageUrls, String message, String sectionBackgrounds,
+                                      String contactInfo,
+                                      String shareTitle, String shareDescription, String shareImageUrl) {
+}

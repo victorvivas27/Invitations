@@ -1,10 +1,5 @@
 package com.invitation.user.application.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import com.invitation.user.application.DuplicateEmailException;
 import com.invitation.user.application.InvalidPasswordException;
 import com.invitation.user.application.RegisterUserCommand;
@@ -14,16 +9,22 @@ import com.invitation.user.application.port.PublicUserCodeGenerator;
 import com.invitation.user.domain.User;
 import com.invitation.user.domain.UserStatus;
 import com.invitation.user.repository.UserRepository;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 class RegisterUserServiceTest {
 
@@ -40,6 +41,10 @@ class RegisterUserServiceTest {
     @Mock
     private PublicUserCodeGenerator codeGenerator;
     private RegisterUserService service;
+
+    private static RegisterUserCommand command(String email, String password) {
+        return new RegisterUserCommand("Ana", "Pérez", email, password);
+    }
 
     @BeforeEach
     void setUp() {
@@ -62,8 +67,8 @@ class RegisterUserServiceTest {
         RegisteredUser result = service.register(command(" ANA@Example.COM ", RAW_PASSWORD));
         User persisted = persistedReference.get();
 
-        assertThat(new Object[] {result.email(), result.status(), result.createdAt(),
-            persisted.getEmail(), persisted.getPasswordHash(), persisted.getStatus()})
+        assertThat(new Object[]{result.email(), result.status(), result.createdAt(),
+                persisted.getEmail(), persisted.getPasswordHash(), persisted.getStatus()})
                 .containsExactly("ana@example.com", UserStatus.ACTIVE, NOW,
                         "ana@example.com", PASSWORD_HASH, UserStatus.ACTIVE);
     }
@@ -82,9 +87,5 @@ class RegisterUserServiceTest {
     void rejectsPasswordsOutsideTheInitialPolicy(String password) {
         assertThatThrownBy(() -> service.register(command(EMAIL, password)))
                 .isInstanceOf(InvalidPasswordException.class);
-    }
-
-    private static RegisterUserCommand command(String email, String password) {
-        return new RegisterUserCommand("Ana", "Pérez", email, password);
     }
 }

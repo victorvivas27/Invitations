@@ -3,16 +3,18 @@ package com.invitation.invitation.domain;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.List;
 
 public record Invitation(UUID id, String publicSlug, UUID ownerId, String templateId,
-        InvitationViewMode viewMode, EventType eventType, String eventName, String honoreeName, Integer honoreeAge,
-        LocalDate eventDate, LocalTime eventTime, String venueName, String address,
-        String mapsUrl, String heroImageUrl, List<String> galleryImageUrls, String message, String sectionBackgrounds, String contactInfo,
-        String shareTitle, String shareDescription, String shareImageUrl,
-        InvitationStatus status, Instant createdAt, Instant updatedAt) {
+                         InvitationViewMode viewMode, EventType eventType, String eventName, String honoreeName,
+                         Integer honoreeAge,
+                         LocalDate eventDate, LocalTime eventTime, String venueName, String address,
+                         String mapsUrl, String heroImageUrl, List<String> galleryImageUrls, String message,
+                         String sectionBackgrounds, String contactInfo,
+                         String shareTitle, String shareDescription, String shareImageUrl,
+                         InvitationStatus status, Instant createdAt, Instant updatedAt) {
 
     private static final String UPLOAD_PATH_PREFIX = "/uploads/";
 

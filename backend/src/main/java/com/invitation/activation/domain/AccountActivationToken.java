@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record AccountActivationToken(UUID id, UUID userId, String tokenHash, Instant expiresAt,
-        Instant createdAt, Instant usedAt) {
+                                     Instant createdAt, Instant usedAt) {
 
     public boolean isExpired(Instant now) {
         return !expiresAt.isAfter(now);

@@ -8,4 +8,4 @@ ALTER TABLE invitation_rsvps
     ALTER COLUMN guest_name_normalized SET NOT NULL;
 
 CREATE UNIQUE INDEX uq_invitation_rsvp_guest_name
-    ON invitation_rsvps(invitation_id, guest_name_normalized);
+    ON invitation_rsvps (invitation_id, guest_name_normalized);

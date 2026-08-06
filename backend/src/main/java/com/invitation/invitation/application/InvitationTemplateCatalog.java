@@ -1,7 +1,8 @@
 package com.invitation.invitation.application;
 
-import java.util.Set;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 public class InvitationTemplateCatalog {

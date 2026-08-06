@@ -7,4 +7,5 @@ import jakarta.validation.constraints.Size;
 
 public record CreatePendingUserRequest(
         @NotBlank @Size(max = 201) @Pattern(regexp = ".*\\s+.*") String name,
-        @NotBlank @Email @Size(max = 254) String email) { }
+        @NotBlank @Email @Size(max = 254) String email) {
+}

@@ -11,4 +11,5 @@ import org.springframework.validation.annotation.Validated;
 public record JwtProperties(
         @NotBlank @Size(min = 32) String secret,
         @Positive long expirationSeconds,
-        @NotBlank String issuer) { }
+        @NotBlank String issuer) {
+}

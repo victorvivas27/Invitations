@@ -12,11 +12,12 @@ import com.invitation.user.application.InvalidPasswordException;
 import com.invitation.user.application.port.PasswordHasher;
 import com.invitation.user.domain.User;
 import com.invitation.user.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.util.regex.Pattern;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AccountActivationService implements AccountActivationUseCase,
@@ -29,13 +30,21 @@ public class AccountActivationService implements AccountActivationUseCase,
     private final Clock clock;
 
     public AccountActivationService(ActivationTokenRepository tokens,
-            ActivationTokenHasher tokenHasher, UserRepository users,
-            PasswordHasher passwordHasher, Clock clock) {
+                                    ActivationTokenHasher tokenHasher, UserRepository users,
+                                    PasswordHasher passwordHasher, Clock clock) {
         this.tokens = tokens;
         this.tokenHasher = tokenHasher;
         this.users = users;
         this.passwordHasher = passwordHasher;
         this.clock = clock;
+    }
+
+    private static void validatePassword(String password) {
+        if (password == null || password.length() < 8
+                || password.chars().noneMatch(Character::isLetter)
+                || password.chars().noneMatch(Character::isDigit)) {
+            throw new InvalidPasswordException();
+        }
     }
 
     @Override
@@ -69,13 +78,5 @@ public class AccountActivationService implements AccountActivationUseCase,
             throw new ActivationTokenGoneException("Activation token has expired");
         }
         return token;
-    }
-
-    private static void validatePassword(String password) {
-        if (password == null || password.length() < 8
-                || password.chars().noneMatch(Character::isLetter)
-                || password.chars().noneMatch(Character::isDigit)) {
-            throw new InvalidPasswordException();
-        }
     }
 }

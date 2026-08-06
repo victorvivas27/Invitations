@@ -20,6 +20,10 @@ spring:
 
   flyway:
     enabled: true
+    #repair: true
+    #validate-on-migrate: false
+    #clean-disabled: false
+    #clean-on-validation-error: true
 
   mail:
     host: smtp.gmail.com

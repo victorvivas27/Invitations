@@ -1,1 +1,2 @@
-ALTER TABLE invitations ADD COLUMN section_backgrounds TEXT;
+ALTER TABLE invitations
+    ADD COLUMN section_backgrounds TEXT;

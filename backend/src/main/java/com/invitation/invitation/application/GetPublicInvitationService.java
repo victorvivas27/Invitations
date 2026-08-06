@@ -7,7 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GetPublicInvitationService implements GetPublicInvitationUseCase {
     private final InvitationRepository repository;
-    public GetPublicInvitationService(InvitationRepository repository) { this.repository = repository; }
+
+    public GetPublicInvitationService(InvitationRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     @Transactional(readOnly = true)

@@ -1,2 +1,4 @@
 package com.invitation.activation.web;
-public record ActivationValidationResponse(boolean valid) { }
+
+public record ActivationValidationResponse(boolean valid) {
+}
