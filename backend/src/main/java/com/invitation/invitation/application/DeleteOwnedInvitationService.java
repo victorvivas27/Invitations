@@ -18,7 +18,7 @@ public class DeleteOwnedInvitationService implements DeleteOwnedInvitationUseCas
     private final InvitationImageCleaner imageCleaner;
 
     public DeleteOwnedInvitationService(InvitationRepository invitations, UserRepository users,
-            InvitationImageCleaner imageCleaner) {
+                                        InvitationImageCleaner imageCleaner) {
         this.invitations = invitations;
         this.users = users;
         this.imageCleaner = imageCleaner;
@@ -32,7 +32,8 @@ public class DeleteOwnedInvitationService implements DeleteOwnedInvitationUseCas
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User not found"));
         Invitation invitation = invitations.findByPublicSlug(publicSlug)
                 .orElseThrow(InvitationNotFoundException::new);
-        if (!invitation.ownerId().equals(owner.getId())) throw new AccessDeniedException("Invitation belongs to another user");
+        if (!invitation.ownerId().equals(owner.getId()))
+            throw new AccessDeniedException("Invitation belongs to another user");
         invitations.delete(invitation);
         deleteImagesAfterCommit(invitation);
     }
@@ -43,7 +44,10 @@ public class DeleteOwnedInvitationService implements DeleteOwnedInvitationUseCas
             return;
         }
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override public void afterCommit() { imageCleaner.deleteImages(invitation); }
+            @Override
+            public void afterCommit() {
+                imageCleaner.deleteImages(invitation);
+            }
         });
     }
 }

@@ -1,21 +1,22 @@
 package com.invitation.auth.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.invitation.auth.domain.AuthenticatedUser;
 import com.invitation.auth.domain.IssuedToken;
 import com.invitation.user.domain.UserStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtTokenServiceTest {
     private static final String SECRET = "test-only-secret-with-at-least-32-characters";
@@ -42,9 +43,9 @@ class JwtTokenServiceTest {
 
         Jwt jwt = decoder.decode(token.value());
 
-        assertThat(new Object[] {jwt.getSubject(), jwt.getIssuer().toString(),
-            jwt.getClaimAsString("email"), jwt.getClaimAsString("status"),
-            jwt.getIssuedAt(), jwt.getExpiresAt(), token.expiresIn()})
+        assertThat(new Object[]{jwt.getSubject(), jwt.getIssuer().toString(),
+                jwt.getClaimAsString("email"), jwt.getClaimAsString("status"),
+                jwt.getIssuedAt(), jwt.getExpiresAt(), token.expiresIn()})
                 .containsExactly(CODE, ISSUER, EMAIL,
                         "ACTIVE", NOW, NOW.plusSeconds(3600), 3600L);
     }
@@ -58,8 +59,8 @@ class JwtTokenServiceTest {
 
     @Test
     void rejectsMalformedAndInvalidSignatureTokens() {
-        assertThat(new boolean[] {service.validate("malformed").isEmpty(),
-            service.validate(validTokenWithOtherSecret()).isEmpty()}).containsExactly(true, true);
+        assertThat(new boolean[]{service.validate("malformed").isEmpty(),
+                service.validate(validTokenWithOtherSecret()).isEmpty()}).containsExactly(true, true);
     }
 
     @Test

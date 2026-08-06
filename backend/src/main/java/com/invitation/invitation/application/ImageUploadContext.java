@@ -8,5 +8,5 @@ public record ImageUploadContext(UUID invitationId, ImageKind kind) {
         if (kind == null) throw new IllegalArgumentException("image kind is required");
     }
 
-    public enum ImageKind { COVER, GALLERY, DECORATION, SOCIAL }
+    public enum ImageKind {COVER, GALLERY, DECORATION, SOCIAL}
 }

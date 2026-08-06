@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { ActivateAccountPage, LoginPage, RegisterPage } from './modules/auth'
 import { HomePage } from './modules/home'
 import {
@@ -15,6 +15,7 @@ import invitationWizardStyles from './modules/invitations/styles/InvitationWizar
 import publicInvitationStyles from './modules/invitations/styles/PublicInvitation.module.css'
 import './styles/theme.css'
 import { FeedbackProvider } from './shared/components/feedback/FeedbackProvider'
+import { ScrollManager } from './shared/components/layout/ScrollManager'
 
 function NotFoundPage() {
   return (
@@ -22,9 +23,9 @@ function NotFoundPage() {
       <span aria-hidden="true">?</span>
       <h1>Página no encontrada</h1>
       <p>La dirección ingresada no existe.</p>
-      <a className="primary-cta" href="/">
+      <Link className="primary-cta" to="/">
         Ir al inicio
-      </a>
+      </Link>
     </main>
   )
 }
@@ -39,23 +40,32 @@ const applicationStyles = {
 export default function App() {
   void applicationStyles
   return (
-    <FeedbackProvider><BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/activate-account" element={<ActivateAccountPage />} />
-        <Route path="/templates" element={<TemplatesPage />} />
-        <Route path="/invitations/create" element={<CreateInvitationPage />} />
-        <Route path="/my-invitations" element={<MyInvitationsPage />} />
-        <Route
-          path="/my-invitations/:slug/guests"
-          element={<InvitationGuestsPage />}
-        />
-        <Route path="/i/:slug" element={<PublicInvitationPage />} />
-        <Route path="/view/:slug" element={<PublicInvitationPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter></FeedbackProvider>
+    <FeedbackProvider>
+      <BrowserRouter>
+        {/* El contenedor persiste entre rutas: el fondo nunca se desmonta. */}
+        <div className="app-shell">
+          <ScrollManager />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/activate-account" element={<ActivateAccountPage />} />
+            <Route path="/templates" element={<TemplatesPage />} />
+            <Route
+              path="/invitations/create"
+              element={<CreateInvitationPage />}
+            />
+            <Route path="/my-invitations" element={<MyInvitationsPage />} />
+            <Route
+              path="/my-invitations/:slug/guests"
+              element={<InvitationGuestsPage />}
+            />
+            <Route path="/i/:slug" element={<PublicInvitationPage />} />
+            <Route path="/view/:slug" element={<PublicInvitationPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </FeedbackProvider>
   )
 }

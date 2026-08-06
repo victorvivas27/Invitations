@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { PublicInvitationRenderer } from './components/PublicInvitationRenderer'
 import { getPublicInvitation, InvitationApiError } from './services/invitations'
 import type { PublicInvitation } from './types/invitation'
@@ -60,9 +60,9 @@ export function PublicInvitationPage() {
         <p>
           El enlace puede ser incorrecto o la invitación ya no está publicada.
         </p>
-        <a className="primary-cta" href="/">
+        <Link className="primary-cta" to="/">
           Ir al inicio
-        </a>
+        </Link>
       </main>
     )
   return (

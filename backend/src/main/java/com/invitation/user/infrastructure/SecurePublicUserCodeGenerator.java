@@ -1,8 +1,9 @@
 package com.invitation.user.infrastructure;
 
 import com.invitation.user.application.port.PublicUserCodeGenerator;
-import java.security.SecureRandom;
 import org.springframework.stereotype.Component;
+
+import java.security.SecureRandom;
 
 @Component
 public class SecurePublicUserCodeGenerator implements PublicUserCodeGenerator {

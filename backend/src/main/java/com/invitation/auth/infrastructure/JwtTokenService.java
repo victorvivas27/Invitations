@@ -5,18 +5,13 @@ import com.invitation.auth.application.port.TokenValidator;
 import com.invitation.auth.domain.AuthenticatedUser;
 import com.invitation.auth.domain.IssuedToken;
 import com.invitation.user.domain.UserStatus;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.*;
+import org.springframework.stereotype.Component;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenService implements TokenGenerator, TokenValidator {
@@ -26,7 +21,7 @@ public class JwtTokenService implements TokenGenerator, TokenValidator {
     private final Clock clock;
 
     public JwtTokenService(JwtEncoder encoder, JwtDecoder decoder, JwtProperties properties,
-            Clock clock) {
+                           Clock clock) {
         this.encoder = encoder;
         this.decoder = decoder;
         this.properties = properties;

@@ -1,12 +1,8 @@
 package com.invitation.user.persistence;
 
 import com.invitation.user.domain.UserStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -48,11 +44,12 @@ public class UserJpaEntity {
     @Column(name = "updated_by", nullable = false)
     private UUID updatedBy;
 
-    protected UserJpaEntity() { }
+    protected UserJpaEntity() {
+    }
 
     public UserJpaEntity(UUID id, String publicCode, String firstName, String lastName,
-            String email, String passwordHash, UserStatus status, Instant createdAt,
-            Instant updatedAt, UUID createdBy, UUID updatedBy) {
+                         String email, String passwordHash, UserStatus status, Instant createdAt,
+                         Instant updatedAt, UUID createdBy, UUID updatedBy) {
         this.id = id;
         this.publicCode = publicCode;
         this.firstName = firstName;
@@ -66,15 +63,47 @@ public class UserJpaEntity {
         this.updatedBy = updatedBy;
     }
 
-    public UUID getId() { return id; }
-    public String getPublicCode() { return publicCode; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getEmail() { return email; }
-    public String getPasswordHash() { return passwordHash; }
-    public UserStatus getStatus() { return status; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public UUID getCreatedBy() { return createdBy; }
-    public UUID getUpdatedBy() { return updatedBy; }
+    public UUID getId() {
+        return id;
+    }
+
+    public String getPublicCode() {
+        return publicCode;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
 }

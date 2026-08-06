@@ -1,11 +1,12 @@
 package com.invitation.activation.infrastructure;
 
 import com.invitation.activation.application.port.ActivationTokenHasher;
+import org.springframework.stereotype.Component;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
-import org.springframework.stereotype.Component;
 
 @Component
 public class Sha256ActivationTokenHasher implements ActivationTokenHasher {

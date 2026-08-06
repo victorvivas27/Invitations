@@ -5,13 +5,22 @@ import { SectionBackground } from './SectionBackground'
 import { InvitationFooter } from './InvitationFooter'
 import { useInvitationAnimations } from './useInvitationAnimations'
 
+const capitalize = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1)
 const formatDate = (date: string) =>
   new Intl.DateTimeFormat('es-CL', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(`${date}T12:00:00`))
+  })
+    .formatToParts(new Date(`${date}T12:00:00`))
+    .map((part) =>
+      part.type === 'weekday' || part.type === 'month'
+        ? capitalize(part.value)
+        : part.value,
+    )
+    .join('')
 const countdown = (date: string, time: string) => {
   const normalizedTime = (time || '00:00').slice(0, 5)
   const target = new Date(`${date}T${normalizedTime}:00`).getTime()
@@ -368,7 +377,7 @@ export function PublicInvitationRenderer({
           background={invitation.sectionBackgrounds?.venue}
         >
           <span className="experience-number">03</span>
-          <h2>Nos encontramos aquí</h2>
+          <h2>Aquí te esperamos con cariño</h2>
           <strong>{invitation.venueName}</strong>
           <p>{invitation.address}</p>
           {invitation.mapsUrl && (
@@ -440,8 +449,8 @@ export function PublicInvitationRenderer({
             </div>
           )}
           <div className="experience-farewell-copy experience-animate">
-            <p>Tu presencia hará este día todavía más especial.</p>
-            <h2>Te esperamos</h2>
+            <p>Gracias por acompañarnos en este día tan especial.</p>
+            <h2>¡Te esperamos!</h2>
             <span>✦</span>
           </div>
         </SectionBackground>

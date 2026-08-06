@@ -15,7 +15,7 @@ public class JavaMailActivationEmailSender implements ActivationEmailSender {
 
     @Override
     public void send(String recipientName, String recipientEmail, String activationUrl,
-            long expiresInSeconds) {
+                     long expiresInSeconds) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipientEmail);
         message.setSubject("Activate your Invitation account");

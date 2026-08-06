@@ -1,9 +1,10 @@
 package com.invitation.activation.infrastructure;
 
 import com.invitation.activation.application.port.ActivationTokenGenerator;
+import org.springframework.stereotype.Component;
+
 import java.security.SecureRandom;
 import java.util.Base64;
-import org.springframework.stereotype.Component;
 
 @Component
 public class SecureActivationTokenGenerator implements ActivationTokenGenerator {

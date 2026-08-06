@@ -1,10 +1,11 @@
 package com.invitation.invitation.infrastructure;
 
 import com.invitation.invitation.application.PublicSlugGenerator;
+import org.springframework.stereotype.Component;
+
 import java.security.SecureRandom;
 import java.text.Normalizer;
 import java.util.Locale;
-import org.springframework.stereotype.Component;
 
 @Component
 public class SecurePublicSlugGenerator implements PublicSlugGenerator {

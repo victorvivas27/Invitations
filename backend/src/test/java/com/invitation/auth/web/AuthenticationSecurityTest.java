@@ -1,14 +1,5 @@
 package com.invitation.auth.web;
 
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.hasKey;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +11,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(properties = "app.cors.allowed-origins=http://localhost:5173,http://localhost:5174")
 @AutoConfigureMockMvc
@@ -37,8 +33,16 @@ class AuthenticationSecurityTest {
             {"firstName":"Ana","lastName":"Pérez","email":"security@example.com",
              "password":"Password1"}
             """;
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private static String loginBody() {
+        return """
+                {"email":" SECURITY@Example.com ","password":"Password1"}
+                """;
+    }
 
     @Test
     void registrationAndLoginRemainPublic() throws Exception {
@@ -114,11 +118,5 @@ class AuthenticationSecurityTest {
                         jsonPath("$.email").value("security@example.com"),
                         jsonPath("$").value(not(hasKey("id"))),
                         jsonPath("$").value(not(hasKey("passwordHash"))));
-    }
-
-    private static String loginBody() {
-        return """
-                {"email":" SECURITY@Example.com ","password":"Password1"}
-                """;
     }
 }

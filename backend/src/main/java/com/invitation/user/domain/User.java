@@ -6,7 +6,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-/** User domain entity and owner of future invitations. */
+/**
+ * User domain entity and owner of future invitations.
+ */
 public final class User {
 
     private static final int NAME_MAX_LENGTH = 100;
@@ -45,7 +47,7 @@ public final class User {
     }
 
     public static User create(UUID id, String publicCode, String firstName, String lastName,
-            String email, String passwordHash, UUID actorId, Instant now) {
+                              String email, String passwordHash, UUID actorId, Instant now) {
         return new User(new UserData(id, publicCode, firstName, lastName, email, passwordHash,
                 UserStatus.ACTIVE, now, now, actorId, actorId));
     }
@@ -55,17 +57,9 @@ public final class User {
     }
 
     public static User createPending(UUID id, String publicCode, String firstName, String lastName,
-            String email, UUID actorId, Instant now) {
+                                     String email, UUID actorId, Instant now) {
         return new User(new UserData(id, publicCode, firstName, lastName, email, null,
                 UserStatus.PENDING_ACTIVATION, now, now, actorId, actorId));
-    }
-
-    public User activate(String newPasswordHash, Instant now) {
-        if (status != UserStatus.PENDING_ACTIVATION) {
-            throw new IllegalStateException("Only pending users can be activated");
-        }
-        return new User(new UserData(id, publicCode, firstName, lastName, email, newPasswordHash,
-                UserStatus.ACTIVE, createdAt, now, createdBy, id));
     }
 
     private static String requirePasswordHash(String value, UserStatus userStatus) {
@@ -102,20 +96,63 @@ public final class User {
         return trimmed;
     }
 
-    public UUID getId() { return id; }
-    public String getPublicCode() { return publicCode; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getEmail() { return email; }
-    public String getPasswordHash() { return passwordHash; }
-    public UserStatus getStatus() { return status; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public UUID getCreatedBy() { return createdBy; }
-    public UUID getUpdatedBy() { return updatedBy; }
+    public User activate(String newPasswordHash, Instant now) {
+        if (status != UserStatus.PENDING_ACTIVATION) {
+            throw new IllegalStateException("Only pending users can be activated");
+        }
+        return new User(new UserData(id, publicCode, firstName, lastName, email, newPasswordHash,
+                UserStatus.ACTIVE, createdAt, now, createdBy, id));
+    }
 
-    /** Complete state used only to restore a persisted domain entity. */
+    public UUID getId() {
+        return id;
+    }
+
+    public String getPublicCode() {
+        return publicCode;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
+
+    /**
+     * Complete state used only to restore a persisted domain entity.
+     */
     public record UserData(UUID id, String publicCode, String firstName, String lastName,
-            String email, String passwordHash, UserStatus status, Instant createdAt,
-            Instant updatedAt, UUID createdBy, UUID updatedBy) { }
+                           String email, String passwordHash, UserStatus status, Instant createdAt,
+                           Instant updatedAt, UUID createdBy, UUID updatedBy) {
+    }
 }

@@ -1,18 +1,19 @@
 package com.invitation.user.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.invitation.user.domain.User;
 import com.invitation.user.mapper.UserPersistenceMapper;
-import com.invitation.user.repository.UserRepository;
 import com.invitation.user.repository.DuplicateUserException;
-import java.time.Instant;
-import java.util.UUID;
+import com.invitation.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Import({JpaUserRepository.class, UserPersistenceMapper.class})
@@ -24,6 +25,11 @@ class JpaUserRepositoryTest {
 
     @Autowired
     private UserRepository repository;
+
+    private static User user(String publicCode, String email) {
+        return User.create(UUID.randomUUID(), publicCode, "Ana", "Vivas", email,
+                "hashed-password", ACTOR_ID, NOW);
+    }
 
     @Test
     void persistsAndFindsAUser() {
@@ -40,9 +46,9 @@ class JpaUserRepositoryTest {
     void findsUsersByNormalizedUniqueFields() {
         repository.save(user("ACC-ABC123DEF456", EMAIL));
 
-        assertThat(new boolean[] {
-            repository.existsByEmail(" ANA@EXAMPLE.COM "),
-            repository.existsByPublicCode(" acc-abc123def456 ")
+        assertThat(new boolean[]{
+                repository.existsByEmail(" ANA@EXAMPLE.COM "),
+                repository.existsByPublicCode(" acc-abc123def456 ")
         }).containsExactly(true, true);
     }
 
@@ -55,10 +61,5 @@ class JpaUserRepositoryTest {
         assertThatThrownBy(() -> repository.save(duplicate))
                 .isInstanceOf(DuplicateUserException.class)
                 .hasMessage("A unique user value already exists");
-    }
-
-    private static User user(String publicCode, String email) {
-        return User.create(UUID.randomUUID(), publicCode, "Ana", "Vivas", email,
-                "hashed-password", ACTOR_ID, NOW);
     }
 }

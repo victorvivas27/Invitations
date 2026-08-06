@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   clearSession,
   getAccessToken,
@@ -18,6 +19,7 @@ export function PublicHeader({
   const authenticated = Boolean(getAccessToken())
   const [user, setUser] = useState(getSessionUser)
   const closeButton = useRef<HTMLButtonElement>(null)
+  const navigate = useNavigate()
   useEffect(() => {
     document.body.classList.toggle('menu-open', open)
     if (open) closeButton.current?.focus()
@@ -39,7 +41,9 @@ export function PublicHeader({
   const close = () => setOpen(false)
   const logout = () => {
     clearSession()
-    window.location.assign('/')
+    setUser(null)
+    setOpen(false)
+    navigate('/', { replace: true })
   }
   const initials =
     user?.firstName && user?.lastName
@@ -61,47 +65,51 @@ export function PublicHeader({
   return (
     <header className="public-header">
       <nav className="public-nav" aria-label="Navegación principal">
-        <a className="public-brand" href="/" aria-label={`${APP_NAME}, inicio`}>
+        <Link
+          className="public-brand"
+          to="/"
+          aria-label={`${APP_NAME}, inicio`}
+        >
           <span aria-hidden="true">✦</span>
           {APP_NAME}
-        </a>
+        </Link>
         <div className="desktop-links">
-          <a className={activePage === 'home' ? 'active' : undefined} href="/">
+          <Link className={activePage === 'home' ? 'active' : undefined} to="/">
             Inicio
-          </a>
-          <a href="/#como-funciona">Cómo funciona</a>
+          </Link>
+          <Link to="/#como-funciona">Cómo funciona</Link>
           {authenticated ? (
             <>
-              <a
+              <Link
                 className={activePage === 'templates' ? 'active' : undefined}
                 aria-current={activePage === 'templates' ? 'page' : undefined}
-                href="/templates"
+                to="/templates"
               >
                 Plantillas
-              </a>
-              <a
+              </Link>
+              <Link
                 className={
                   activePage === 'my-invitations' ? 'active' : undefined
                 }
                 aria-current={
                   activePage === 'my-invitations' ? 'page' : undefined
                 }
-                href="/my-invitations"
+                to="/my-invitations"
               >
                 Mis invitaciones
-              </a>
+              </Link>
               {userIndicator}
-              <a className="nav-cta" href="/templates">
+              <Link className="nav-cta" to="/templates">
                 Crear invitación
-              </a>
+              </Link>
               <button type="button" className="logout-button" onClick={logout}>
                 Cerrar sesión
               </button>
             </>
           ) : (
-            <a className="nav-cta" href="/login">
+            <Link className="nav-cta" to="/login">
               Iniciar sesión
-            </a>
+            </Link>
           )}
           <ThemeToggle />
         </div>
@@ -130,35 +138,35 @@ export function PublicHeader({
             >
               ×
             </button>
-            <a href="/" onClick={close}>
+            <Link to="/" onClick={close}>
               Inicio
-            </a>
-            <a href="/#como-funciona" onClick={close}>
+            </Link>
+            <Link to="/#como-funciona" onClick={close}>
               Cómo funciona
-            </a>
+            </Link>
             <ThemeToggle />
             {authenticated ? (
               <>
                 {userIndicator}
-                <a
+                <Link
                   aria-current={activePage === 'templates' ? 'page' : undefined}
-                  href="/templates"
+                  to="/templates"
                   onClick={close}
                 >
                   Plantillas
-                </a>
-                <a
+                </Link>
+                <Link
                   aria-current={
                     activePage === 'my-invitations' ? 'page' : undefined
                   }
-                  href="/my-invitations"
+                  to="/my-invitations"
                   onClick={close}
                 >
                   Mis invitaciones
-                </a>
-                <a className="nav-cta" href="/templates" onClick={close}>
+                </Link>
+                <Link className="nav-cta" to="/templates" onClick={close}>
                   Crear invitación
-                </a>
+                </Link>
                 <button
                   type="button"
                   className="logout-button"
@@ -168,9 +176,9 @@ export function PublicHeader({
                 </button>
               </>
             ) : (
-              <a className="nav-cta" href="/login" onClick={close}>
+              <Link className="nav-cta" to="/login" onClick={close}>
                 Iniciar sesión
-              </a>
+              </Link>
             )}
           </div>
         </div>

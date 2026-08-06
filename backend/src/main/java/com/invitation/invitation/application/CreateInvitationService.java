@@ -5,12 +5,13 @@ import com.invitation.invitation.domain.Invitation;
 import com.invitation.invitation.domain.InvitationStatus;
 import com.invitation.user.domain.User;
 import com.invitation.user.repository.UserRepository;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.util.UUID;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class CreateInvitationService implements CreateInvitationUseCase {
@@ -22,9 +23,12 @@ public class CreateInvitationService implements CreateInvitationUseCase {
     private final Clock clock;
 
     public CreateInvitationService(InvitationRepository invitations, UserRepository users,
-            InvitationTemplateCatalog templates, PublicSlugGenerator slugGenerator, Clock clock) {
-        this.invitations = invitations; this.users = users; this.templates = templates;
-        this.slugGenerator = slugGenerator; this.clock = clock;
+                                   InvitationTemplateCatalog templates, PublicSlugGenerator slugGenerator, Clock clock) {
+        this.invitations = invitations;
+        this.users = users;
+        this.templates = templates;
+        this.slugGenerator = slugGenerator;
+        this.clock = clock;
     }
 
     @Override

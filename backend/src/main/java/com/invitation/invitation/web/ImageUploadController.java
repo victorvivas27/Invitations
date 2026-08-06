@@ -8,26 +8,23 @@ import com.invitation.invitation.infrastructure.persistence.InvitationImageJpaEn
 import com.invitation.invitation.infrastructure.persistence.SpringDataInvitationImageRepository;
 import com.invitation.user.domain.User;
 import com.invitation.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.Map;
 import java.util.UUID;
-import javax.imageio.ImageIO;
-import org.springframework.http.MediaType;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/invitation-images")
@@ -44,20 +41,64 @@ public class ImageUploadController {
     private final Clock clock;
 
     public ImageUploadController(ImageStorageService storage, SpringDataInvitationImageRepository images,
-            UserRepository users, Clock clock) {
-        this.storage = storage; this.images = images; this.users = users; this.clock = clock;
+                                 UserRepository users, Clock clock) {
+        this.storage = storage;
+        this.images = images;
+        this.users = users;
+        this.clock = clock;
+    }
+
+    private static void validate(MultipartFile image) throws IOException {
+        byte[] signature = image.isEmpty() ? new byte[0] : image.getInputStream().readNBytes(12);
+        if (image.isEmpty() || !FORMATS.containsKey(image.getContentType()) || image.getSize() > MAX_BYTES
+                || !hasExpectedSignature(image.getContentType(), signature)) {
+            throw new IllegalArgumentException("Image must be JPG, JPEG, PNG or WebP and no larger than 5 MB");
+        }
+    }
+
+    private static void validateSocialDimensions(MultipartFile image) throws IOException {
+        validate(image);
+        if (IMAGE_WEBP.equals(image.getContentType())) return;
+        BufferedImage decoded = ImageIO.read(image.getInputStream());
+        if (decoded == null || decoded.getWidth() < 600 || decoded.getHeight() < 315)
+            throw new IllegalArgumentException("Social image must be at least 600 x 315 pixels");
+        double ratio = (double) decoded.getWidth() / decoded.getHeight();
+        if (ratio < 1.7 || ratio > 2.1)
+            throw new IllegalArgumentException("Social image aspect ratio must be close to 1.91:1");
+    }
+
+    private static boolean hasExpectedSignature(String type, byte[] value) {
+        if (MediaType.IMAGE_JPEG_VALUE.equals(type)) return value.length >= 3 && unsigned(value[0]) == 255
+                && unsigned(value[1]) == 216 && unsigned(value[2]) == 255;
+        if (MediaType.IMAGE_PNG_VALUE.equals(type)) {
+            int[] png = {137, 80, 78, 71, 13, 10, 26, 10};
+            if (value.length < png.length) return false;
+            for (int index = 0; index < png.length; index++) if (unsigned(value[index]) != png[index]) return false;
+            return true;
+        }
+        return IMAGE_WEBP.equals(type) && value.length >= 12 && ascii(value, 0, "RIFF") && ascii(value, 8, "WEBP");
+    }
+
+    private static boolean ascii(byte[] value, int offset, String expected) {
+        for (int index = 0; index < expected.length(); index++)
+            if (value[offset + index] != (byte) expected.charAt(index)) return false;
+        return true;
+    }
+
+    private static int unsigned(byte value) {
+        return value & 255;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> upload(@RequestParam("image") MultipartFile image,
-            @RequestParam UUID invitationId, @RequestParam ImageUploadContext.ImageKind context,
-            @AuthenticationPrincipal AuthenticatedUser principal) {
+                                    @RequestParam UUID invitationId, @RequestParam ImageUploadContext.ImageKind context,
+                                    @AuthenticationPrincipal AuthenticatedUser principal) {
         return uploadResponse(image, new ImageUploadContext(invitationId, context), principal);
     }
 
     @PostMapping(path = "/social", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadSocial(@RequestParam("image") MultipartFile image,
-            @RequestParam UUID invitationId, @AuthenticationPrincipal AuthenticatedUser principal) {
+                                          @RequestParam UUID invitationId, @AuthenticationPrincipal AuthenticatedUser principal) {
         try {
             validateSocialDimensions(image);
             return uploadResponse(image,
@@ -79,7 +120,7 @@ public class ImageUploadController {
 
     @Transactional
     private UploadedImage store(MultipartFile image, ImageUploadContext context,
-            AuthenticatedUser principal) throws IOException {
+                                AuthenticatedUser principal) throws IOException {
         LOGGER.info("Image upload received: invitationId={}, context={}, contentType={}, bytes={}",
                 context.invitationId(), context.kind(), image.getContentType(), image.getSize());
         validate(image);
@@ -108,7 +149,7 @@ public class ImageUploadController {
     }
 
     private ResponseEntity<?> uploadResponse(MultipartFile image, ImageUploadContext context,
-            AuthenticatedUser principal) {
+                                             AuthenticatedUser principal) {
         try {
             UploadedImage uploaded = store(image, context, principal);
             return ResponseEntity.ok(uploaded);
@@ -130,40 +171,10 @@ public class ImageUploadController {
         return users.findByPublicCode(principal.code())
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User not found"));
     }
-    private static void validate(MultipartFile image) throws IOException {
-        byte[] signature = image.isEmpty() ? new byte[0] : image.getInputStream().readNBytes(12);
-        if (image.isEmpty() || !FORMATS.containsKey(image.getContentType()) || image.getSize() > MAX_BYTES
-                || !hasExpectedSignature(image.getContentType(), signature)) {
-            throw new IllegalArgumentException("Image must be JPG, JPEG, PNG or WebP and no larger than 5 MB");
-        }
+
+    public record UploadedImage(String url) {
     }
-    private static void validateSocialDimensions(MultipartFile image) throws IOException {
-        validate(image);
-        if (IMAGE_WEBP.equals(image.getContentType())) return;
-        BufferedImage decoded = ImageIO.read(image.getInputStream());
-        if (decoded == null || decoded.getWidth() < 600 || decoded.getHeight() < 315)
-            throw new IllegalArgumentException("Social image must be at least 600 x 315 pixels");
-        double ratio = (double) decoded.getWidth() / decoded.getHeight();
-        if (ratio < 1.7 || ratio > 2.1)
-            throw new IllegalArgumentException("Social image aspect ratio must be close to 1.91:1");
+
+    public record UploadError(String error, String message) {
     }
-    private static boolean hasExpectedSignature(String type, byte[] value) {
-        if (MediaType.IMAGE_JPEG_VALUE.equals(type)) return value.length >= 3 && unsigned(value[0]) == 255
-                && unsigned(value[1]) == 216 && unsigned(value[2]) == 255;
-        if (MediaType.IMAGE_PNG_VALUE.equals(type)) {
-            int[] png = {137, 80, 78, 71, 13, 10, 26, 10};
-            if (value.length < png.length) return false;
-            for (int index = 0; index < png.length; index++) if (unsigned(value[index]) != png[index]) return false;
-            return true;
-        }
-        return IMAGE_WEBP.equals(type) && value.length >= 12 && ascii(value, 0, "RIFF") && ascii(value, 8, "WEBP");
-    }
-    private static boolean ascii(byte[] value, int offset, String expected) {
-        for (int index = 0; index < expected.length(); index++)
-            if (value[offset + index] != (byte) expected.charAt(index)) return false;
-        return true;
-    }
-    private static int unsigned(byte value) { return value & 255; }
-    public record UploadedImage(String url) { }
-    public record UploadError(String error, String message) { }
 }

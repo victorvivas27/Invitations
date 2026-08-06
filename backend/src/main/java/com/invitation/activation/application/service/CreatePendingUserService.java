@@ -2,11 +2,7 @@ package com.invitation.activation.application.service;
 
 import com.invitation.activation.application.CreatePendingUserCommand;
 import com.invitation.activation.application.PendingUserResult;
-import com.invitation.activation.application.port.ActivationEmailSender;
-import com.invitation.activation.application.port.ActivationTokenGenerator;
-import com.invitation.activation.application.port.ActivationTokenHasher;
-import com.invitation.activation.application.port.ActivationTokenRepository;
-import com.invitation.activation.application.port.CreatePendingUserUseCase;
+import com.invitation.activation.application.port.*;
 import com.invitation.activation.domain.AccountActivationToken;
 import com.invitation.activation.infrastructure.ActivationProperties;
 import com.invitation.auth.application.InvalidCredentialsException;
@@ -14,12 +10,13 @@ import com.invitation.user.application.DuplicateEmailException;
 import com.invitation.user.application.port.PublicUserCodeGenerator;
 import com.invitation.user.domain.User;
 import com.invitation.user.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CreatePendingUserService implements CreatePendingUserUseCase {
@@ -33,9 +30,9 @@ public class CreatePendingUserService implements CreatePendingUserUseCase {
     private final Clock clock;
 
     public CreatePendingUserService(UserRepository users, ActivationTokenRepository tokens,
-            PublicUserCodeGenerator codeGenerator, ActivationTokenGenerator tokenGenerator,
-            ActivationTokenHasher tokenHasher, ActivationEmailSender emailSender,
-            ActivationProperties properties, Clock clock) {
+                                    PublicUserCodeGenerator codeGenerator, ActivationTokenGenerator tokenGenerator,
+                                    ActivationTokenHasher tokenHasher, ActivationEmailSender emailSender,
+                                    ActivationProperties properties, Clock clock) {
         this.users = users;
         this.tokens = tokens;
         this.codeGenerator = codeGenerator;
@@ -44,6 +41,15 @@ public class CreatePendingUserService implements CreatePendingUserUseCase {
         this.emailSender = emailSender;
         this.properties = properties;
         this.clock = clock;
+    }
+
+    private static String[] splitName(String fullName) {
+        String normalized = fullName.trim().replaceAll("\\s+", " ");
+        int separator = normalized.indexOf(' ');
+        if (separator < 1 || separator == normalized.length() - 1) {
+            throw new IllegalArgumentException("name must include first name and last name");
+        }
+        return new String[]{normalized.substring(0, separator), normalized.substring(separator + 1)};
     }
 
     @Override
@@ -64,7 +70,7 @@ public class CreatePendingUserService implements CreatePendingUserUseCase {
         tokens.deleteByUserId(pending.getId());
         tokens.save(new AccountActivationToken(UUID.randomUUID(), pending.getId(),
                 tokenHasher.hash(rawToken), now.plusSeconds(
-                        properties.accountActivationExpirationSeconds()), now, null));
+                properties.accountActivationExpirationSeconds()), now, null));
         String url = frontendBaseUrl() + "/activate-account?token=" + rawToken;
         emailSender.send(command.name().trim(), email, url,
                 properties.accountActivationExpirationSeconds());
@@ -85,14 +91,5 @@ public class CreatePendingUserService implements CreatePendingUserUseCase {
     private String frontendBaseUrl() {
         String url = properties.frontendUrl();
         return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
-    }
-
-    private static String[] splitName(String fullName) {
-        String normalized = fullName.trim().replaceAll("\\s+", " ");
-        int separator = normalized.indexOf(' ');
-        if (separator < 1 || separator == normalized.length() - 1) {
-            throw new IllegalArgumentException("name must include first name and last name");
-        }
-        return new String[] {normalized.substring(0, separator), normalized.substring(separator + 1)};
     }
 }

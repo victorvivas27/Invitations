@@ -2,30 +2,57 @@ package com.invitation.invitation.web;
 
 import com.invitation.invitation.application.GetPublicInvitationUseCase;
 import com.invitation.invitation.application.PublicInvitation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.web.util.HtmlUtils;
-import java.nio.charset.StandardCharsets;
-import org.springframework.web.util.UriUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.HtmlUtils;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/public/invitations")
 public class PublicInvitationController {
     private final GetPublicInvitationUseCase useCase;
     private final String frontendUrl;
+
     public PublicInvitationController(GetPublicInvitationUseCase useCase,
-            @Value("${app.frontend-url:http://localhost:5173}") String frontendUrl) {
+                                      @Value("${app.frontend-url:http://localhost:5173}") String frontendUrl) {
         this.useCase = useCase;
         this.frontendUrl = frontendUrl.replaceAll("/+$", "");
     }
+
+    private static String escape(String value) {
+        return HtmlUtils.htmlEscape(value, "UTF-8");
+    }
+
+    private static String encodedSlug(String slug) {
+        return UriUtils.encodePathSegment(slug, StandardCharsets.UTF_8);
+    }
+
+    private static String publicImageUrl(String value) {
+        if (value == null) return "";
+        String normalized = value.trim();
+        if (normalized.startsWith("http://") || normalized.startsWith("https://")) return normalized;
+        String path = normalized.startsWith("/") ? normalized : "/" + normalized;
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(path)
+                .build().encode().toUriString();
+    }
+
+    private static String javascriptString(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"")
+                .replace("<", "\\u003c").replace(">", "\\u003e") + "\"";
+    }
+
     @GetMapping("/{slug}")
-    public PublicInvitation get(@PathVariable String slug) { return useCase.get(slug); }
+    public PublicInvitation get(@PathVariable String slug) {
+        return useCase.get(slug);
+    }
 
     @GetMapping("/{slug}/metadata")
     public PublicInvitationMetadata metadata(@PathVariable String slug) {
@@ -54,24 +81,7 @@ public class PublicInvitationController {
                 <meta http-equiv="refresh" content="0;url=%s"><link rel="canonical" href="%s">
                 </head><body><p>Abriendo invitación…</p><script>location.replace(%s)</script></body></html>
                 """.formatted(title, description, title, description, image, url, url, url,
-                        javascriptString(target));
+                javascriptString(target));
         return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(html);
-    }
-
-    private static String escape(String value) { return HtmlUtils.htmlEscape(value, "UTF-8"); }
-    private static String encodedSlug(String slug) {
-        return UriUtils.encodePathSegment(slug, StandardCharsets.UTF_8);
-    }
-    private static String publicImageUrl(String value) {
-        if (value == null) return "";
-        String normalized = value.trim();
-        if (normalized.startsWith("http://") || normalized.startsWith("https://")) return normalized;
-        String path = normalized.startsWith("/") ? normalized : "/" + normalized;
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(path)
-                .build().encode().toUriString();
-    }
-    private static String javascriptString(String value) {
-        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"")
-                .replace("<", "\\u003c").replace(">", "\\u003e") + "\"";
     }
 }

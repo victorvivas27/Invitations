@@ -2,12 +2,8 @@ package com.invitation.invitation.web;
 
 import com.invitation.invitation.domain.EventType;
 import com.invitation.invitation.domain.InvitationViewMode;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -34,4 +30,5 @@ public record CreateInvitationRequest(
         @Size(max = 3000) String contactInfo,
         @NotBlank @Size(max = 70) String shareTitle,
         @NotBlank @Size(max = 160) String shareDescription,
-        @Size(max = 500) String shareImageUrl) { }
+        @Size(max = 500) String shareImageUrl) {
+}

@@ -1,6 +1,8 @@
 package com.invitation.user.domain;
 
-/** Lifecycle states supported by a user account. */
+/**
+ * Lifecycle states supported by a user account.
+ */
 public enum UserStatus {
     PENDING_ACTIVATION,
     ACTIVE,

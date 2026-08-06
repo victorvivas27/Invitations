@@ -1,13 +1,14 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { invitationTemplates } from '../templates/data/invitationTemplates'
+import { MemoryRouter } from 'react-router-dom'
 import { HomePage } from './HomePage'
 
 describe('HomePage redesign', () => {
   beforeEach(() => window.localStorage.clear())
 
   it('explains the web product and links both hero actions to templates', () => {
-    render(<HomePage />)
+    render(<MemoryRouter><HomePage /></MemoryRouter>)
     expect(screen.getByRole('heading', { level: 1, name: 'Crea invitaciones digitales que se sienten únicas' })).toBeInTheDocument()
     expect(screen.getByText(/invitación web personalizada/)).toBeInTheDocument()
     expect(screen.getByLabelText('Demostración de una invitación web real')).toHaveTextContent('Emilia')
@@ -18,7 +19,7 @@ describe('HomePage redesign', () => {
   })
 
   it('uses real categories and featured template identifiers', () => {
-    render(<HomePage />)
+    render(<MemoryRouter><HomePage /></MemoryRouter>)
     for (const category of ['Cumpleaños', 'Bautismos', 'Matrimonios', 'Graduaciones']) expect(screen.getByRole('heading', { name: category })).toBeInTheDocument()
     const featured = invitationTemplates.filter((item) => item.isFeatured && item.isAvailable)
     const templateLinks = screen.getAllByRole('link', { name: /Usar esta plantilla/ })
@@ -27,7 +28,7 @@ describe('HomePage redesign', () => {
   })
 
   it('shows actual and future capabilities honestly and includes the creator signature', () => {
-    render(<HomePage />)
+    render(<MemoryRouter><HomePage /></MemoryRouter>)
     expect(screen.getByText('Confirmación de asistencia')).toBeInTheDocument()
     expect(screen.getAllByText('Disponible').length).toBeGreaterThanOrEqual(4)
     expect(screen.getByText('Música personalizada')).toBeInTheDocument()
@@ -37,14 +38,14 @@ describe('HomePage redesign', () => {
   })
 
   it('keeps content visible without IntersectionObserver and has no page-level horizontal overflow class', () => {
-    const { container } = render(<HomePage />)
+    const { container } = render(<MemoryRouter><HomePage /></MemoryRouter>)
     expect(container.querySelectorAll('.home-reveal:not(.is-visible)')).toHaveLength(0)
     expect(container.querySelector('.redesigned-home')).toHaveClass('redesigned-home')
     expect(container.querySelector('.product-demo .wizard-preview')).toBeInTheDocument()
   })
 
   it('opens, closes and updates the accessible mobile menu', async () => {
-    render(<HomePage />)
+    render(<MemoryRouter><HomePage /></MemoryRouter>)
     const trigger = screen.getByRole('button', { name: 'Abrir menú' })
     await userEvent.click(trigger)
     const menu = document.getElementById('mobile-menu')
@@ -54,7 +55,7 @@ describe('HomePage redesign', () => {
   })
 
   it('switches between light and dark themes and remembers the choice', async () => {
-    render(<HomePage />)
+    render(<MemoryRouter><HomePage /></MemoryRouter>)
     const toggles = screen.getAllByRole('button', { name: 'Cambiar a tema oscuro' })
     await userEvent.click(toggles[0])
     expect(document.documentElement).toHaveAttribute('data-theme', 'dark')

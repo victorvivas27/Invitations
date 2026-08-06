@@ -185,3 +185,46 @@ input[type='file']:disabled::file-selector-button { cursor:not-allowed;box-shado
   .home-hero h1 { max-width:390px;font-size:clamp(1.85rem,5.8vw,2.35rem); }
   .home-hero .hero-copy>p { max-width:390px;font-size:.76rem; }
 }
+
+/* Contenedor persistente entre rutas: evita el destello blanco al navegar.
+   El color de fondo se queda en `body` a propósito: pintarlo aquí taparía los
+   decorados con z-index negativo (.creation-success::before, .preview-wrap). */
+.app-shell { min-height:100svh;color:var(--theme-text); }
+
+/* Esqueletos de carga: reservan el espacio real del contenido. */
+.skeleton { display:block;height:1em;border-radius:8px;background:linear-gradient(90deg,var(--theme-surface-soft) 25%,color-mix(in srgb,var(--theme-border) 65%,var(--theme-surface-soft)) 50%,var(--theme-surface-soft) 75%);background-size:220% 100%;animation:skeleton-sweep 1.4s ease-in-out infinite; }
+.skeleton-pill { width:96px;height:24px;border-radius:999px; }
+.skeleton-title { width:75%;height:1.5rem;margin-top:16px; }
+.skeleton-line { height:.9rem;margin-top:10px; }
+.skeleton-metric { width:60%;height:2.4rem;margin-inline:auto; }
+.skeleton-rows { display:grid;gap:10px;margin:20px 0; }
+.skeleton-row { height:56px;border-radius:12px; }
+.skeleton-action { height:44px;border-radius:999px;margin-top:6px; }
+.guest-list article.is-skeleton .skeleton-row { margin-top:14px; }
+.guest-summary > div:has(.skeleton-metric) { display:grid;gap:8px; }
+@keyframes skeleton-sweep { from { background-position:120% 0 } to { background-position:-120% 0 } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation:none } }
+
+/* Tarea 23: pantalla "invitación publicada" con acabado oscuro y jerarquía ordenada. */
+.creation-success { padding-block:clamp(24px,6vh,56px);color:#eaf1fb;color-scheme:dark;background:transparent;border:0;box-shadow:none; }
+.creation-success::before { background:radial-gradient(circle at 12% 12%,rgba(215,25,32,.22),transparent 42%),radial-gradient(circle at 88% 85%,rgba(21,87,160,.28),transparent 45%),linear-gradient(165deg,#0a1729,#050c18); }
+.creation-success>section { display:grid;justify-items:center;width:min(100%,580px);padding:clamp(30px,7vw,52px) clamp(20px,6vw,44px);color:#eaf1fb;border:1px solid rgba(255,255,255,.14);border-radius:28px;background:linear-gradient(170deg,#16294a,#0a1526);backdrop-filter:blur(18px);box-shadow:0 34px 84px rgba(3,9,20,.6); }
+.creation-success .success-mark { width:72px;height:72px;margin:0 0 20px;border:6px solid rgba(79,209,139,.16);color:#04150c;background:#4fd18b;box-shadow:0 16px 36px rgba(79,209,139,.28); }
+.creation-success .pill { color:#a9c9f2;border:1px solid rgba(255,255,255,.12);background:rgba(109,166,232,.16);font-size:.7rem;letter-spacing:.12em; }
+.creation-success h1 { margin:16px 0 10px;color:#fff;font-size:clamp(1.85rem,7vw,2.85rem);letter-spacing:-.04em;line-height:1.05; }
+.creation-success section>p:not(.copy-status) { max-width:400px;margin:0 0 28px;color:#b6c7dd;font-size:.98rem;line-height:1.6; }
+.creation-success .share-url { width:100%;gap:9px;margin:0 0 22px;border:0;background:transparent; }
+.creation-success .share-url>span { color:#8fb4e4;font-size:.7rem;letter-spacing:.13em; }
+.creation-success .share-url input { min-height:54px;color:#f4f8ff;border:1px solid #3d5b82;border-radius:14px;background:#060f1e;font-size:.86rem;font-weight:600; }
+.creation-success .share-url input:focus { border-color:#6aa7ea;outline:3px solid rgba(106,167,234,.28); }
+.creation-success .success-actions { width:100%;gap:11px; }
+.creation-success .success-actions>.primary-cta { color:#fff!important;border:0;background:linear-gradient(135deg,#e02730,#a90f18);box-shadow:0 16px 34px rgba(215,25,32,.35);font-weight:850; }
+.creation-success .success-actions>.primary-cta:hover { background:linear-gradient(135deg,#e02730,#a90f18);filter:brightness(1.08); }
+.creation-success .success-actions>.secondary-cta { color:#dce8f8;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.06);font-weight:800; }
+.creation-success .success-actions>.secondary-cta:hover { border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.12); }
+.creation-success .success-actions>a:last-child { margin-top:2px;color:#8fb4e4; }
+.creation-success .copy-status { margin:16px 0 0;color:#7ee0ab; }
+@media (max-width:480px) {
+  .creation-success>section { border-radius:22px; }
+  .creation-success .success-mark { width:60px;height:60px;border-width:5px;font-size:1.6rem; }
+}

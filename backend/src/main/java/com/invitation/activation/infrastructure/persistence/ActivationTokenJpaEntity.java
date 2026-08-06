@@ -4,23 +4,31 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "account_activation_tokens")
 public class ActivationTokenJpaEntity {
-    @Id private UUID id;
-    @Column(name = "user_id", nullable = false, unique = true) private UUID userId;
-    @Column(name = "token_hash", nullable = false, unique = true, length = 64) private String tokenHash;
-    @Column(name = "expires_at", nullable = false) private Instant expiresAt;
-    @Column(name = "created_at", nullable = false) private Instant createdAt;
-    @Column(name = "used_at") private Instant usedAt;
+    @Id
+    private UUID id;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private UUID userId;
+    @Column(name = "token_hash", nullable = false, unique = true, length = 64)
+    private String tokenHash;
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+    @Column(name = "used_at")
+    private Instant usedAt;
 
-    protected ActivationTokenJpaEntity() { }
+    protected ActivationTokenJpaEntity() {
+    }
 
     public ActivationTokenJpaEntity(UUID id, UUID userId, String tokenHash, Instant expiresAt,
-            Instant createdAt, Instant usedAt) {
+                                    Instant createdAt, Instant usedAt) {
         this.id = id;
         this.userId = userId;
         this.tokenHash = tokenHash;
@@ -29,10 +37,27 @@ public class ActivationTokenJpaEntity {
         this.usedAt = usedAt;
     }
 
-    public UUID getId() { return id; }
-    public UUID getUserId() { return userId; }
-    public String getTokenHash() { return tokenHash; }
-    public Instant getExpiresAt() { return expiresAt; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUsedAt() { return usedAt; }
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public Instant getExpiresAt() {
+        return expiresAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUsedAt() {
+        return usedAt;
+    }
 }

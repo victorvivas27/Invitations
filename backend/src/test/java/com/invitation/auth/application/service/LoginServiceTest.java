@@ -1,9 +1,5 @@
 package com.invitation.auth.application.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
-
 import com.invitation.auth.application.InvalidCredentialsException;
 import com.invitation.auth.application.LoginCommand;
 import com.invitation.auth.application.LoginResult;
@@ -14,22 +10,30 @@ import com.invitation.user.domain.User;
 import com.invitation.user.domain.User.UserData;
 import com.invitation.user.domain.UserStatus;
 import com.invitation.user.repository.UserRepository;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 class LoginServiceTest {
     private static final String EMAIL = "ana@example.com";
     private static final String HASH = "stored-hash";
     private static final String PASSWORD = "Password1";
     private User user;
-    @Mock private UserRepository repository;
-    @Mock private PasswordHasher hasher;
-    @Mock private TokenGenerator tokens;
+    @Mock
+    private UserRepository repository;
+    @Mock
+    private PasswordHasher hasher;
+    @Mock
+    private TokenGenerator tokens;
     private LoginService service;
 
     @BeforeEach
@@ -49,8 +53,8 @@ class LoginServiceTest {
 
         LoginResult result = service.login(new LoginCommand(" ANA@Example.COM ", PASSWORD));
 
-        assertThat(new Object[] {result.token(), result.tokenType(), result.expiresIn(),
-            result.user().code(), result.user().email(), result.user().status()})
+        assertThat(new Object[]{result.token(), result.tokenType(), result.expiresIn(),
+                result.user().code(), result.user().email(), result.user().status()})
                 .containsExactly("jwt", "Bearer", 3600L, "ACC-ABC123DEF456", EMAIL, UserStatus.ACTIVE);
     }
 
