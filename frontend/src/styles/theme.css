@@ -1144,12 +1144,14 @@ textarea::placeholder {
     border-radius: 14px;
   }
   .wizard-preview {
-    border-width: 5px;
-    border-radius: 20px;
+    border: 0;
+    border-radius: 0;
+    background: #081220;
   }
   .wizard-preview .invitation-experience {
     max-height: 570px;
-    border-radius: 14px;
+    border-radius: 0;
+    background: #081220;
   }
   .preview-caption {
     font-size: 0.65rem;

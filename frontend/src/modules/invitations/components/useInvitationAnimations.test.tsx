@@ -65,7 +65,7 @@ describe('useInvitationAnimations', () => {
     vi.restoreAllMocks()
   })
 
-  it('reveals each chapter once and stops observing it', () => {
+  it('keeps observing each chapter after revealing it', () => {
     const { getByTestId } = render(<Harness />)
     const chapter = getByTestId('chapter')
     const [observer] = observers
@@ -73,16 +73,18 @@ describe('useInvitationAnimations', () => {
 
     observer.emit(chapter, true)
     expect(chapter).toHaveClass('is-visible')
-    expect(observer.observed.has(chapter)).toBe(false)
+    expect(observer.observed.has(chapter)).toBe(true)
   })
 
-  it('keeps a revealed chapter visible when it leaves the viewport', () => {
+  it('hides a chapter when it leaves and reveals it again on return', () => {
     const { getByTestId } = render(<Harness />)
     const chapter = getByTestId('chapter')
     const [observer] = observers
 
     observer.emit(chapter, true)
     observer.emit(chapter, false)
+    expect(chapter).not.toHaveClass('is-visible')
+    observer.emit(chapter, true)
     expect(chapter).toHaveClass('is-visible')
   })
 

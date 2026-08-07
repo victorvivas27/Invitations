@@ -1,57 +1,82 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { confirmAttendance, InvitationApiError } from '../services/invitations'
 import type { PublicInvitation } from '../types/invitation'
 import { SectionBackground } from './SectionBackground'
 import { InvitationFooter } from './InvitationFooter'
 import { useInvitationAnimations } from './useInvitationAnimations'
 
+// Utilidades con mejor manejo de errores
 const capitalize = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1)
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('es-CL', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-    .formatToParts(new Date(`${date}T12:00:00`))
-    .map((part) =>
-      part.type === 'weekday' || part.type === 'month'
-        ? capitalize(part.value)
-        : part.value,
-    )
-    .join('')
-const countdown = (date: string, time: string) => {
-  const normalizedTime = (time || '00:00').slice(0, 5)
-  const target = new Date(`${date}T${normalizedTime}:00`).getTime()
-  const difference = target - Date.now()
-  if (!date || !Number.isFinite(target) || difference <= 0)
-    return { days: 0, hours: 0, minutes: 0 }
-  return {
-    days: Math.floor(difference / 86400000),
-    hours: Math.floor(difference / 3600000) % 24,
-    minutes: Math.floor(difference / 60000) % 60,
+  value?.charAt(0)?.toUpperCase() + value?.slice(1) || ''
+
+const formatDate = (date: string) => {
+  if (!date) return ''
+  try {
+    const dateObj = new Date(date)
+    if (isNaN(dateObj.getTime())) return ''
+
+    return new Intl.DateTimeFormat('es-CL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+      .formatToParts(dateObj)
+      .map((part) =>
+        part.type === 'weekday' || part.type === 'month'
+          ? capitalize(part.value)
+          : part.value,
+      )
+      .join('')
+  } catch {
+    return ''
   }
 }
 
+const countdown = (date: string, time: string) => {
+  if (!date || !time) return { days: 0, hours: 0, minutes: 0 }
+
+  try {
+    const normalizedTime = time.slice(0, 5) || '00:00'
+    const target = new Date(`${date}T${normalizedTime}:00`).getTime()
+
+    if (isNaN(target)) return { days: 0, hours: 0, minutes: 0 }
+
+    const difference = target - Date.now()
+    if (difference <= 0) return { days: 0, hours: 0, minutes: 0 }
+
+    return {
+      days: Math.floor(difference / 86400000),
+      hours: Math.floor(difference / 3600000) % 24,
+      minutes: Math.floor(difference / 60000) % 60,
+    }
+  } catch {
+    return { days: 0, hours: 0, minutes: 0 }
+  }
+}
+
+// Componente RsvpForm mejorado
 function RsvpForm({ publicSlug }: { publicSlug: string }) {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
-    guestCount: 1,
+    guestCount: '1',
     attending: true,
     message: '',
   })
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>(
-    'idle',
-  )
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [error, setError] = useState('')
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault()
     setState('sending')
     setError('')
+
     try {
-      await confirmAttendance(publicSlug, form)
+      await confirmAttendance(publicSlug, {
+        ...form,
+        guestCount: form.attending ? Number(form.guestCount) : 1,
+      })
       setState('sent')
     } catch (failure) {
       setState('error')
@@ -62,12 +87,15 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
       )
     }
   }
-  if (state === 'sent')
+
+  if (state === 'sent') {
     return (
       <p className="rsvp-success" role="status">
         ¡Gracias! Tu respuesta fue enviada.
       </p>
     )
+  }
+
   return (
     <form className="rsvp-form" onSubmit={submit}>
       <div className="rsvp-name-row">
@@ -75,6 +103,7 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
           <span>Nombre</span>
           <input
             required
+            placeholder=" "
             maxLength={55}
             autoComplete="given-name"
             value={form.firstName}
@@ -87,6 +116,7 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
           <span>Apellido</span>
           <input
             required
+            placeholder=" "
             maxLength={55}
             autoComplete="family-name"
             value={form.lastName}
@@ -100,12 +130,14 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
         <span>Cantidad de asistentes</span>
         <input
           type="number"
+          placeholder=" "
           min="1"
           max="20"
-          required
+          required={form.attending}
+          disabled={!form.attending}
           value={form.guestCount}
           onChange={(event) =>
-            setForm({ ...form, guestCount: Number(event.target.value) })
+            setForm({ ...form, guestCount: event.target.value })
           }
         />
       </label>
@@ -116,7 +148,13 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
             type="radio"
             name="attending"
             checked={form.attending}
-            onChange={() => setForm({ ...form, attending: true })}
+            onChange={() =>
+              setForm({
+                ...form,
+                attending: true,
+                guestCount: form.guestCount || '1',
+              })
+            }
           />{' '}
           Sí, asistiré
         </label>
@@ -125,7 +163,9 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
             type="radio"
             name="attending"
             checked={!form.attending}
-            onChange={() => setForm({ ...form, attending: false })}
+            onChange={() =>
+              setForm({ ...form, attending: false, guestCount: '' })
+            }
           />{' '}
           No podré asistir
         </label>
@@ -134,6 +174,7 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
         <span>Mensaje para el anfitrión (opcional)</span>
         <textarea
           maxLength={500}
+          placeholder=" "
           rows={2}
           value={form.message}
           onChange={(event) =>
@@ -153,6 +194,7 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
   )
 }
 
+// Componente principal mejorado
 export function PublicInvitationRenderer({
   invitation,
   preview = false,
@@ -162,118 +204,162 @@ export function PublicInvitationRenderer({
   preview?: boolean
   viewMode?: 'scroll' | 'navigation'
 }) {
+  // Validación temprana de props
+  if (!invitation?.publicSlug) {
+    console.warn('Invitation missing required props')
+    return <div>Error: Datos de invitación incompletos</div>
+  }
+
   const CoverHeading = preview ? 'h2' : 'h1'
   const experienceRef = useRef<HTMLDivElement>(null)
   const [activeChapter, setActiveChapter] = useState('portada')
   const viewMode = selectedViewMode ?? 'scroll'
-  const [remaining, setRemaining] = useState(() =>
+
+  // Memoizar el cálculo del countdown
+  const initialRemaining = useMemo(() =>
     countdown(invitation.eventDate, invitation.eventTime),
+    [invitation.eventDate, invitation.eventTime]
   )
+
+  const [remaining, setRemaining] = useState(initialRemaining)
+
+  // Actualizar countdown de forma segura
   useEffect(() => {
-    const timer = window.setInterval(
-      () => setRemaining(countdown(invitation.eventDate, invitation.eventTime)),
-      60000,
-    )
+    const timer = window.setInterval(() => {
+      try {
+        setRemaining(countdown(invitation.eventDate, invitation.eventTime))
+      } catch {
+        // Silenciar errores de actualización
+      }
+    }, 60000)
+
     return () => window.clearInterval(timer)
   }, [invitation.eventDate, invitation.eventTime])
+
+  // Hook de animaciones con manejo de errores
   useInvitationAnimations(
     experienceRef,
     preview,
     viewMode,
-    invitation.galleryImageUrls,
+    invitation.galleryImageUrls || []
   )
+
+  // Observer de capítulos con mejor manejo
   useEffect(() => {
     const experience = experienceRef.current
     if (!experience || !('IntersectionObserver' in window)) return
-    const observationRoot =
-      viewMode === 'navigation'
-        ? experience.querySelector('.experience-chapters')
-        : preview
-          ? experience
-          : null
+
+    const observationRoot = viewMode === 'navigation'
+      ? experience.querySelector('.experience-chapters')
+      : preview
+        ? experience
+        : null
+
     const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveChapter(entry.target.id)
-        }),
-      { root: observationRoot, threshold: 0.55 },
+      (entries) => {
+        const visibleChapter = entries.find(entry => entry.isIntersecting)
+        if (visibleChapter) {
+          setActiveChapter(visibleChapter.target.id)
+        }
+      },
+      { root: observationRoot, threshold: 0.55 }
     )
-    experience
-      .querySelectorAll<HTMLElement>('.experience-chapter[id]')
-      .forEach((chapter) => observer.observe(chapter))
+
+    const chapters = experience.querySelectorAll<HTMLElement>('.experience-chapter[id]')
+    chapters.forEach((chapter) => observer.observe(chapter))
+
     return () => observer.disconnect()
-  }, [preview, viewMode, invitation.galleryImageUrls])
-  const gallery = invitation.galleryImageUrls ?? []
-  const finalImage = gallery.at(-1) ?? invitation.heroImageUrl
+  }, [preview, viewMode])
+
+  // Posiciones de imágenes con mejor manejo
   useEffect(() => {
     const applyImagePositions = () => {
       const experience = experienceRef.current
       if (!experience) return
-      const hero = experience.querySelector<HTMLImageElement>(
-        '.experience-cover-media img',
-      )
-      const farewell = experience.querySelector<HTMLImageElement>(
-        '.experience-farewell-media img',
-      )
-      const heroPosition =
-        invitation.heroImagePosition ??
-        Number(sessionStorage.getItem('heroImagePosition') ?? 50)
-      const finalPosition =
-        invitation.finalImagePosition ??
-        Number(sessionStorage.getItem('finalImagePosition') ?? 50)
-      if (hero) hero.style.objectPosition = `50% ${heroPosition}%`
-      if (farewell) farewell.style.objectPosition = `50% ${finalPosition}%`
+
+      try {
+        const hero = experience.querySelector<HTMLImageElement>(
+          '.experience-cover-media img'
+        )
+        const farewell = experience.querySelector<HTMLImageElement>(
+          '.experience-farewell-media img'
+        )
+
+        const heroPosition = invitation.heroImagePosition ??
+          Number(sessionStorage.getItem('heroImagePosition') ?? 50)
+        const finalPosition = invitation.finalImagePosition ??
+          Number(sessionStorage.getItem('finalImagePosition') ?? 50)
+
+        if (hero) hero.style.objectPosition = `50% ${heroPosition}%`
+        if (farewell) farewell.style.objectPosition = `50% ${finalPosition}%`
+      } catch {
+        // Silenciar errores de posicionamiento
+      }
     }
+
     applyImagePositions()
-    window.addEventListener(
+
+    window.addEventListener('invitation-image-position-change', applyImagePositions)
+    return () => window.removeEventListener(
       'invitation-image-position-change',
-      applyImagePositions,
+      applyImagePositions
     )
-    return () =>
-      window.removeEventListener(
-        'invitation-image-position-change',
-        applyImagePositions,
-      )
-  }, [
-    invitation.heroImagePosition,
-    invitation.finalImagePosition,
-    invitation.heroImageUrl,
-    finalImage,
-  ])
-  const chapters = [
-    { id: 'portada', label: 'Portada' },
-    { id: 'frase', label: 'Frase' },
-    { id: 'fecha', label: 'Fecha' },
-    { id: 'lugar', label: 'Lugar' },
-    ...(gallery.length ? [{ id: 'fotos', label: 'Fotos' }] : []),
-    { id: 'confirmar', label: '¿Vas a venir?' },
-    { id: 'final', label: 'Final' },
-  ]
-  const navigateTo = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    id: string,
-  ) => {
+  }, [invitation.heroImagePosition, invitation.finalImagePosition])
+
+  // Navegación con mejor manejo de errores
+  const navigateTo = useCallback((event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     event.preventDefault()
     const experience = experienceRef.current
-    const target = experience?.querySelector<HTMLElement>(`#${id}`)
+    if (!experience) return
+
+    const target = experience.querySelector<HTMLElement>(`#${id}`)
     if (!target) return
-    if (viewMode === 'navigation')
-      experience
-        ?.querySelector<HTMLElement>('.experience-chapters')
-        ?.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
-    else target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-  const navigateAdjacent = (direction: 1 | -1) => {
+
+    try {
+      if (viewMode === 'navigation') {
+        const container = experience.querySelector<HTMLElement>('.experience-chapters')
+        if (container) {
+          container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
+        }
+      } else {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    } catch {
+      // Silenciar errores de navegación
+    }
+  }, [viewMode])
+
+  const navigateAdjacent = useCallback((direction: 1 | -1) => {
     const index = chapters.findIndex((chapter) => chapter.id === activeChapter)
     const adjacent = chapters[index + direction]
     if (!adjacent) return
-    const target = experienceRef.current?.querySelector<HTMLElement>(
-      `#${adjacent.id}`,
-    )
-    experienceRef.current
-      ?.querySelector<HTMLElement>('.experience-chapters')
-      ?.scrollTo({ left: target?.offsetLeft ?? 0, behavior: 'smooth' })
+
+    const target = experienceRef.current?.querySelector<HTMLElement>(`#${adjacent.id}`)
+    const container = experienceRef.current?.querySelector<HTMLElement>('.experience-chapters')
+
+    if (container && target) {
+      container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
+    }
+  }, [activeChapter])
+
+  // Capítulos con validación
+  const chapters = useMemo(() => [
+    { id: 'portada', label: 'Portada' },
+    { id: 'frase', label: 'Frase' },
+    { id: 'fecha', label: 'Datos' },
+    { id: 'confirmar', label: '¿Vas a venir?' },
+    ...(invitation.galleryImageUrls?.length ? [{ id: 'fotos', label: 'Fotos' }] : []),
+    { id: 'final', label: 'Final' },
+  ], [invitation.galleryImageUrls])
+
+  const gallery = invitation.galleryImageUrls ?? []
+  const finalImage = gallery.at(-1) ?? invitation.heroImageUrl
+
+  // Rendering seguro
+  if (!invitation) {
+    return <div>Error: Invitación no disponible</div>
   }
+
   return (
     <div
       ref={experienceRef}
@@ -304,28 +390,50 @@ export function PublicInvitationRenderer({
           </button>
         </div>
       )}
+
       <div className="experience-chapters">
+        {/* Cover Section */}
         <SectionBackground
           id="portada"
           className="experience-cover experience-chapter"
           background={invitation.sectionBackgrounds?.basic}
         >
-          {invitation.heroImageUrl && (
-            <div className="experience-cover-media" data-reveal="media">
-              <img
-                src={invitation.heroImageUrl}
-                alt={`Foto principal de ${invitation.honoreeName}`}
-              />
-            </div>
-          )}
+          {invitation.heroImageUrl &&
+            !(
+              invitation.sectionBackgrounds?.basic?.customized &&
+              invitation.sectionBackgrounds.basic.type === 'image'
+            ) && (
+              <div className="experience-cover-media" data-reveal="media">
+                <img
+                  src={invitation.heroImageUrl}
+                  alt={`Foto principal de ${invitation.honoreeName || 'invitado'}`}
+                />
+              </div>
+            )}
           <div className="experience-cover-copy" data-reveal="group">
+            <span className="experience-number">01</span>
             <p className="experience-cover-invite">
-              Estamos felices de invitarte al cumple de
+              {invitation.sectionBackgrounds?.basic?.introText ||
+                'Estamos felices de invitarte al cumple de'}
             </p>
-            <CoverHeading>{invitation.honoreeName}</CoverHeading>
-            {invitation.honoreeAge !== null && (
+            <CoverHeading className="experience-cover-name">
+              {invitation.honoreeName || 'Invitado'}
+            </CoverHeading>
+            {(invitation.sectionBackgrounds?.basic?.coverDescription ||
+              invitation.honoreeAge !== null) && (
               <p className="experience-cover-age">
-                que cumple <strong>{invitation.honoreeAge} años</strong>
+                {(
+                  invitation.sectionBackgrounds?.basic?.coverDescription ||
+                  `Cumplo ${invitation.honoreeAge || 0} años`
+                )
+                  .split(/(\d+(?:[.,]\d+)?)/g)
+                  .map((part, index) =>
+                    /^\d/.test(part) ? (
+                      <strong key={`${part}-${index}`}>{part}</strong>
+                    ) : (
+                      part
+                    ),
+                  )}
               </p>
             )}
             <a
@@ -339,25 +447,29 @@ export function PublicInvitationRenderer({
             </a>
           </div>
         </SectionBackground>
+
+        {/* Frase Section */}
         <SectionBackground
           id="frase"
           className="experience-section experience-intro experience-chapter"
           background={invitation.sectionBackgrounds?.tribute}
           reveal="group"
         >
-          <span className="experience-number">01</span>
-          <p>{invitation.message}</p>
+          <span className="experience-number">02</span>
+          <p>{invitation.message || 'Mensaje especial'}</p>
         </SectionBackground>
+
+        {/* Fecha Section */}
         <SectionBackground
           id="fecha"
-          className="experience-section experience-when experience-chapter"
+          className="experience-section experience-when experience-place experience-chapter"
           background={invitation.sectionBackgrounds?.date}
           reveal="group"
         >
-          <span className="experience-number">02</span>
+          <span className="experience-number">03</span>
           <h2>Reserva este momento</h2>
-          <strong>{formatDate(invitation.eventDate)}</strong>
-          <p>A las {invitation.eventTime.slice(0, 5)} horas</p>
+          <strong>{formatDate(invitation.eventDate) || 'Fecha por definir'}</strong>
+          <p>A las {invitation.eventTime?.slice(0, 5) || 'Hora por definir'} horas</p>
           <div className="countdown">
             <div>
               <b>{remaining.days}</b>
@@ -372,17 +484,11 @@ export function PublicInvitationRenderer({
               <span>Minutos</span>
             </div>
           </div>
-        </SectionBackground>
-        <SectionBackground
-          id="lugar"
-          className="experience-section experience-place experience-chapter"
-          background={invitation.sectionBackgrounds?.venue}
-          reveal="group"
-        >
-          <span className="experience-number">03</span>
-          <h2>Aquí te esperamos con cariño</h2>
-          <strong>{invitation.venueName}</strong>
-          <p>{invitation.address}</p>
+          <h2 className="experience-place-title">
+            Aquí te esperamos con cariño
+          </h2>
+          <strong>{invitation.venueName || 'Lugar por confirmar'}</strong>
+          <p>{invitation.address || 'Dirección por confirmar'}</p>
           {invitation.mapsUrl && (
             <a
               href={invitation.mapsUrl}
@@ -393,36 +499,15 @@ export function PublicInvitationRenderer({
             </a>
           )}
         </SectionBackground>
-        {gallery.length > 0 && (
-          <SectionBackground
-            id="fotos"
-            className="experience-section experience-gallery experience-chapter"
-            background={invitation.sectionBackgrounds?.gallery}
-            reveal="group"
-          >
-            <span className="experience-number">04</span>
-            <h2>Momentos que guardamos</h2>
-            <div>
-              {gallery.map((url, index) => (
-                <figure key={url}>
-                  <img
-                    src={url}
-                    alt={`Recuerdo ${index + 1} de ${invitation.honoreeName}`}
-                    loading="lazy"
-                  />
-                </figure>
-              ))}
-            </div>
-            <p>Cada recuerdo nos trae hasta este día tan especial.</p>
-          </SectionBackground>
-        )}
+
+        {/* Confirmar Section */}
         <SectionBackground
           id="confirmar"
           className="experience-section experience-rsvp experience-chapter"
           background={invitation.sectionBackgrounds?.message}
           reveal="group"
         >
-          <span className="experience-number">05</span>
+          <span className="experience-number">04</span>
           <h2>Confirma tu presencia</h2>
           {preview ? (
             <div className="rsvp-preview">
@@ -432,27 +517,76 @@ export function PublicInvitationRenderer({
             <RsvpForm publicSlug={invitation.publicSlug} />
           )}
         </SectionBackground>
+
+        {/* Fotos Section */}
+        {(gallery.length > 0 || preview) && (
+          <SectionBackground
+            id="fotos"
+            className="experience-section experience-gallery experience-chapter"
+            background={invitation.sectionBackgrounds?.gallery}
+            reveal="group"
+          >
+            <span className="experience-number">05</span>
+            <h2>Momentos que guardamos</h2>
+            {gallery.length > 0 ? (
+              <>
+                <div className="experience-gallery-grid" data-reveal="group">
+                  {gallery.map((url, index) => (
+                    <figure key={url || index}>
+                      <img
+                        src={url}
+                        alt={`Recuerdo ${index + 1} de ${invitation.honoreeName || 'invitado'}`}
+                        loading="lazy"
+                      />
+                    </figure>
+                  ))}
+                </div>
+                <p className="experience-gallery-caption">
+                  Cada recuerdo nos trae hasta este día tan especial.
+                </p>
+              </>
+            ) : (
+              <p className="experience-gallery-caption">
+                Tus fotos aparecerán aquí cuando las agregues.
+              </p>
+            )}
+          </SectionBackground>
+        )}
+
+        {/* Final Section */}
         <SectionBackground
           id="final"
           className="experience-farewell experience-chapter"
           background={invitation.sectionBackgrounds?.summary}
         >
-          {finalImage && (
-            <div className="experience-farewell-media" data-reveal="media">
-              <img
-                src={finalImage}
-                alt={`Recuerdo especial de ${invitation.honoreeName}`}
-                loading="lazy"
-              />
-            </div>
-          )}
+          {finalImage &&
+            !(
+              invitation.sectionBackgrounds?.summary?.customized &&
+              invitation.sectionBackgrounds.summary.type === 'image'
+            ) && (
+              <div className="experience-farewell-media" data-reveal="media">
+                <img
+                  src={finalImage}
+                  alt={`Recuerdo especial de ${invitation.honoreeName || 'invitado'}`}
+                  loading="lazy"
+                />
+              </div>
+            )}
           <div className="experience-farewell-copy" data-reveal="group">
-            <p>Gracias por acompañarnos en este día tan especial.</p>
-            <h2>¡Te esperamos!</h2>
+            <span className="experience-number">06</span>
+            <p>
+              {invitation.sectionBackgrounds?.summary?.farewellText ||
+                'Gracias por acompañarnos en este día tan especial.'}
+            </p>
+            <h2>
+              {invitation.sectionBackgrounds?.summary?.farewellTitle ||
+                '¡Te esperamos!'}
+            </h2>
             <span>✦</span>
           </div>
         </SectionBackground>
       </div>
+
       <InvitationFooter contact={invitation.contactInfo} />
     </div>
   )

@@ -64,3 +64,40 @@ export type OwnedInvitation = {
   status: 'PUBLISHED'
   createdAt: string
 }
+
+export type UpdateInvitationInput = CreateInvitationInput
+
+export type OwnedInvitationDetail = {
+  id: string
+  publicSlug: string
+  publicUrl: string
+  templateId: string
+  viewMode: InvitationViewMode
+  eventType: InvitationEventType
+  eventName: string
+  honoreeName: string
+  honoreeAge: number | null
+  eventDate: string
+  eventTime: string
+  venueName: string
+  address: string
+  mapsUrl: string | null
+  heroImageUrl: string | null
+  galleryImageUrls: string[]
+  message: string
+  sectionBackgrounds?: SectionBackgrounds
+  contactInfo?: InvitationContactInfo
+  shareTitle: string
+  shareDescription: string
+  shareImageUrl: string | null
+  status: 'PUBLISHED'
+  createdAt: string
+  updatedAt: string
+}
+
+export type UpdatedInvitation = {
+  publicSlug: string
+  publicUrl: string
+  status: 'PUBLISHED'
+  eventName: string
+}

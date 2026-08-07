@@ -30,16 +30,6 @@ const automaticOutline = (background: Background) => {
 export function sectionBackgroundStyle(background?: Background): CSSProperties {
   if (!background || background.customized === false) return {}
   let backgroundImage: string | undefined
-  if (background.type === 'image' && background.imageUrl)
-    backgroundImage = `linear-gradient(${background.overlayColor}${Math.round(
-      background.overlayOpacity * 255,
-    )
-      .toString(16)
-      .padStart(2, '0')}, ${background.overlayColor}${Math.round(
-      background.overlayOpacity * 255,
-    )
-      .toString(16)
-      .padStart(2, '0')}), url("${background.imageUrl.replaceAll('"', '\\"')}")`
   if (background.type === 'gradient') {
     const colors = [
       background.gradientStart,
@@ -58,9 +48,6 @@ export function sectionBackgroundStyle(background?: Background): CSSProperties {
     backgroundColor:
       background.type === 'solid' ? background.solidColor : undefined,
     backgroundImage,
-    backgroundPosition: background.imagePosition,
-    backgroundSize:
-      background.type === 'image' ? background.imageFit : undefined,
     backgroundRepeat: 'no-repeat',
   }
 }
@@ -96,6 +83,15 @@ export function SectionBackground({
   )
     .toString(16)
     .padStart(2, '0')
+  const hasImage = Boolean(
+    background?.customized &&
+    background.type === 'image' &&
+    background.imageUrl,
+  )
+  const alphaColor = (color: string, opacity: number) =>
+    `${color}${Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, '0')}`
   return (
     <section
       {...props}
@@ -122,10 +118,56 @@ export function SectionBackground({
             (background?.textShadow ?? true)
               ? `0 2px 5px #000000${shadowOpacity}`
               : 'none',
+          '--cover-intro-size': `${background?.introFontSize ?? 24}px`,
+          '--cover-name-size': `${background?.nameFontSize ?? 88}px`,
+          '--cover-age-size': `${background?.ageFontSize ?? 28}px`,
+          '--section-body-size': `${background?.textFontSize ?? 28}px`,
+          '--section-title-size': `${background?.titleFontSize ?? 34}px`,
         } as CSSProperties
       }
     >
-      {children}
+      {hasImage && (
+        <>
+          <div className="section-background-media" aria-hidden="true">
+            <img
+              src={background?.imageUrl}
+              alt=""
+              style={{
+                objectFit: background?.imageFit ?? 'cover',
+                objectPosition: `calc(50% + ${background?.imageOffsetX ?? 0}px) calc(50% + ${background?.imageOffsetY ?? 0}px)`,
+                transform: `scale(${background?.imageZoom ?? 1})`,
+              }}
+            />
+          </div>
+          {(background?.overlayOpacity ?? 0) > 0 && (
+            <div
+              className="section-background-overlay"
+              aria-hidden="true"
+              style={{
+                background: alphaColor(
+                  background?.overlayColor ?? '#000000',
+                  background?.overlayOpacity ?? 0,
+                ),
+              }}
+            />
+          )}
+          {background?.glassEnabled && (
+            <div
+              className="section-background-glass"
+              aria-hidden="true"
+              style={{
+                background: alphaColor(
+                  background.glassColor ?? '#ffffff',
+                  background.glassOpacity ?? 0.18,
+                ),
+                backdropFilter: `blur(${background.glassBlur ?? 10}px)`,
+                WebkitBackdropFilter: `blur(${background.glassBlur ?? 10}px)`,
+              }}
+            />
+          )}
+        </>
+      )}
+      <div className="section-background-content">{children}</div>
     </section>
   )
 }

@@ -51,6 +51,61 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
         Objects.requireNonNull(updatedAt, "updatedAt is required");
     }
 
+    public Invitation update(
+            String templateId,
+            InvitationViewMode viewMode,
+            EventType eventType,
+            String eventName,
+            String honoreeName,
+            Integer honoreeAge,
+            LocalDate eventDate,
+            LocalTime eventTime,
+            String venueName,
+            String address,
+            String mapsUrl,
+            String heroImageUrl,
+            List<String> galleryImageUrls,
+            String message,
+            String sectionBackgrounds,
+            String contactInfo,
+            String shareTitle,
+            String shareDescription,
+            String shareImageUrl,
+            Instant updatedAt
+    ) {
+        return new Invitation(
+                id,
+                publicSlug,
+                ownerId,
+                templateId,
+                viewMode,
+                eventType,
+                eventName,
+                honoreeName,
+                honoreeAge,
+                eventDate,
+                eventTime,
+                venueName,
+                address,
+                mapsUrl,
+                heroImageUrl,
+                galleryImageUrls,
+                message,
+                sectionBackgrounds,
+                contactInfo,
+                shareTitle,
+                shareDescription,
+                shareImageUrl,
+                status,
+                createdAt,
+                updatedAt
+        );
+    }
+
+    public boolean belongsTo(UUID userId) {
+        return ownerId.equals(userId);
+    }
+
     private static String text(String value, String field, int maximum) {
         if (value == null || value.isBlank()) throw new IllegalArgumentException(field + " is required");
         String normalized = value.trim();

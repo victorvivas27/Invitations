@@ -2,6 +2,7 @@ import { useEffect, useState, type RefObject } from 'react'
 
 export const MOTION_READY_CLASS = 'motion-ready'
 export const REVEALED_CLASS = 'is-visible'
+export const RESETTING_CLASS = 'is-resetting'
 export const REVEAL_SELECTOR = '[data-reveal]'
 
 /* threshold 0 con un margen inferior negativo: el disparo depende de cuánto ha
@@ -51,23 +52,35 @@ export function useRevealGroup(
       (entries) =>
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            entry.target.classList.remove(RESETTING_CLASS)
             entry.target.classList.add(REVEALED_CLASS)
             if (once) observer.unobserve(entry.target)
           } else if (!once) {
+            entry.target.classList.add(RESETTING_CLASS)
             entry.target.classList.remove(REVEALED_CLASS)
+            window.requestAnimationFrame(() =>
+              entry.target.classList.remove(RESETTING_CLASS),
+            )
           }
         }),
       { ...REVEAL_VIEWPORT, root },
     )
-    // Se espera un frame para que el navegador haya aplicado el estado inicial
-    // antes de observar; si no, un elemento ya visible salta sin transición.
-    const frame = window.requestAnimationFrame(() => {
-      container
-        .querySelectorAll(REVEAL_SELECTOR)
-        .forEach((element) => observer.observe(element))
+    // El primer frame pinta el estado inicial que activa .motion-ready; el
+    // segundo empieza a observar. Observar en el primer callback permitía que
+    // un elemento ya visible recibiera .is-visible antes de que el navegador
+    // llegara a pintar su desplazamiento inicial, por lo que no había una
+    // transición perceptible.
+    let observationFrame = 0
+    const preparationFrame = window.requestAnimationFrame(() => {
+      observationFrame = window.requestAnimationFrame(() => {
+        container
+          .querySelectorAll(REVEAL_SELECTOR)
+          .forEach((element) => observer.observe(element))
+      })
     })
     return () => {
-      window.cancelAnimationFrame(frame)
+      window.cancelAnimationFrame(preparationFrame)
+      window.cancelAnimationFrame(observationFrame)
       observer.disconnect()
     }
   }, [containerRef, once, rootSelector, rootIsContainer, refreshKey])

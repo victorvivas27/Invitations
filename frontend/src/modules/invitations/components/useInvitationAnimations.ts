@@ -14,6 +14,10 @@ export function useInvitationAnimations(
   refreshKey: unknown,
 ) {
   useRevealGroup(experienceRef, {
+    // La invitación es una experiencia de scroll reversible: al salir por
+    // completo del viewport el elemento vuelve a su estado inicial y se anima
+    // otra vez cuando el usuario regresa, tanto al bajar como al subir.
+    once: false,
     rootSelector:
       viewMode === 'navigation' ? '.experience-chapters' : undefined,
     rootIsContainer: viewMode !== 'navigation' && preview,

@@ -53,6 +53,12 @@ class FakeIntersectionObserver {
       this,
     )
   }
+  hideAll() {
+    this.callback(
+      [...this.observed].map((target) => ({ target, isIntersecting: false })),
+      this,
+    )
+  }
 }
 
 describe('PublicInvitationRenderer animations', () => {
@@ -68,8 +74,8 @@ describe('PublicInvitationRenderer animations', () => {
     const marked = [...container.querySelectorAll('[data-reveal]')].map(
       (element) => element.getAttribute('data-reveal'),
     )
-    // Portada (imagen + texto), frase, fecha, lugar, fotos, confirmación y
-    // despedida (imagen + texto).
+    // Portada (imagen + texto), frase, datos del evento, confirmación, sección
+    // de fotos, cuadrícula escalonada y despedida (imagen + texto).
     expect(marked).toEqual([
       'media',
       'group',
@@ -101,7 +107,7 @@ describe('PublicInvitationRenderer animations', () => {
     window.IntersectionObserver = original
   })
 
-  it('reveals each marked element once', () => {
+  it('reveals, hides and reveals marked elements as they cross the viewport', () => {
     vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver)
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
       callback(0)
@@ -119,6 +125,10 @@ describe('PublicInvitationRenderer animations', () => {
 
     revealObserver.revealAll()
     marked.forEach((element) => expect(element).toHaveClass('is-visible'))
-    expect(revealObserver.observed.size).toBe(0)
+    expect(revealObserver.observed.size).toBe(marked.length)
+    revealObserver.hideAll()
+    marked.forEach((element) => expect(element).not.toHaveClass('is-visible'))
+    revealObserver.revealAll()
+    marked.forEach((element) => expect(element).toHaveClass('is-visible'))
   })
 })

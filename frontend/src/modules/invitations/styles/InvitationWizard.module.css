@@ -440,16 +440,16 @@
 .wizard-preview {
   min-width: 0;
   overflow: hidden;
-  border: 8px solid #172033;
-  border-radius: 30px;
-  background: #172033;
+  border: 0;
+  border-radius: 0;
+  background: #081220;
   box-shadow: 0 24px 60px #1118273d;
 }
 .wizard-preview .invitation-experience {
   overflow: auto;
   max-height: 720px;
-  border-radius: 21px;
-  background: white;
+  border-radius: 0;
+  background: #081220;
 }
 .preview-caption {
   margin: 0;
@@ -510,7 +510,7 @@
 .is-navigation .countdown b {
   font-size: clamp(1.35rem, 4vw, 2.2rem);
 }
-.is-navigation .experience-gallery > div {
+.is-navigation .experience-gallery-grid {
   max-height: calc(100% - 130px);
 }
 .is-navigation .experience-gallery figure {
@@ -533,7 +533,7 @@
 .wizard-preview .is-navigation .experience-section {
   padding: 24px 14px;
 }
-.wizard-preview .is-navigation .experience-gallery > div {
+.wizard-preview .is-navigation .experience-gallery-grid {
   max-height: 390px;
 }
 .is-navigation .experience-cover-copy > a {
@@ -1186,5 +1186,76 @@
   }
   .public-event-details {
     grid-template-columns: 1fr 1fr;
+  }
+}
+.position-editor {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 12px;
+}
+
+.position-editor-viewport {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 9 / 14;
+  border-radius: 18px;
+  background: #111827;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+@media (min-width: 700px) {
+  .position-editor-viewport {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 980px) {
+  .position-editor-viewport {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.position-editor-viewport:active {
+  cursor: grabbing;
+}
+.position-editor-viewport img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform-origin: center;
+}
+.position-editor-guide {
+  position: absolute;
+  inset: 22% 12%;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(255, 255, 255, 0.8);
+  border-radius: 14px;
+  color: white;
+  background: rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+.position-editor-controls {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: end;
+}
+.position-editor-controls button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.position-editor-controls button:last-child {
+  grid-column: 1 / -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .position-editor-viewport img {
+    transition: none;
   }
 }

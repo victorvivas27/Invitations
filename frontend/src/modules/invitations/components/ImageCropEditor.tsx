@@ -16,6 +16,7 @@ export function ImageCropEditor({
   variant = 'cover',
 }: Props) {
   const frameRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
   const [dragging, setDragging] = useState(false)
 
   const move = (clientY: number) => {
@@ -35,15 +36,31 @@ export function ImageCropEditor({
         ref={frameRef}
         className={`image-crop-frame${dragging ? ' is-dragging' : ''}`}
         onPointerDown={(event) => {
+          event.preventDefault()
+          draggingRef.current = true
           setDragging(true)
           event.currentTarget.setPointerCapture(event.pointerId)
           move(event.clientY)
         }}
         onPointerMove={(event) => {
-          if (dragging) move(event.clientY)
+          if (!draggingRef.current) return
+          event.preventDefault()
+          move(event.clientY)
         }}
-        onPointerUp={() => setDragging(false)}
-        onPointerCancel={() => setDragging(false)}
+        onPointerUp={(event) => {
+          draggingRef.current = false
+          setDragging(false)
+          if (event.currentTarget.hasPointerCapture(event.pointerId))
+            event.currentTarget.releasePointerCapture(event.pointerId)
+        }}
+        onPointerCancel={() => {
+          draggingRef.current = false
+          setDragging(false)
+        }}
+        onLostPointerCapture={() => {
+          draggingRef.current = false
+          setDragging(false)
+        }}
       >
         {imageUrl ? (
           <img
