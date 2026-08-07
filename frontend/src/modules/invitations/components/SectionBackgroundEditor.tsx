@@ -1,6 +1,10 @@
 import { useState } from 'react'
-import { uploadInvitationImage } from '../services/invitations'
+import {
+  deleteUploadedImage,
+  uploadInvitationImage,
+} from '../services/invitations'
 import type { SectionBackground } from '../types/invitationDraft'
+import { ImagePositionEditor } from './ImagePositionEditor'
 
 const thematicImages = [
   '/invitation-backgrounds/confetti.svg',
@@ -10,13 +14,20 @@ const thematicImages = [
 export function SectionBackgroundEditor({
   value,
   onChange,
+  invitationId,
+  showIntroText = false,
+  showFarewellText = false,
   title = 'Personalizar fondo y texto',
 }: {
   value: SectionBackground
   onChange: (value: SectionBackground) => void
+  invitationId: string
+  showIntroText?: boolean
+  showFarewellText?: boolean
   title?: string
 }) {
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const update = <K extends keyof SectionBackground>(
     key: K,
     next: SectionBackground[K],
@@ -24,15 +35,140 @@ export function SectionBackgroundEditor({
   const upload = async (file?: File) => {
     if (!file) return
     setUploading(true)
+    setUploadError('')
     try {
-      update('imageUrl', await uploadInvitationImage(file, 'DECORATION'))
+      const previous = value.imageUrl
+      update(
+        'imageUrl',
+        await uploadInvitationImage(file, invitationId, 'DECORATION'),
+      )
+      if (previous)
+        void deleteUploadedImage(previous).catch(() =>
+          setUploadError(
+            'La imagen se reemplazó, pero no pudimos borrar el archivo anterior.',
+          ),
+        )
+    } catch {
+      setUploadError('No fue posible subir la imagen de fondo.')
     } finally {
       setUploading(false)
     }
   }
+  const selectIncludedImage = (url: string) => {
+    const previous = value.imageUrl
+    update('imageUrl', url)
+    if (previous && previous !== url)
+      void deleteUploadedImage(previous).catch(() =>
+        setUploadError(
+          'Cambiamos el fondo, pero no pudimos borrar el archivo anterior.',
+        ),
+      )
+  }
   return (
     <details className="background-editor" open>
       <summary>{title}</summary>
+      {showIntroText && (
+        <div className="background-grid">
+          <label>
+            Texto de introducción
+            <textarea
+              value={value.introText}
+              maxLength={140}
+              rows={3}
+              onChange={(event) => update('introText', event.target.value)}
+              placeholder="Escribe la frase que aparecerá antes del nombre"
+            />
+          </label>
+          <label>
+            Tamaño de la introducción: {value.introFontSize}px
+            <input
+              type="range"
+              min="16"
+              max="36"
+              step="1"
+              value={value.introFontSize}
+              onChange={(event) =>
+                update('introFontSize', Number(event.target.value))
+              }
+            />
+          </label>
+          <label>
+            Tamaño del nombre: {value.nameFontSize}px
+            <input
+              type="range"
+              min="40"
+              max="120"
+              step="2"
+              value={value.nameFontSize}
+              onChange={(event) =>
+                update('nameFontSize', Number(event.target.value))
+              }
+            />
+          </label>
+          <label>
+            Tamaño de la edad: {value.ageFontSize}px
+            <input
+              type="range"
+              min="16"
+              max="42"
+              step="1"
+              value={value.ageFontSize}
+              onChange={(event) =>
+                update('ageFontSize', Number(event.target.value))
+              }
+            />
+          </label>
+        </div>
+      )}
+      {showFarewellText && (
+        <div className="background-grid">
+          <label>
+            Mensaje de agradecimiento
+            <textarea
+              value={value.farewellText}
+              maxLength={180}
+              rows={3}
+              onChange={(event) => update('farewellText', event.target.value)}
+            />
+          </label>
+          <label>
+            Título final
+            <input
+              value={value.farewellTitle}
+              maxLength={80}
+              onChange={(event) => update('farewellTitle', event.target.value)}
+            />
+          </label>
+        </div>
+      )}
+      <div className="background-grid">
+        <label>
+          Tamaño del texto: {value.textFontSize}px
+          <input
+            type="range"
+            min="14"
+            max="72"
+            step="1"
+            value={value.textFontSize}
+            onChange={(event) =>
+              update('textFontSize', Number(event.target.value))
+            }
+          />
+        </label>
+        <label>
+          Tamaño de títulos y datos destacados: {value.titleFontSize}px
+          <input
+            type="range"
+            min="18"
+            max="96"
+            step="1"
+            value={value.titleFontSize}
+            onChange={(event) =>
+              update('titleFontSize', Number(event.target.value))
+            }
+          />
+        </label>
+      </div>
       <div className="background-type" role="group" aria-label="Tipo de fondo">
         {(['solid', 'gradient', 'image'] as const).map((type) => (
           <button
@@ -130,25 +266,51 @@ export function SectionBackgroundEditor({
                 type="button"
                 key={url}
                 aria-pressed={value.imageUrl === url}
-                onClick={() => update('imageUrl', url)}
+                onClick={() => selectIncludedImage(url)}
               >
                 <img src={url} alt="Fondo temático" />
               </button>
             ))}
           </div>
-          <label>
-            Posición
-            <select
-              value={value.imagePosition}
-              onChange={(e) => update('imagePosition', e.target.value)}
+          {value.imageUrl && (
+            <ImagePositionEditor
+              imageUrl={value.imageUrl}
+              fit={value.imageFit}
+              offsetX={value.imageOffsetX}
+              offsetY={value.imageOffsetY}
+              zoom={value.imageZoom}
+              onChange={(position) =>
+                onChange({
+                  ...value,
+                  imageOffsetX: position.offsetX,
+                  imageOffsetY: position.offsetY,
+                  imageZoom: position.zoom,
+                })
+              }
+            />
+          )}
+          {value.imageUrl && (
+            <button
+              type="button"
+              className="background-reset"
+              onClick={() => {
+                const previous = value.imageUrl
+                update('imageUrl', '')
+                void deleteUploadedImage(previous).catch(() =>
+                  setUploadError(
+                    'Quitamos la referencia, pero no pudimos borrar el archivo remoto.',
+                  ),
+                )
+              }}
             >
-              <option value="center center">Centro</option>
-              <option value="center top">Arriba</option>
-              <option value="center bottom">Abajo</option>
-              <option value="left center">Izquierda</option>
-              <option value="right center">Derecha</option>
-            </select>
-          </label>
+              Quitar imagen de fondo
+            </button>
+          )}
+          {uploadError && (
+            <p className="wizard-error" role="alert">
+              {uploadError}
+            </p>
+          )}
           <label>
             Ajuste
             <select
@@ -180,6 +342,50 @@ export function SectionBackgroundEditor({
               onChange={(e) => update('overlayOpacity', Number(e.target.value))}
             />
           </label>
+          <label className="background-checkbox">
+            <input
+              type="checkbox"
+              checked={value.glassEnabled}
+              onChange={(e) => update('glassEnabled', e.target.checked)}
+            />
+            Vidrio sobre el fondo
+          </label>
+          {value.glassEnabled && (
+            <>
+              <label>
+                Desenfoque: {value.glassBlur}px
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value={value.glassBlur}
+                  onChange={(e) => update('glassBlur', Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Opacidad del vidrio: {Math.round(value.glassOpacity * 100)}%
+                <input
+                  type="range"
+                  min="0"
+                  max="0.8"
+                  step="0.02"
+                  value={value.glassOpacity}
+                  onChange={(e) =>
+                    update('glassOpacity', Number(e.target.value))
+                  }
+                />
+              </label>
+              <label>
+                Color base
+                <input
+                  type="color"
+                  value={value.glassColor}
+                  onChange={(e) => update('glassColor', e.target.value)}
+                />
+              </label>
+            </>
+          )}
         </div>
       )}
       {value.customized && (

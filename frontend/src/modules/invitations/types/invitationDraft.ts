@@ -2,6 +2,17 @@ export type InvitationBackgroundGradient =
   'aurora' | 'sunset' | 'cosmic' | 'candy' | 'ocean' | 'festive'
 
 export type SectionBackground = {
+  introText: string
+  coverDescription: string
+  ageText: string
+  ageSuffix: string
+  introFontSize: number
+  nameFontSize: number
+  ageFontSize: number
+  textFontSize: number
+  titleFontSize: number
+  farewellText: string
+  farewellTitle: string
   customized: boolean
   type: 'solid' | 'gradient' | 'image'
   solidColor: string
@@ -10,7 +21,6 @@ export type SectionBackground = {
   gradientEnd: string
   gradientDirection: 'vertical' | 'horizontal' | 'diagonal' | 'radial'
   imageUrl: string
-  imagePosition: string
   imageFit: 'cover' | 'contain'
   overlayColor: string
   overlayOpacity: number
@@ -23,6 +33,13 @@ export type SectionBackground = {
   textOutlineWidth: number
   textShadow: boolean
   textShadowIntensity: number
+  imageOffsetX: number
+  imageOffsetY: number
+  imageZoom: number
+  glassEnabled: boolean
+  glassBlur: number
+  glassOpacity: number
+  glassColor: string
 }
 export type InvitationSection =
   'basic' | 'tribute' | 'date' | 'venue' | 'gallery' | 'message' | 'summary'
@@ -35,6 +52,17 @@ export type InvitationContactInfo = {
 }
 
 export const defaultSectionBackground = (): SectionBackground => ({
+  introText: 'Estamos felices de invitarte al cumple de',
+  coverDescription: '',
+  ageText: 'En mi cumple número',
+  ageSuffix: 'años',
+  introFontSize: 24,
+  nameFontSize: 88,
+  ageFontSize: 28,
+  textFontSize: 28,
+  titleFontSize: 34,
+  farewellText: 'Gracias por acompañarnos en este día tan especial.',
+  farewellTitle: '¡Te esperamos!',
   customized: false,
   type: 'solid',
   solidColor: '#ffffff',
@@ -43,7 +71,6 @@ export const defaultSectionBackground = (): SectionBackground => ({
   gradientEnd: '#fce7f3',
   gradientDirection: 'diagonal',
   imageUrl: '',
-  imagePosition: 'center center',
   imageFit: 'cover',
   overlayColor: '#000000',
   overlayOpacity: 0,
@@ -56,6 +83,13 @@ export const defaultSectionBackground = (): SectionBackground => ({
   textOutlineWidth: 1,
   textShadow: true,
   textShadowIntensity: 35,
+  imageOffsetX: 0,
+  imageOffsetY: 0,
+  imageZoom: 1,
+  glassEnabled: false,
+  glassBlur: 10,
+  glassOpacity: 0.18,
+  glassColor: '#ffffff',
 })
 export const defaultSectionBackgrounds = (): SectionBackgrounds => ({
   basic: defaultSectionBackground(),
@@ -66,6 +100,18 @@ export const defaultSectionBackgrounds = (): SectionBackgrounds => ({
   message: defaultSectionBackground(),
   summary: defaultSectionBackground(),
 })
+
+export const normalizeSectionBackgrounds = (
+  value?: Partial<SectionBackgrounds>,
+): SectionBackgrounds => {
+  const defaults = defaultSectionBackgrounds()
+  return Object.fromEntries(
+    (Object.keys(defaults) as InvitationSection[]).map((section) => [
+      section,
+      { ...defaults[section], ...value?.[section] },
+    ]),
+  ) as SectionBackgrounds
+}
 
 export type InvitationDraft = {
   viewMode: 'scroll' | 'navigation'

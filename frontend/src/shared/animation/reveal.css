@@ -51,6 +51,15 @@
   transform: none;
 }
 
+/* Al salir completamente del viewport se rearma sin transición. Así queda
+   realmente oculto antes de volver a entrar y la animación de entrada puede
+   reproducirse completa en ambos sentidos del scroll. */
+.motion-ready [data-reveal='item'].is-resetting,
+.motion-ready [data-reveal='group'].is-resetting > *,
+.motion-ready [data-reveal='media'].is-resetting > img {
+  transition: none !important;
+}
+
 /* Escalonado. Se resuelve fijando --reveal-delay, que la transición de arriba ya
    consume, en lugar de declarar otra transition por posición. Un style en línea
    puede sobrescribirlo cuando la cantidad de hijos es dinámica. */

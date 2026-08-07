@@ -64,6 +64,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFoundPage />} />
+            <Route path="/my-invitations/:slug/edit" element={<CreateInvitationPage />}/>
           </Routes>
         </div>
       </BrowserRouter>

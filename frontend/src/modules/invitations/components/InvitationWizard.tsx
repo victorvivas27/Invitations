@@ -4,6 +4,7 @@ import { WizardNavigation } from './WizardNavigation'
 import { WizardStepper } from './WizardStepper'
 import {
   deleteUploadedImage,
+  InvitationApiError,
   uploadInvitationImage,
   uploadSocialImage,
 } from '../services/invitations'
@@ -28,6 +29,7 @@ const minutes = Array.from({ length: 12 }, (_, index) =>
   String(index * 5).padStart(2, '0'),
 )
 type Props = {
+  invitationId: string
   draft: InvitationDraft
   onChange: (draft: InvitationDraft) => void
   onSubmit: () => void
@@ -36,6 +38,7 @@ type Props = {
 }
 
 export function InvitationWizard({
+  invitationId,
   draft,
   onChange,
   onSubmit,
@@ -61,11 +64,9 @@ export function InvitationWizard({
   const validate = () => {
     const next: Record<string, string> = {}
     const required: Partial<Record<number, (keyof InvitationDraft)[]>> = {
-      1: ['eventType', 'eventName'],
-      2: ['honoreeName'],
-      3: ['date', 'time'],
-      4: ['venueName', 'address'],
-      5: ['message'],
+      1: ['eventType', 'eventName', 'honoreeName'],
+      2: ['message'],
+      3: ['date', 'time', 'venueName', 'address'],
       7: ['shareTitle', 'shareDescription', 'shareImageUrl'],
     }
     for (const field of required[step] ?? []) {
@@ -73,19 +74,13 @@ export function InvitationWizard({
       if (typeof value === 'string' && !value.trim())
         next[field] = 'Este campo es obligatorio.'
     }
-    if (
-      step === 2 &&
-      draft.age &&
-      (!/^\d+$/.test(draft.age) || Number(draft.age) > 150)
-    )
-      next.age = 'Ingresa una edad válida.'
     if (step === 3 && draft.date) {
       const today = new Date()
       const localToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
       if (draft.date < localToday)
         next.date = 'La fecha no puede ser anterior a hoy.'
     }
-    if (step === 4 && draft.mapsUrl) {
+    if (step === 3 && draft.mapsUrl) {
       try {
         if (!['http:', 'https:'].includes(new URL(draft.mapsUrl).protocol))
           next.mapsUrl = 'Ingresa un enlace http o https válido.'
@@ -160,37 +155,39 @@ export function InvitationWizard({
     update('time', hour ? `${hour}:${selectedMinute || '00'}` : '')
   const updateMinute = (minute: string) =>
     update('time', minute && selectedHour ? `${selectedHour}:${minute}` : '')
-  const uploadHero = async (files: FileList | null) => {
-    const image = files?.[0]
-    if (!image) return
-    setUploading(true)
-    setUploadError('')
-    try {
-      const previous = draft.heroImageUrl
-      const uploaded = await uploadInvitationImage(image, 'COVER')
-      update('heroImageUrl', uploaded)
-      if (previous) await deleteUploadedImage(previous)
-    } catch {
-      setUploadError('No fue posible subir la foto de portada.')
-    } finally {
-      setUploading(false)
-    }
-  }
   const uploadGallery = async (files: FileList | null) => {
     if (!files?.length) return
+    const available = Math.max(0, 10 - draft.galleryImageUrls.length)
+    const selected = Array.from(files).slice(0, available)
+    const invalid = selected.find(
+      (file) =>
+        !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
+        file.size > 5 * 1024 * 1024,
+    )
+    if (invalid) {
+      setUploadError(
+        `“${invalid.name}” debe ser JPG, PNG o WebP y pesar como máximo 5 MB.`,
+      )
+      return
+    }
     setUploading(true)
     setUploadError('')
+    const uploaded: string[] = []
     try {
-      const available = Math.max(0, 10 - draft.galleryImageUrls.length)
-      const urls = await Promise.all(
-        Array.from(files)
-          .slice(0, available)
-          .map((file) => uploadInvitationImage(file, 'GALLERY')),
+      for (const file of selected) {
+        uploaded.push(
+          await uploadInvitationImage(file, invitationId, 'GALLERY'),
+        )
+      }
+    } catch (error) {
+      setUploadError(
+        error instanceof InvitationApiError
+          ? error.message
+          : 'No fue posible subir una o más fotos.',
       )
-      update('galleryImageUrls', [...draft.galleryImageUrls, ...urls])
-    } catch {
-      setUploadError('No fue posible subir una o más fotos.')
     } finally {
+      if (uploaded.length)
+        update('galleryImageUrls', [...draft.galleryImageUrls, ...uploaded])
       setUploading(false)
     }
   }
@@ -248,7 +245,14 @@ export function InvitationWizard({
     }
     setUploading(true)
     try {
-      update('shareImageUrl', await uploadSocialImage(image))
+      const previous = draft.shareImageUrl
+      update('shareImageUrl', await uploadSocialImage(image, invitationId))
+      if (previous)
+        void deleteUploadedImage(previous).catch(() =>
+          setUploadError(
+            'La imagen social se reemplazó, pero no pudimos borrar el archivo anterior.',
+          ),
+        )
     } catch {
       setUploadError('No fue posible subir la imagen para compartir.')
     } finally {
@@ -325,15 +329,57 @@ export function InvitationWizard({
             )}
           </>
         )}
-        {step === 2 && (
+        {step === 1 && (
           <>
             <div className="wizard-heading">
-              <span>02</span>
+              <span>01</span>
               <h1>Persona homenajeada</h1>
               <p>Agrega el nombre protagonista de esta celebración.</p>
             </div>
             {field('honoreeName', 'Nombre', 'text', 'Ej. Sofía')}
-            {field('age', 'Edad que cumple (opcional)', 'number', 'Ej. 7')}
+            <label className="wizard-field">
+              <span>Texto de descripción</span>
+              <input
+                value={draft.sectionBackgrounds.basic.coverDescription}
+                maxLength={120}
+                placeholder="Ej. Cumplo 7 añitos"
+                onChange={(event) =>
+                  update('sectionBackgrounds', {
+                    ...draft.sectionBackgrounds,
+                    basic: {
+                      ...draft.sectionBackgrounds.basic,
+                      coverDescription: event.target.value,
+                    },
+                  })
+                }
+              />
+              <small>Los números se destacarán automáticamente.</small>
+            </label>
+          </>
+        )}
+        {step === 2 && (
+          <>
+            <div className="wizard-heading">
+              <span>02</span>
+              <h1>Frase especial</h1>
+              <p>Escribe el mensaje que verá tu invitado en la sección 02.</p>
+            </div>
+            <label className="wizard-field">
+              <span>Mensaje especial</span>
+              <textarea
+                name="message"
+                aria-label="Mensaje especial"
+                value={draft.message}
+                onChange={(event) => update('message', event.target.value)}
+                placeholder="Queremos compartir contigo un día lleno de alegría..."
+                rows={5}
+                maxLength={1000}
+                aria-invalid={Boolean(errors.message)}
+              />
+              {errors.message && (
+                <small className="wizard-error">{errors.message}</small>
+              )}
+            </label>
           </>
         )}
         {step === 3 && (
@@ -391,7 +437,7 @@ export function InvitationWizard({
             </div>
           </>
         )}
-        {step === 4 && (
+        {step === 3 && (
           <>
             <div className="wizard-heading">
               <span>04</span>
@@ -413,43 +459,39 @@ export function InvitationWizard({
             )}
           </>
         )}
+        {step === 4 && (
+          <>
+            <div className="wizard-heading">
+              <span>04</span>
+              <h1>Confirmación</h1>
+              <p>
+                Personaliza el fondo y la legibilidad del formulario de
+                asistencia.
+              </p>
+            </div>
+          </>
+        )}
         {step === 5 && (
           <>
             <div className="wizard-heading">
               <span>05</span>
-              <h1>Historia y fotos</h1>
-              <p>Agrega una portada, una galería y unas palabras especiales.</p>
+              <h1>Galería</h1>
+              <p>Agrega los recuerdos que quieras mostrar en la invitación.</p>
             </div>
             <label className="wizard-field image-upload-field">
-              <span>Foto principal (opcional)</span>
-              <input
-                aria-label="Foto principal"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                disabled={uploading}
-                onChange={(event) => void uploadHero(event.target.files)}
-              />
-            </label>
-            {draft.heroImageUrl && (
-              <div className="uploaded-hero">
-                <img src={draft.heroImageUrl} alt="Portada seleccionada" />
-                <button
-                  type="button"
-                  onClick={() => update('heroImageUrl', '')}
-                >
-                  Quitar
-                </button>
-              </div>
-            )}
-            <label className="wizard-field image-upload-field">
-              <span>Galería (hasta 6 fotos)</span>
+              <span>Galería (hasta 10 fotos, máximo 5 MB cada una)</span>
               <input
                 aria-label="Fotos de la galería"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 multiple
                 disabled={uploading || draft.galleryImageUrls.length >= 10}
-                onChange={(event) => void uploadGallery(event.target.files)}
+                onChange={(event) => {
+                  const input = event.currentTarget
+                  void uploadGallery(input.files).finally(() => {
+                    input.value = ''
+                  })
+                }}
               />
             </label>
             {draft.galleryImageUrls.length > 0 && (
@@ -484,25 +526,6 @@ export function InvitationWizard({
                 {uploadError}
               </p>
             )}
-            <label className="wizard-field">
-              <span>Mensaje especial</span>
-              <textarea
-                name="message"
-                aria-label="Mensaje especial"
-                value={draft.message}
-                onChange={(event) => update('message', event.target.value)}
-                placeholder="Queremos compartir contigo un día lleno de alegría..."
-                rows={5}
-                maxLength={1000}
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={errors.message ? 'message-error' : undefined}
-              />
-              {errors.message && (
-                <small id="message-error" className="wizard-error">
-                  {errors.message}
-                </small>
-              )}
-            </label>
           </>
         )}
         {step === 6 && (
@@ -676,7 +699,15 @@ export function InvitationWizard({
                 </div>
                 <button
                   type="button"
-                  onClick={() => update('shareImageUrl', '')}
+                  onClick={() => {
+                    const previous = draft.shareImageUrl
+                    update('shareImageUrl', '')
+                    void deleteUploadedImage(previous).catch(() =>
+                      setUploadError(
+                        'La imagen social se quitó, pero no pudo eliminarse del almacenamiento.',
+                      ),
+                    )
+                  }}
                 >
                   Quitar
                 </button>
@@ -696,13 +727,16 @@ export function InvitationWizard({
           ['basic'],
           ['tribute'],
           ['date'],
-          ['venue'],
-          ['gallery', 'message'],
+          ['message'],
+          ['gallery'],
           ['summary'],
           [],
         ] as InvitationSection[][]
       )[step - 1].map((section) => (
         <SectionBackgroundEditor
+          invitationId={invitationId}
+          showIntroText={section === 'basic'}
+          showFarewellText={section === 'summary'}
           key={section}
           title={`Personalizar ${section === 'basic' ? 'portada' : section === 'tribute' ? 'homenaje' : section === 'date' ? 'fecha y hora' : section === 'venue' ? 'lugar' : section === 'gallery' ? 'galería' : section === 'message' ? 'confirmación' : 'sección final'}`}
           value={draft.sectionBackgrounds[section]}

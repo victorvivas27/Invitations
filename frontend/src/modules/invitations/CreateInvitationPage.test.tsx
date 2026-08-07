@@ -39,7 +39,7 @@ describe('CreateInvitationPage', () => {
   it('validates only the current step before advancing', async () => {
     renderWizard()
     await next()
-    expect(screen.getAllByText('Este campo es obligatorio.')).toHaveLength(2)
+    expect(screen.getAllByText('Este campo es obligatorio.')).toHaveLength(3)
     expect(screen.getByText('Paso 1 de 7')).toBeInTheDocument()
     await userEvent.selectOptions(
       screen.getByRole('combobox', { name: 'Tipo de evento' }),
@@ -49,9 +49,13 @@ describe('CreateInvitationPage', () => {
       screen.getByRole('textbox', { name: 'Nombre del evento' }),
       'Cumpleaños de Sofía',
     )
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Nombre' }),
+      'Sofía',
+    )
     await next()
     expect(
-      screen.getByRole('heading', { name: 'Persona homenajeada' }),
+      screen.getByRole('heading', { name: 'Frase especial' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Paso 2 de 7')).toBeInTheDocument()
   })
@@ -88,6 +92,10 @@ describe('CreateInvitationPage', () => {
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Nombre del evento' }),
       'Fiesta de Alex',
+    )
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Nombre' }),
+      'Alex',
     )
     await next()
     await userEvent.click(screen.getByRole('button', { name: 'Anterior' }))
@@ -138,16 +146,19 @@ describe('CreateInvitationPage', () => {
       screen.getByRole('textbox', { name: 'Nombre del evento' }),
       'Cumpleaños de Sofía',
     )
-    await next()
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Nombre' }),
       'Sofía',
     )
     await next()
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Mensaje especial' }),
+      'Te esperamos para celebrar.',
+    )
+    await next()
     await userEvent.type(screen.getByLabelText('Fecha'), '2026-08-22')
     await userEvent.selectOptions(screen.getByLabelText('Hora'), '17')
     await userEvent.selectOptions(screen.getByLabelText('Minutos'), '00')
-    await next()
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Nombre del lugar' }),
       'Salón Central',
@@ -161,10 +172,7 @@ describe('CreateInvitationPage', () => {
       'https://maps.app.goo.gl/example',
     )
     await next()
-    await userEvent.type(
-      screen.getByRole('textbox', { name: 'Mensaje especial' }),
-      'Te esperamos para celebrar.',
-    )
+    await next()
     await next()
     expect(screen.getByRole('heading', { name: 'Resumen' })).toBeInTheDocument()
     expect(

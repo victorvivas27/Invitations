@@ -1,10 +1,10 @@
 const steps = [
-  'Información básica',
-  'Homenaje',
-  'Fecha',
-  'Lugar',
-  'Mensaje',
-  'Resumen',
+  '01 · Portada',
+  '02 · Frase',
+  '03 · Datos',
+  '04 · Confirmación',
+  '05 · Galería',
+  '06 · Despedida',
   'Vista al compartir',
 ]
 

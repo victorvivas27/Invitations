@@ -16,12 +16,16 @@ public class InvitationController {
     private final CreateInvitationUseCase useCase;
     private final ListOwnedInvitationsUseCase listUseCase;
     private final DeleteOwnedInvitationUseCase deleteUseCase;
+    private final GetOwnedInvitationUseCase getUseCase;
+    private final UpdateInvitationUseCase updateUseCase;
 
     public InvitationController(CreateInvitationUseCase useCase, ListOwnedInvitationsUseCase listUseCase,
-                                DeleteOwnedInvitationUseCase deleteUseCase) {
+                                DeleteOwnedInvitationUseCase deleteUseCase, GetOwnedInvitationUseCase getUseCase, UpdateInvitationUseCase updateUseCase) {
         this.useCase = useCase;
         this.listUseCase = listUseCase;
         this.deleteUseCase = deleteUseCase;
+        this.getUseCase = getUseCase;
+        this.updateUseCase = updateUseCase;
     }
 
     @GetMapping
@@ -45,5 +49,26 @@ public class InvitationController {
                 request.mapsUrl(), request.heroImageUrl(), request.galleryImageUrls(), request.message(), request.sectionBackgrounds(), request.contactInfo(),
                 request.shareTitle(), request.shareDescription(), request.shareImageUrl()), user);
         return ResponseEntity.created(URI.create("/api/public/invitations/" + result.publicSlug())).body(result);
+    }
+
+    @GetMapping("/{publicSlug}")
+    public OwnedInvitationDetail get(
+            @PathVariable String publicSlug,
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        return getUseCase.get(publicSlug, user);
+    }
+
+    @PutMapping("/{publicSlug}")
+    public UpdatedInvitation update(
+            @PathVariable String publicSlug,
+            @Valid @RequestBody UpdateInvitationRequest request,
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        return updateUseCase.update(
+                publicSlug,
+                request.toCommand(),
+                user
+        );
     }
 }

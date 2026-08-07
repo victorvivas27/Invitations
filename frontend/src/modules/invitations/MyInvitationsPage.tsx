@@ -161,6 +161,13 @@ export function MyInvitationsPage() {
                 >
                   Invitados
                 </Link>
+
+                <Link
+                  className="guest-button"
+                  to={`/my-invitations/${invitation.publicSlug}/edit`}
+                >
+                  Editar
+                </Link>
                 <button
                   className="delete-invitation"
                   type="button"

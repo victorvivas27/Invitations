@@ -39,8 +39,7 @@ export function InvitationPreview({
     shareTitle: draft.shareTitle,
     shareDescription: draft.shareDescription,
     shareImageUrl: draft.shareImageUrl,
-    message:
-      draft.message || 'Queremos compartir contigo un día lleno de alegría.',
+    message: draft.message || 'Tu mensaje especial aparecerá aquí.',
   }
   return (
     <aside

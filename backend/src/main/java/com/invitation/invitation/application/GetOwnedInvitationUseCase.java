@@ -1,4 +1,10 @@
 package com.invitation.invitation.application;
 
-public class GetOwnedInvitationUseCase {
+import com.invitation.auth.domain.AuthenticatedUser;
+
+@FunctionalInterface
+public interface GetOwnedInvitationUseCase {
+
+    OwnedInvitationDetail get(String publicSlug, AuthenticatedUser principal);
+
 }

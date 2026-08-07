@@ -1,4 +1,13 @@
 package com.invitation.invitation.application;
 
-public class UpdatedInvitation {
+
+
+import com.invitation.invitation.domain.InvitationStatus;
+
+public record UpdatedInvitation(
+        String publicSlug,
+        String publicUrl,
+        InvitationStatus status,
+        String eventName
+) {
 }
