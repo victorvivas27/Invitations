@@ -418,23 +418,40 @@
 }
 .wizard-navigation button {
   min-height: 48px;
+  border: 1px solid rgba(47, 128, 237, 0.72);
   border-radius: 999px;
   padding: 0 18px;
+  color: white;
   font: inherit;
   font-weight: 850;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .wizard-navigation .wizard-previous {
-  border: 1px solid var(--border);
-  color: var(--secondary-dark);
-  background: white;
+  border-color: rgba(227, 27, 35, 0.78);
+  color: white;
+  background:
+    radial-gradient(circle at 20% 20%, #ffffff2e 0 8%, transparent 24%),
+    linear-gradient(135deg, #1557a0, #07172f);
+  box-shadow: 0 10px 24px rgba(21, 87, 160, 0.32);
 }
 .wizard-navigation .wizard-next {
   margin-left: auto;
-  border: 0;
+  border-color: rgba(47, 128, 237, 0.82);
   color: white;
-  background: var(--primary);
-  box-shadow: var(--shadow-primary);
+  background:
+    radial-gradient(circle at 20% 20%, #ffffff38 0 8%, transparent 24%),
+    linear-gradient(135deg, #e31b23, #9f1018);
+  box-shadow: 0 10px 24px rgba(215, 25, 32, 0.34);
+}
+@media (hover: hover) and (pointer: fine) {
+  .wizard-navigation button:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+  }
 }
 .wizard-navigation button:disabled {
   opacity: 0.5;

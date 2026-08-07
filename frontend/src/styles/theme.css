@@ -190,15 +190,12 @@ textarea::placeholder {
 .wizard-navigation {
   border-color: var(--theme-border);
 }
-.wizard-navigation button:first-child,
+.wizard-navigation .wizard-previous,
 .background-reset {
-  color: var(--theme-blue-bright);
-  background: var(--theme-surface);
-  border-color: var(--theme-border);
-}
-.wizard-navigation button:last-child {
   color: #fff;
-  background: linear-gradient(135deg, var(--theme-red), var(--theme-red-dark));
+}
+.wizard-navigation .wizard-next {
+  color: #fff;
 }
 .wizard-summary > div,
 .uploaded-hero,
@@ -1648,7 +1645,7 @@ body,
     padding-inline: 5px;
   }
   .wizard-navigation {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
   .wizard-navigation button {
     flex: 0 1 auto;
