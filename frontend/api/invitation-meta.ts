@@ -147,7 +147,9 @@ export default async function invitationMetadata(request: Request) {
       throw new Error('BACKEND_URL is not configured')
     }
 
-    const upstreamUrl = `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}`
+    // The metadata endpoint resolves saved sharing fields and turns uploaded
+    // image paths into absolute URLs that social crawlers can fetch.
+    const upstreamUrl = `${backendUrl}/api/public/invitations/${encodeURIComponent(slug)}/metadata`
 
     const upstream = await fetch(upstreamUrl, {
       headers: {

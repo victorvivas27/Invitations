@@ -48,7 +48,7 @@ describe('invitation metadata function', () => {
     expect(html).toContain('<meta name="twitter:image"')
     expect(html).not.toContain('location.replace')
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://backend.example/api/public/invitations/fiesta-123',
+      'https://backend.example/api/public/invitations/fiesta-123/metadata',
       {
         headers: { Accept: 'application/json' },
         cache: 'no-store',
@@ -62,7 +62,7 @@ describe('invitation metadata function', () => {
       Response.json({
         shareTitle: 'Fiesta de Theo',
         shareDescription: 'Te esperamos',
-        heroImageUrl: 'https://cdn.example/theo.png',
+        shareImageUrl: 'https://cdn.example/theo.png',
       }),
     )
 

@@ -56,7 +56,13 @@ const countdown = (date: string, time: string) => {
 }
 
 // Componente RsvpForm mejorado
-function RsvpForm({ publicSlug }: { publicSlug: string }) {
+function RsvpForm({
+  publicSlug,
+  preview = false,
+}: {
+  publicSlug: string
+  preview?: boolean
+}) {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -69,6 +75,9 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault()
+    // Keep the form usable in preview without creating a real RSVP.
+    if (preview) return
+
     setState('sending')
     setError('')
 
@@ -97,7 +106,12 @@ function RsvpForm({ publicSlug }: { publicSlug: string }) {
   }
 
   return (
-    <form className="rsvp-form" onSubmit={submit}>
+    <form
+      className="rsvp-form"
+      onSubmit={submit}
+      aria-hidden={preview || undefined}
+      inert={preview || undefined}
+    >
       <div className="rsvp-name-row">
         <label>
           <span>Nombre</span>
@@ -509,13 +523,7 @@ export function PublicInvitationRenderer({
         >
           <span className="experience-number">04</span>
           <h2>Confirma tu presencia</h2>
-          {preview ? (
-            <div className="rsvp-preview">
-              El formulario de confirmación aparecerá aquí.
-            </div>
-          ) : (
-            <RsvpForm publicSlug={invitation.publicSlug} />
-          )}
+          <RsvpForm publicSlug={invitation.publicSlug} preview={preview} />
         </SectionBackground>
 
         {/* Fotos Section */}

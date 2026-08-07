@@ -13,6 +13,9 @@ export function WizardNavigation({
 }) {
   return (
     <div className="wizard-navigation">
+      <p className="wizard-navigation-progress" aria-live="polite">
+        <strong>Sección {step} de 7</strong>
+      </p>
       {step > 1 && (
         <button
           type="button"

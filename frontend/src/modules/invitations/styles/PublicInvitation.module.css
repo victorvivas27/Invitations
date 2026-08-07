@@ -709,13 +709,19 @@ section[data-custom-background='true'] .countdown span {
 .rsvp-form {
   display: grid;
   gap: 7px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none;
+  padding: clamp(12px, 3vw, 18px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(7, 23, 47, 0.78),
+    rgba(2, 8, 21, 0.62)
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow:
+    0 22px 52px rgba(2, 8, 21, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .rsvp-name-row {
