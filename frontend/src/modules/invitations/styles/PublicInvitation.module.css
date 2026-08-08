@@ -1591,12 +1591,12 @@ section[data-custom-background='true'].experience-farewell
 }
 
 .guests-page > header {
-  margin: 35px 0 28px;
+  margin: 18px 0 16px;
 }
 
 .guests-page > header h1 {
-  margin: 14px 0 8px;
-  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.25rem);
   letter-spacing: -0.05em;
 }
 
@@ -1606,14 +1606,16 @@ section[data-custom-background='true'].experience-farewell
 
 .guest-list {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
 }
 
 .guest-list article {
   position: relative;
   overflow: hidden;
-  padding: 22px;
-  border-radius: 18px;
+  padding: 12px;
+  border-radius: 12px;
   border: 1px solid rgba(70, 130, 255, 0.18);
   background:
     radial-gradient(
@@ -1628,23 +1630,35 @@ section[data-custom-background='true'].experience-farewell
 }
 
 .guest-list article h2 {
-  margin: 14px 0 6px;
+  margin: 8px 0 2px;
   color: #fff;
-  font-size: 1.35rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
 .guest-list article > p {
   margin: 0;
   color: #c7d6ea;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
+}
+
+.guest-list article blockquote {
+  margin: 8px 0 0;
+  padding: 7px 9px;
+  color: #e8f3ff;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  border-left: 3px solid #ff4b53;
+  border-radius: 0 10px 10px 0;
+  background: rgba(38, 103, 190, 0.2);
+  box-shadow: inset 0 0 18px rgba(71, 134, 255, 0.08);
 }
 
 .guest-list article small {
   display: block;
-  margin-top: 18px;
+  margin-top: 8px;
   color: #89a6c9;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
 }
 
 .guest-yes,
@@ -1652,7 +1666,7 @@ section[data-custom-background='true'].experience-farewell
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1787,12 +1801,23 @@ section[data-custom-background='true'].experience-farewell
 }
 
 @media (min-width: 680px) {
+  .guest-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .guest-summary {
     grid-template-columns: repeat(3, 1fr);
   }
 
   .guest-summary > div:nth-child(3) {
     grid-column: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .guest-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
   }
 }
 /* =========================================================

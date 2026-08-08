@@ -12,7 +12,9 @@ const capitalize = (value: string) =>
 const formatDate = (date: string) => {
   if (!date) return ''
   try {
-    const dateObj = new Date(date)
+    // A YYYY-MM-DD value is an event-local date, not a UTC instant. Parsing it
+    // as UTC can display the previous day in Chile and other western zones.
+    const dateObj = new Date(`${date.slice(0, 10)}T00:00:00`)
     if (isNaN(dateObj.getTime())) return ''
 
     return new Intl.DateTimeFormat('es-CL', {

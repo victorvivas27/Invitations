@@ -1,15 +1,26 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { PublicInvitationRenderer } from './components/PublicInvitationRenderer'
 import { getPublicInvitation, InvitationApiError } from './services/invitations'
 import type { PublicInvitation } from './types/invitation'
 type State = 'loading' | 'ready' | 'not-found' | 'network' | 'unexpected'
 export function PublicInvitationPage() {
   const { slug = '' } = useParams()
+  const location = useLocation()
   const [state, setState] = useState<State>('loading')
   const [invitation, setInvitation] = useState<PublicInvitation | null>(null)
   const [attempt, setAttempt] = useState(0)
   const retry = useCallback(() => setAttempt((value) => value + 1), [])
+
+  useEffect(() => {
+    if (!slug || !location.pathname.startsWith('/view/')) return
+
+    // `/view` is only the internal React entry point. Keep the shareable `/i`
+    // address visible so copying the browser URL preserves social metadata.
+    const sharePath = `/i/${encodeURIComponent(slug)}${location.search}${location.hash}`
+    window.history.replaceState(window.history.state, '', sharePath)
+  }, [location.hash, location.pathname, location.search, slug])
+
   useEffect(() => {
     let active = true
     setState('loading')
