@@ -474,10 +474,10 @@ textarea::placeholder {
   );
   box-shadow: 0 12px 35px var(--theme-shadow);
   text-align: left;
-  opacity: 0;
-  /* Sin escala: la tarjeta ocupa todo el ancho en un teléfono y al redimensionar
-     el texto durante la transición se ve borroso y descuadrado. */
-  transform: translateY(26px);
+  /* La firma permanece visible aunque el observador todavía no se haya
+     activado. La clase is-visible se usa solo para reiniciar su animación. */
+  opacity: 1;
+  transform: none;
   transition:
     opacity 0.8s ease-out,
     transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -487,6 +487,30 @@ textarea::placeholder {
 .creator-signature.is-visible {
   opacity: 1;
   transform: none;
+  animation: creator-signature-enter 1.15s ease-out both;
+}
+@keyframes creator-signature-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-120px) rotate(-2deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(18px) rotate(1deg);
+  }
+  72% {
+    transform: translateY(-10px) rotate(-0.5deg);
+  }
+  86% {
+    transform: translateY(5px);
+  }
+  94% {
+    transform: translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 @media (hover: hover) and (pointer: fine) {
   .creator-signature:hover {
@@ -647,6 +671,7 @@ textarea::placeholder {
   .creator-signature {
     opacity: 1;
     transform: none;
+    animation: none;
     transition: none;
   }
   .creator-monogram,
@@ -1175,6 +1200,10 @@ textarea::placeholder {
     padding: 18px;
     border-radius: 18px;
   }
+  .my-invitation-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
   .login-card h1,
   .activation-card h1,
   .my-invitations h1 {
@@ -1185,7 +1214,7 @@ textarea::placeholder {
   }
   .my-invitation-actions {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .my-invitation-actions > * {
     width: 100%;
@@ -1662,9 +1691,6 @@ body,
     padding-inline: 8px;
     font-size: 0.72rem;
   }
-  .my-invitation-actions > :first-child {
-    grid-column: 1/-1;
-  }
   .template-filters {
     gap: 10px;
     padding: 10px;
@@ -2032,6 +2058,8 @@ input[type='file']:disabled::file-selector-button {
   .redesigned-home .guest-feature-list {
     width: 100%;
     max-width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
     margin-inline: auto;
   }
   .redesigned-home .guest-feature-list > article {
@@ -2039,6 +2067,7 @@ input[type='file']:disabled::file-selector-button {
     max-width: 100%;
     min-width: 0;
     min-height: 64px;
+    grid-template-columns: auto minmax(0, 1fr);
     padding: 7px;
     gap: 4px;
     overflow: hidden;
@@ -2054,8 +2083,9 @@ input[type='file']:disabled::file-selector-button {
     overflow-wrap: anywhere;
   }
   .redesigned-home .guest-feature-list small {
+    grid-column: 1 / -1;
     font-size: 0.52rem;
-    line-height: 1;
+    line-height: 1.15;
   }
 }
 @media (min-width: 480px) and (max-width: 767px) {

@@ -17,7 +17,7 @@ export function AnimatedSection({
   as: Tag = 'div',
 }: Props) {
   const ref = useRef<HTMLElement>(null)
-  const visible = useRevealed(ref)
+  const visible = useRevealed(ref, { once: false })
   return (
     <Tag
       ref={ref as React.Ref<never>}
