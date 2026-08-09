@@ -73,16 +73,19 @@ describe('HomePage redesign', () => {
     )
   })
 
-  it('shows actual and future capabilities honestly and includes the creator signature', () => {
+  it('shows the real invitation structure and includes the creator signature', () => {
     render(
       <MemoryRouter>
         <HomePage />
       </MemoryRouter>,
     )
-    expect(screen.getByText('Confirmación de asistencia')).toBeInTheDocument()
-    expect(screen.getAllByText('Disponible').length).toBeGreaterThanOrEqual(4)
-    expect(screen.getByText('Música personalizada')).toBeInTheDocument()
-    expect(screen.getByText('Próximamente')).toBeInTheDocument()
+    expect(screen.getByText('Portada')).toBeInTheDocument()
+    expect(screen.getByText('Frase especial')).toBeInTheDocument()
+    expect(screen.getByText('Fecha y lugar')).toBeInTheDocument()
+    expect(screen.getByText('Confirmación')).toBeInTheDocument()
+    expect(screen.getByText('Galería')).toBeInTheDocument()
+    expect(screen.getByText('Cierre')).toBeInTheDocument()
+    expect(screen.queryByText('Música personalizada')).not.toBeInTheDocument()
     expect(
       screen.getByText('Creado por Victor Javier Vivas'),
     ).toBeInTheDocument()

@@ -16,11 +16,12 @@ const invitation = {
   mapsUrl: 'https://maps.app.goo.gl/example',
   message: 'Te esperamos para celebrar.',
 }
-const renderPage = () =>
+const renderPage = (path = '/i/cumpleanos-sofia-a8k3m2') =>
   render(
-    <MemoryRouter initialEntries={['/i/cumpleanos-sofia-a8k3m2']}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/i/:slug" element={<PublicInvitationPage />} />
+        <Route path="/view/:slug" element={<PublicInvitationPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -54,6 +55,24 @@ describe('PublicInvitationPage', () => {
       undefined,
     )
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+  })
+  it('keeps the shareable URL visible after entering through the React route', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(invitation), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const replaceState = vi.spyOn(window.history, 'replaceState')
+
+    renderPage('/view/cumpleanos-sofia-a8k3m2')
+
+    await screen.findByRole('heading', { level: 1, name: 'Sofía' })
+    expect(replaceState).toHaveBeenCalledWith(
+      window.history.state,
+      '',
+      '/i/cumpleanos-sofia-a8k3m2',
+    )
   })
   it('hides whether a missing invitation ever existed', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(

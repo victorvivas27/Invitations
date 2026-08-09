@@ -71,9 +71,7 @@ export function InvitationGuestsPage() {
         ← Mis invitaciones
       </Link>
       <header>
-        <span className="pill">Confirmaciones</span>
         <h1>Invitados</h1>
-        <p>Revisa quiénes asistirán y los mensajes que dejaron.</p>
       </header>
       {loading ? (
         <GuestsSkeleton />

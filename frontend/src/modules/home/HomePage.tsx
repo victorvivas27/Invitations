@@ -42,19 +42,20 @@ const steps = [
   ],
 ] as const
 const details = [
-  'Nombre y evento',
-  'Fecha y hora',
-  'Lugar y mapa',
-  'Mensaje especial',
-  'Fotografías y galería',
-  'Colores y fondos',
+  'Portada e imagen principal',
+  'Frase o mensaje especial',
+  'Fecha, hora y cuenta regresiva',
+  'Lugar, dirección y mapa',
+  'Confirmación y mensajes',
+  'Galería y cierre',
 ]
 const guestInfo = [
-  ['Fecha, hora y cuenta regresiva', 'Disponible'],
-  ['Dirección y acceso a Google Maps', 'Disponible'],
-  ['Galería de recuerdos', 'Disponible'],
-  ['Confirmación de asistencia', 'Disponible'],
-  ['Música personalizada', 'Próximamente'],
+  ['Portada', 'Nombre, imagen y presentación'],
+  ['Frase especial', 'Un mensaje para tus invitados'],
+  ['Fecha y lugar', 'Cuenta regresiva, dirección y mapa'],
+  ['Confirmación', 'Asistencia, acompañantes y mensaje'],
+  ['Galería', 'Fotografías y recuerdos opcionales'],
+  ['Cierre', 'Despedida y datos de contacto'],
 ] as const
 const featured = invitationTemplates.filter(
   (template) => template.isFeatured && template.isAvailable,
@@ -231,28 +232,24 @@ export function HomePage() {
         direction="right"
       >
         <div>
-          <span className="eyebrow">Todo claro para tus invitados</span>
-          <h2>La información importante, reunida en una experiencia</h2>
+          <span className="eyebrow">La invitación por dentro</span>
+          <h2>Una historia clara, sección por sección</h2>
           <p>
-            La invitación publicada no es una imagen: es una página interactiva
-            que informa, orienta y recibe respuestas.
+            Cada invitación publicada sigue este recorrido para presentar el
+            evento, orientar a tus invitados y recibir sus respuestas.
           </p>
         </div>
         <div className="guest-feature-list">
-          {guestInfo.map(([label, status], index) => (
+          {guestInfo.map(([label, description], index) => (
             <AnimatedSection
               as="article"
               direction="up"
               delay={index * 90}
               key={label}
             >
-              <span aria-hidden="true">
-                {status === 'Disponible' ? '✓' : '＋'}
-              </span>
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
               <strong>{label}</strong>
-              <small className={status === 'Próximamente' ? 'is-soon' : ''}>
-                {status}
-              </small>
+              <small>{description}</small>
             </AnimatedSection>
           ))}
         </div>

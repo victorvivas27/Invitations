@@ -4,7 +4,7 @@ import { APP_NAME } from './PublicHeader'
 
 export function PublicFooter() {
   const signatureRef = useRef<HTMLDivElement>(null)
-  const signatureVisible = useRevealed(signatureRef)
+  const signatureVisible = useRevealed(signatureRef, { once: false })
   return (
     <footer className="public-footer">
       <div>
