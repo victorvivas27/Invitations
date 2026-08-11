@@ -9,5 +9,7 @@ public interface SpringDataInvitationRsvpRepository
         extends JpaRepository<InvitationRsvpJpaEntity, UUID> {
     boolean existsByInvitationIdAndGuestNameNormalized(UUID invitationId, String normalizedName);
 
+    boolean existsByInvitationIdAndGuestNameNormalizedAndIdNot(UUID invitationId, String normalizedName, UUID id);
+
     List<InvitationRsvpJpaEntity> findAllByInvitationIdOrderByCreatedAtDesc(UUID invitationId);
 }

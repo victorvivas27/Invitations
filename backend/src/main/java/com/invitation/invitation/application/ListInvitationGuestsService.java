@@ -34,7 +34,7 @@ public class ListInvitationGuestsService {
         if (!invitation.ownerId().equals(owner.getId()))
             throw new AccessDeniedException("Invitation belongs to another user");
         return rsvps.findAllByInvitationId(invitation.id()).stream()
-                .map(value -> new InvitationGuest(value.guestName(), value.guestCount(),
+                .map(value -> new InvitationGuest(value.id(), value.guestName(), value.guestCount(),
                         value.attending(), value.message(), value.createdAt())).toList();
     }
 }

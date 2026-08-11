@@ -5,6 +5,7 @@ import com.invitation.invitation.domain.InvitationRsvp;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -26,6 +27,19 @@ public class JpaInvitationRsvpRepository implements InvitationRsvpRepository {
     public boolean existsByInvitationIdAndGuestNameNormalized(UUID invitationId,
                                                               String normalizedName) {
         return repository.existsByInvitationIdAndGuestNameNormalized(invitationId, normalizedName);
+    }
+
+    @Override
+    public boolean existsByInvitationIdAndGuestNameNormalizedAndIdNot(
+            UUID invitationId, String normalizedName, UUID id) {
+        return repository.existsByInvitationIdAndGuestNameNormalizedAndIdNot(invitationId, normalizedName, id);
+    }
+
+    @Override
+    public Optional<InvitationRsvp> findById(UUID id) {
+        return repository.findById(id).map(value -> new InvitationRsvp(value.getId(), value.getInvitationId(),
+                value.getGuestName(), value.getGuestNameNormalized(), value.getGuestCount(),
+                value.isAttending(), value.getMessage(), value.getCreatedAt()));
     }
 
     @Override
