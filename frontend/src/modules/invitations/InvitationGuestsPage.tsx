@@ -5,6 +5,7 @@ import { Skeleton } from '../../shared/components/feedback/Skeleton'
 import { getAccessToken } from '../auth/services/authSession'
 import {
   getInvitationGuests,
+  updateInvitationGuest,
   type InvitationGuest,
 } from './services/invitations'
 
@@ -38,6 +39,30 @@ export function InvitationGuestsPage() {
   const [guests, setGuests] = useState<InvitationGuest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState<InvitationGuest | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [editError, setEditError] = useState('')
+  const saveGuest = async () => {
+    if (!editing || !editing.name.trim()) return
+    setSaving(true)
+    setEditError('')
+    try {
+      const updated = await updateInvitationGuest(slug, editing.id, {
+        name: editing.name,
+        attending: editing.attending,
+        guestCount: editing.guestCount,
+        message: editing.message,
+      })
+      setGuests((current) =>
+        current.map((guest) => (guest.id === updated.id ? updated : guest)),
+      )
+      setEditing(null)
+    } catch {
+      setEditError('No fue posible guardar la confirmación.')
+    } finally {
+      setSaving(false)
+    }
+  }
   useEffect(() => {
     if (getAccessToken())
       void getInvitationGuests(slug)
@@ -104,7 +129,35 @@ export function InvitationGuestsPage() {
           ) : (
             <section className="guest-list" aria-label="Lista de invitados">
               {guests.map((guest) => (
-                <article key={`${guest.name}-${guest.respondedAt}`}>
+                <article key={guest.id}>
+                  {editing?.id === guest.id ? (
+                    <div className="guest-edit-form">
+                      <label>
+                        Nombre
+                        <input maxLength={120} value={editing.name} onChange={(event) => setEditing({ ...editing, name: event.target.value })} />
+                      </label>
+                      <label>
+                        Respuesta
+                        <select value={editing.attending ? 'yes' : 'no'} onChange={(event) => setEditing({ ...editing, attending: event.target.value === 'yes' })}>
+                          <option value="yes">Asistirá</option>
+                          <option value="no">No asistirá</option>
+                        </select>
+                      </label>
+                      {editing.attending && <label>
+                        Personas
+                        <input type="number" min="1" max="20" value={editing.guestCount} onChange={(event) => setEditing({ ...editing, guestCount: Number(event.target.value) })} />
+                      </label>}
+                      <label>
+                        Mensaje
+                        <textarea maxLength={500} value={editing.message ?? ''} onChange={(event) => setEditing({ ...editing, message: event.target.value })} />
+                      </label>
+                      {editError && <p role="alert">{editError}</p>}
+                      <div className="guest-edit-actions">
+                        <button type="button" disabled={saving} onClick={() => setEditing(null)}>Cancelar</button>
+                        <button type="button" disabled={saving || !editing.name.trim()} onClick={() => void saveGuest()}>{saving ? 'Guardando…' : 'Guardar'}</button>
+                      </div>
+                    </div>
+                  ) : <>
                   <span className={guest.attending ? 'guest-yes' : 'guest-no'}>
                     {guest.attending ? 'Asistirá' : 'No asistirá'}
                   </span>
@@ -121,6 +174,8 @@ export function InvitationGuestsPage() {
                       timeStyle: 'short',
                     }).format(new Date(guest.respondedAt))}
                   </small>
+                  <button className="guest-edit-button" type="button" onClick={() => { setEditError(''); setEditing({ ...guest }) }}>Editar confirmación</button>
+                  </>}
                 </article>
               ))}
             </section>

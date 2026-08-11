@@ -325,12 +325,17 @@ export async function confirmAttendance(
   if (!response.ok) throw await parseError(response)
 }
 export type InvitationGuest = {
+  id: string
   name: string
   guestCount: number
   attending: boolean
   message: string | null
   respondedAt: string
 }
+export type UpdateInvitationGuestInput = Pick<
+  InvitationGuest,
+  'name' | 'guestCount' | 'attending' | 'message'
+>
 export async function getInvitationGuests(
   publicSlug: string,
 ): Promise<InvitationGuest[]> {
@@ -341,4 +346,25 @@ export async function getInvitationGuests(
   )
   if (!response.ok) throw await parseError(response)
   return response.json() as Promise<InvitationGuest[]>
+}
+
+export async function updateInvitationGuest(
+  publicSlug: string,
+  guestId: string,
+  input: UpdateInvitationGuestInput,
+): Promise<InvitationGuest> {
+  const token = getAccessToken()
+  const response = await request(
+    `${apiBaseUrl}/api/invitations/${encodeURIComponent(publicSlug)}/guests/${encodeURIComponent(guestId)}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(input),
+    },
+  )
+  if (!response.ok) throw await parseError(response)
+  return response.json() as Promise<InvitationGuest>
 }
