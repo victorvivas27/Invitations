@@ -17,8 +17,8 @@ const formatDate = (value: string) =>
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`))
+    timeZone: 'America/Santiago',
+  }).format(new Date(`${value}T12:00:00Z`))
 
 function InvitationCardSkeleton() {
   return (

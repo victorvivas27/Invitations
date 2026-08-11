@@ -12,9 +12,9 @@ const capitalize = (value: string) =>
 const formatDate = (date: string) => {
   if (!date) return ''
   try {
-    // A YYYY-MM-DD value is an event-local date, not a UTC instant. Parsing it
-    // as UTC can display the previous day in Chile and other western zones.
-    const dateObj = new Date(`${date.slice(0, 10)}T00:00:00`)
+    // A YYYY-MM-DD value is a Chilean calendar date, not a UTC instant. Noon
+    // UTC remains on the same calendar day when formatted in Santiago.
+    const dateObj = new Date(`${date.slice(0, 10)}T12:00:00Z`)
     if (isNaN(dateObj.getTime())) return ''
 
     return new Intl.DateTimeFormat('es-CL', {
@@ -22,6 +22,7 @@ const formatDate = (date: string) => {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      timeZone: 'America/Santiago',
     })
       .formatToParts(dateObj)
       .map((part) =>
