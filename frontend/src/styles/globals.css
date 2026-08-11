@@ -801,12 +801,12 @@ body {
 .public-brand > span {
   color: var(--theme-red);
 }
-.desktop-links > a:not(.nav-cta),
+.desktop-links a:not(.nav-cta),
 .mobile-menu > a:not(.nav-cta) {
   color: var(--theme-muted);
 }
-.desktop-links > a.active:not(.nav-cta),
-.desktop-links > a:not(.nav-cta):hover {
+.desktop-links a.active:not(.nav-cta),
+.desktop-links a:not(.nav-cta):hover {
   color: var(--theme-red);
 }
 .nav-cta,

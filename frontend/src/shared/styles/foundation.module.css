@@ -14,7 +14,7 @@
   backdrop-filter: blur(18px);
 }
 .public-nav {
-  min-height: 72px;
+  min-height: 62px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,14 +41,40 @@
 .desktop-links {
   display: none;
   align-items: center;
-  gap: 26px;
+  justify-content: flex-end;
+  gap: 18px;
+  min-width: 0;
+  flex: 1;
+}
+.desktop-navigation,
+.desktop-actions {
+  display: flex;
+  align-items: center;
+}
+.desktop-navigation {
+  gap: 18px;
+}
+.desktop-actions {
+  gap: 8px;
 }
 .desktop-links a,
 .mobile-menu a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #334155;
   font-size: 0.8rem;
   font-weight: 700;
   text-decoration: none;
+}
+.nav-item-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+.nav-cta .nav-item-icon {
+  width: 18px;
+  height: 18px;
 }
 .desktop-links a:hover {
   color: var(--primary);
@@ -72,7 +98,8 @@
   box-shadow: 0 10px 25px rgba(215, 25, 32, 0.22);
 }
 .nav-cta {
-  min-height: 44px;
+  min-height: 38px;
+  padding-inline: 14px;
 }
 .secondary-cta {
   color: var(--primary);
@@ -124,6 +151,7 @@
   min-height: 48px;
   display: flex;
   align-items: center;
+  gap: 12px;
   padding: 0 14px;
   border-radius: 14px;
 }

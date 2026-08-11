@@ -134,48 +134,120 @@ export function InvitationGuestsPage() {
                     <div className="guest-edit-form">
                       <label>
                         Nombre
-                        <input maxLength={120} value={editing.name} onChange={(event) => setEditing({ ...editing, name: event.target.value })} />
+                        <input
+                          maxLength={120}
+                          value={editing.name}
+                          onChange={(event) =>
+                            setEditing({ ...editing, name: event.target.value })
+                          }
+                        />
                       </label>
                       <label>
                         Respuesta
-                        <select value={editing.attending ? 'yes' : 'no'} onChange={(event) => setEditing({ ...editing, attending: event.target.value === 'yes' })}>
+                        <select
+                          value={editing.attending ? 'yes' : 'no'}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              attending: event.target.value === 'yes',
+                            })
+                          }
+                        >
                           <option value="yes">Asistirá</option>
                           <option value="no">No asistirá</option>
                         </select>
                       </label>
-                      {editing.attending && <label>
-                        Personas
-                        <input type="number" min="1" max="20" value={editing.guestCount} onChange={(event) => setEditing({ ...editing, guestCount: Number(event.target.value) })} />
-                      </label>}
+                      {editing.attending && (
+                        <label>
+                          Personas
+                          <input
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={editing.guestCount}
+                            onChange={(event) =>
+                              setEditing({
+                                ...editing,
+                                guestCount: Number(event.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                      )}
                       <label>
                         Mensaje
-                        <textarea maxLength={500} value={editing.message ?? ''} onChange={(event) => setEditing({ ...editing, message: event.target.value })} />
+                        <textarea
+                          maxLength={500}
+                          value={editing.message ?? ''}
+                          onChange={(event) =>
+                            setEditing({
+                              ...editing,
+                              message: event.target.value,
+                            })
+                          }
+                        />
                       </label>
                       {editError && <p role="alert">{editError}</p>}
                       <div className="guest-edit-actions">
-                        <button type="button" disabled={saving} onClick={() => setEditing(null)}>Cancelar</button>
-                        <button type="button" disabled={saving || !editing.name.trim()} onClick={() => void saveGuest()}>{saving ? 'Guardando…' : 'Guardar'}</button>
+                        <button
+                          type="button"
+                          disabled={saving}
+                          onClick={() => setEditing(null)}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          disabled={saving || !editing.name.trim()}
+                          onClick={() => void saveGuest()}
+                        >
+                          {saving ? 'Guardando…' : 'Guardar'}
+                        </button>
                       </div>
                     </div>
-                  ) : <>
-                  <span className={guest.attending ? 'guest-yes' : 'guest-no'}>
-                    {guest.attending ? 'Asistirá' : 'No asistirá'}
-                  </span>
-                  <h2>{guest.name}</h2>
-                  <p>
-                    {guest.attending
-                      ? `${guest.guestCount} ${guest.guestCount === 1 ? 'persona' : 'personas'}`
-                      : 'Sin asistentes'}
-                  </p>
-                  {guest.message && <blockquote>{guest.message}</blockquote>}
-                  <small>
-                    {new Intl.DateTimeFormat('es-CL', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(new Date(guest.respondedAt))}
-                  </small>
-                  <button className="guest-edit-button" type="button" onClick={() => { setEditError(''); setEditing({ ...guest }) }}>Editar confirmación</button>
-                  </>}
+                  ) : (
+                    <>
+                      <span
+                        className={guest.attending ? 'guest-yes' : 'guest-no'}
+                      >
+                        {guest.attending ? 'Asistirá' : 'No asistirá'}
+                      </span>
+                      <h2>{guest.name}</h2>
+                      <p>
+                        {guest.attending
+                          ? `${guest.guestCount} ${guest.guestCount === 1 ? 'persona' : 'personas'}`
+                          : 'Sin asistentes'}
+                      </p>
+                      {guest.message && (
+                        <blockquote>{guest.message}</blockquote>
+                      )}
+                      <small>
+                        {new Intl.DateTimeFormat('es-CL', {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }).format(new Date(guest.respondedAt))}
+                      </small>
+                      <button
+                        className="guest-edit-button"
+                        type="button"
+                        onClick={() => {
+                          setEditError('')
+                          setEditing({ ...guest })
+                        }}
+                      >
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                          <path
+                            d="M13.5 6.5 17.5 10.5M4 20l4.25-.85L19 6.4a2.12 2.12 0 0 0-3-3L5.15 16.25 4 20Z"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        Editar
+                      </button>
+                    </>
+                  )}
                 </article>
               ))}
             </section>
