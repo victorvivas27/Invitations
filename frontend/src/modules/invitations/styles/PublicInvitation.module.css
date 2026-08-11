@@ -151,8 +151,7 @@
   .experience-cover-copy[data-reveal='group'].is-visible
   > .experience-cover-name {
   transform: translateX(0);
-  animation: cover-name-from-right 1.9s cubic-bezier(0.16, 1, 0.3, 1) 520ms
-    both;
+  animation: cover-name-from-right 1.9s cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
 }
 
 @keyframes cover-invite-from-left {
@@ -185,8 +184,7 @@
   .experience-intro[data-reveal='group'].is-visible
   .section-background-content
   > p {
-  animation: invitation-from-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) 220ms
-    both;
+  animation: invitation-from-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
 }
 
 .motion-ready
@@ -197,8 +195,7 @@
   .experience-when[data-reveal='group'].is-visible
   .section-background-content
   > p {
-  animation: invitation-from-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) 220ms
-    both;
+  animation: invitation-from-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
 }
 
 .motion-ready
@@ -213,8 +210,7 @@
   .experience-when[data-reveal='group'].is-visible
   .section-background-content
   > a {
-  animation: invitation-from-right 1.8s cubic-bezier(0.16, 1, 0.3, 1) 520ms
-    both;
+  animation: invitation-from-right 1.8s cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
 }
 
 /* Los controles del RSVP entran individualmente. Los retrasos cortos hacen
@@ -307,18 +303,12 @@
 
 /* Cierre con personalidad propia: el contenido cae desde arriba y amortigua
    dos veces antes de asentarse, como un rebote firme pero controlado. */
-.motion-ready
-  .experience-farewell-copy[data-reveal='group'].is-visible
-  > p {
-  animation: farewell-drop-bounce 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) 160ms
-    both;
+.motion-ready .experience-farewell-copy[data-reveal='group'].is-visible > p {
+  animation: farewell-drop-bounce 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) 160ms both;
 }
 
-.motion-ready
-  .experience-farewell-copy[data-reveal='group'].is-visible
-  > h2 {
-  animation: farewell-drop-bounce 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) 420ms
-    both;
+.motion-ready .experience-farewell-copy[data-reveal='group'].is-visible > h2 {
+  animation: farewell-drop-bounce 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) 420ms both;
 }
 
 .motion-ready
@@ -476,8 +466,6 @@
   box-shadow: 0 16px 46px #11182724;
 }
 
-
-
 .experience-number {
   display: grid;
   place-items: center;
@@ -518,7 +506,6 @@
 .experience-farewell-copy > p {
   font-size: var(--section-body-size, 28px) !important;
 }
-
 
 .experience-intro p {
   width: 100%;
@@ -667,19 +654,7 @@ section[data-custom-background='true'] .countdown span {
   }
 }
 
-
-
-
-
-
-
-
-
-
 /* En modo navegación los capítulos son más compactos. */
-
-
-
 
 .experience-rsvp > p {
   margin-top: -12px;
@@ -1618,6 +1593,7 @@ section[data-custom-background='true'].experience-farewell
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 8px;
+  overflow-x: clip;
 }
 
 .guest-list article {
@@ -1635,7 +1611,17 @@ section[data-custom-background='true'].experience-farewell
     linear-gradient(145deg, #132b50, #081220);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
 
-  animation: guestCard 0.9s ease both;
+  animation-duration: 0.95s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.guest-list article:nth-child(odd) {
+  animation-name: guest-card-from-left;
+}
+
+.guest-list article:nth-child(even) {
+  animation-name: guest-card-from-right;
 }
 
 .guest-list article h2 {
@@ -1681,13 +1667,74 @@ section[data-custom-background='true'].experience-farewell
   background: rgba(38, 103, 190, 0.3);
 }
 
-.guest-edit-form { display: grid; gap: 10px; }
-.guest-edit-form label { display: grid; gap: 5px; color: #e8f3ff; font-size: 0.8rem; }
+.guest-edit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 5px 9px;
+  border-color: rgba(239, 68, 68, 0.38);
+  border-radius: 9px;
+  color: #f5f8ff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: linear-gradient(
+    135deg,
+    rgba(25, 74, 145, 0.52),
+    rgba(12, 38, 82, 0.64)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(74, 134, 220, 0.12),
+    0 3px 10px rgba(215, 25, 32, 0.12);
+}
+
+.guest-edit-button svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: #ff5b62;
+}
+
+@media (hover: hover) {
+  .guest-edit-button:hover {
+    border-color: rgba(255, 75, 83, 0.62);
+    background: linear-gradient(
+      135deg,
+      rgba(32, 91, 175, 0.68),
+      rgba(18, 49, 101, 0.78)
+    );
+  }
+}
+
+.guest-edit-form {
+  display: grid;
+  gap: 10px;
+}
+.guest-edit-form label {
+  display: grid;
+  gap: 5px;
+  color: #e8f3ff;
+  font-size: 0.8rem;
+}
 .guest-edit-form input,
 .guest-edit-form select,
-.guest-edit-form textarea { width: 100%; padding: 10px; border: 1px solid #506b8d; border-radius: 9px; color: #fff; background: #081220; }
-.guest-edit-form textarea { min-height: 80px; resize: vertical; }
-.guest-edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.guest-edit-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #506b8d;
+  border-radius: 9px;
+  color: #fff;
+  background: #081220;
+}
+.guest-edit-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.guest-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 
 .guest-yes,
 .guest-no {
@@ -1724,15 +1771,33 @@ section[data-custom-background='true'].experience-farewell
   }
 }
 
-@keyframes guestCard {
+@keyframes guest-card-from-left {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateX(-48px);
   }
 
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes guest-card-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-list article {
+    animation: none;
   }
 }
 
@@ -2021,7 +2086,6 @@ section[data-custom-background='true'][data-background-type='image'].experience-
   font-size: min(var(--cover-name-size, 88px), 14vw) !important;
   line-height: 0.98;
 }
-
 
 .experience-farewell,
 .experience-farewell:has(.experience-farewell-media) {
