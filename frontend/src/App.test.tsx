@@ -3,11 +3,11 @@ import App from './App'
 
 describe('public routes', () => {
   beforeEach(() => window.localStorage.clear())
-  it('opens Home without authentication', () => {
+  it('opens Home without authentication', async () => {
     window.history.pushState({}, '', '/')
     render(<App />)
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Crea invitaciones digitales que se sienten únicas',
       }),
     ).toBeInTheDocument()
@@ -38,10 +38,9 @@ describe('public routes', () => {
     window.localStorage.setItem('invitation_access_token', 'safe-token')
     window.history.pushState({}, '', '/')
     render(<App />)
-    expect(screen.getByRole('link', { name: 'Plantillas' })).toHaveAttribute(
-      'href',
-      '/templates',
-    )
+    expect(
+      await screen.findByRole('link', { name: 'Plantillas' }),
+    ).toHaveAttribute('href', '/templates')
     expect(
       screen.getAllByRole('link', { name: 'Crear invitación' }).length,
     ).toBeGreaterThan(0)
