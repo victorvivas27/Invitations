@@ -132,6 +132,9 @@ export function SectionBackground({
             <img
               src={background?.imageUrl}
               alt=""
+              loading={props.id === 'portada' ? 'eager' : 'lazy'}
+              fetchPriority={props.id === 'portada' ? 'high' : 'auto'}
+              decoding="async"
               style={{
                 objectFit: background?.imageFit ?? 'cover',
                 objectPosition: `calc(50% + ${background?.imageOffsetX ?? 0}px) calc(50% + ${background?.imageOffsetY ?? 0}px)`,

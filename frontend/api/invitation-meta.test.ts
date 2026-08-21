@@ -29,7 +29,7 @@ describe('invitation metadata function', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('Content-Type')).toContain('text/html')
     expect(response.headers.get('Cache-Control')).toBe(
-      'no-store, no-cache, must-revalidate',
+      'public, s-maxage=60, stale-while-revalidate=300',
     )
     expect(response.headers.get('Vary')).toBe('User-Agent')
     expect(html).toContain('Cumpleaños de &lt;Theo&gt;')
@@ -56,24 +56,16 @@ describe('invitation metadata function', () => {
     )
   })
 
-  it('redirects normal browsers to the React view after returning metadata', async () => {
+  it('redirects normal browsers without waiting for metadata', async () => {
     vi.stubEnv('BACKEND_URL', 'https://backend.example')
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      Response.json({
-        shareTitle: 'Fiesta de Theo',
-        shareDescription: 'Te esperamos',
-        shareImageUrl: 'https://cdn.example/theo.png',
-      }),
-    )
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+    const response = await invitationMetadata(request('Mozilla/5.0'))
 
-    const html = await (await invitationMetadata(request('Mozilla/5.0'))).text()
-
-    expect(html).toMatch(
-      /location\.replace\(\s*"https:\/\/invitations\.example\/view\/fiesta-123"\s*\)/,
+    expect(response.status).toBe(307)
+    expect(response.headers.get('Location')).toBe(
+      'https://invitations.example/view/fiesta-123',
     )
-    expect(html).toContain(
-      '<meta property="og:image" content="https://cdn.example/theo.png">',
-    )
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it('uses safe fallbacks when the backend is unavailable', async () => {

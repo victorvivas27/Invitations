@@ -30,3 +30,5 @@ export function TemplatesPage() {
     </AppLayout>
   )
 }
+import templateStyles from './styles/Templates.module.css'
+void templateStyles

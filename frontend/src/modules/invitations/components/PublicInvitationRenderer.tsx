@@ -73,7 +73,9 @@ function RsvpForm({
     attending: true,
     message: '',
   })
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>(
+    'idle',
+  )
   const [error, setError] = useState('')
 
   const submit = async (event: React.FormEvent) => {
@@ -233,9 +235,9 @@ export function PublicInvitationRenderer({
   const viewMode = selectedViewMode ?? 'scroll'
 
   // Memoizar el cálculo del countdown
-  const initialRemaining = useMemo(() =>
-    countdown(invitation.eventDate, invitation.eventTime),
-    [invitation.eventDate, invitation.eventTime]
+  const initialRemaining = useMemo(
+    () => countdown(invitation.eventDate, invitation.eventTime),
+    [invitation.eventDate, invitation.eventTime],
   )
 
   const [remaining, setRemaining] = useState(initialRemaining)
@@ -258,7 +260,7 @@ export function PublicInvitationRenderer({
     experienceRef,
     preview,
     viewMode,
-    invitation.galleryImageUrls || []
+    invitation.galleryImageUrls || [],
   )
 
   // Observer de capítulos con mejor manejo
@@ -266,23 +268,26 @@ export function PublicInvitationRenderer({
     const experience = experienceRef.current
     if (!experience || !('IntersectionObserver' in window)) return
 
-    const observationRoot = viewMode === 'navigation'
-      ? experience.querySelector('.experience-chapters')
-      : preview
-        ? experience
-        : null
+    const observationRoot =
+      viewMode === 'navigation'
+        ? experience.querySelector('.experience-chapters')
+        : preview
+          ? experience
+          : null
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visibleChapter = entries.find(entry => entry.isIntersecting)
+        const visibleChapter = entries.find((entry) => entry.isIntersecting)
         if (visibleChapter) {
           setActiveChapter(visibleChapter.target.id)
         }
       },
-      { root: observationRoot, threshold: 0.55 }
+      { root: observationRoot, threshold: 0.55 },
     )
 
-    const chapters = experience.querySelectorAll<HTMLElement>('.experience-chapter[id]')
+    const chapters = experience.querySelectorAll<HTMLElement>(
+      '.experience-chapter[id]',
+    )
     chapters.forEach((chapter) => observer.observe(chapter))
 
     return () => observer.disconnect()
@@ -296,15 +301,17 @@ export function PublicInvitationRenderer({
 
       try {
         const hero = experience.querySelector<HTMLImageElement>(
-          '.experience-cover-media img'
+          '.experience-cover-media img',
         )
         const farewell = experience.querySelector<HTMLImageElement>(
-          '.experience-farewell-media img'
+          '.experience-farewell-media img',
         )
 
-        const heroPosition = invitation.heroImagePosition ??
+        const heroPosition =
+          invitation.heroImagePosition ??
           Number(sessionStorage.getItem('heroImagePosition') ?? 50)
-        const finalPosition = invitation.finalImagePosition ??
+        const finalPosition =
+          invitation.finalImagePosition ??
           Number(sessionStorage.getItem('finalImagePosition') ?? 50)
 
         if (hero) hero.style.objectPosition = `50% ${heroPosition}%`
@@ -316,58 +323,81 @@ export function PublicInvitationRenderer({
 
     applyImagePositions()
 
-    window.addEventListener('invitation-image-position-change', applyImagePositions)
-    return () => window.removeEventListener(
+    window.addEventListener(
       'invitation-image-position-change',
-      applyImagePositions
+      applyImagePositions,
     )
+    return () =>
+      window.removeEventListener(
+        'invitation-image-position-change',
+        applyImagePositions,
+      )
   }, [invitation.heroImagePosition, invitation.finalImagePosition])
 
   // Navegación con mejor manejo de errores
-  const navigateTo = useCallback((event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    event.preventDefault()
-    const experience = experienceRef.current
-    if (!experience) return
+  const navigateTo = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+      event.preventDefault()
+      const experience = experienceRef.current
+      if (!experience) return
 
-    const target = experience.querySelector<HTMLElement>(`#${id}`)
-    if (!target) return
+      const target = experience.querySelector<HTMLElement>(`#${id}`)
+      if (!target) return
 
-    try {
-      if (viewMode === 'navigation') {
-        const container = experience.querySelector<HTMLElement>('.experience-chapters')
-        if (container) {
-          container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
+      try {
+        if (viewMode === 'navigation') {
+          const container = experience.querySelector<HTMLElement>(
+            '.experience-chapters',
+          )
+          if (container) {
+            container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
+          }
+        } else {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
-      } else {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } catch {
+        // Silenciar errores de navegación
       }
-    } catch {
-      // Silenciar errores de navegación
-    }
-  }, [viewMode])
+    },
+    [viewMode],
+  )
 
-  const navigateAdjacent = useCallback((direction: 1 | -1) => {
-    const index = chapters.findIndex((chapter) => chapter.id === activeChapter)
-    const adjacent = chapters[index + direction]
-    if (!adjacent) return
+  const navigateAdjacent = useCallback(
+    (direction: 1 | -1) => {
+      const index = chapters.findIndex(
+        (chapter) => chapter.id === activeChapter,
+      )
+      const adjacent = chapters[index + direction]
+      if (!adjacent) return
 
-    const target = experienceRef.current?.querySelector<HTMLElement>(`#${adjacent.id}`)
-    const container = experienceRef.current?.querySelector<HTMLElement>('.experience-chapters')
+      const target = experienceRef.current?.querySelector<HTMLElement>(
+        `#${adjacent.id}`,
+      )
+      const container = experienceRef.current?.querySelector<HTMLElement>(
+        '.experience-chapters',
+      )
 
-    if (container && target) {
-      container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
-    }
-  }, [activeChapter])
+      if (container && target) {
+        container.scrollTo({ left: target.offsetLeft, behavior: 'smooth' })
+      }
+    },
+    [activeChapter],
+  )
 
   // Capítulos con validación
-  const chapters = useMemo(() => [
-    { id: 'portada', label: 'Portada' },
-    { id: 'frase', label: 'Frase' },
-    { id: 'fecha', label: 'Datos' },
-    { id: 'confirmar', label: '¿Vas a venir?' },
-    ...(invitation.galleryImageUrls?.length ? [{ id: 'fotos', label: 'Fotos' }] : []),
-    { id: 'final', label: 'Final' },
-  ], [invitation.galleryImageUrls])
+  const chapters = useMemo(
+    () => [
+      { id: 'portada', label: 'Portada' },
+      { id: 'frase', label: 'Frase' },
+      { id: 'fecha', label: 'Datos' },
+      { id: 'confirmar', label: '¿Vas a venir?' },
+      ...(invitation.galleryImageUrls?.length
+        ? [{ id: 'fotos', label: 'Fotos' }]
+        : []),
+      { id: 'final', label: 'Final' },
+    ],
+    [invitation.galleryImageUrls],
+  )
 
   const gallery = invitation.galleryImageUrls ?? []
   const finalImage = gallery.at(-1) ?? invitation.heroImageUrl
@@ -424,6 +454,8 @@ export function PublicInvitationRenderer({
                 <img
                   src={invitation.heroImageUrl}
                   alt={`Foto principal de ${invitation.honoreeName || 'invitado'}`}
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </div>
             )}
@@ -485,8 +517,13 @@ export function PublicInvitationRenderer({
         >
           <span className="experience-number">03</span>
           <h2>Reserva este momento</h2>
-          <strong>{formatDate(invitation.eventDate) || 'Fecha por definir'}</strong>
-          <p>A las {invitation.eventTime?.slice(0, 5) || 'Hora por definir'} horas</p>
+          <strong>
+            {formatDate(invitation.eventDate) || 'Fecha por definir'}
+          </strong>
+          <p>
+            A las {invitation.eventTime?.slice(0, 5) || 'Hora por definir'}{' '}
+            horas
+          </p>
           <div className="countdown">
             <div>
               <b>{remaining.days}</b>
@@ -548,6 +585,7 @@ export function PublicInvitationRenderer({
                         src={url}
                         alt={`Recuerdo ${index + 1} de ${invitation.honoreeName || 'invitado'}`}
                         loading="lazy"
+                        decoding="async"
                       />
                     </figure>
                   ))}
@@ -580,6 +618,7 @@ export function PublicInvitationRenderer({
                   src={finalImage}
                   alt={`Recuerdo especial de ${invitation.honoreeName || 'invitado'}`}
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
             )}

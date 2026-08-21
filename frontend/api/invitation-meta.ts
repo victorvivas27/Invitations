@@ -139,6 +139,15 @@ export default async function invitationMetadata(request: Request) {
   const publicUrl = `${origin}/i/${encodeURIComponent(slug)}`
   const appUrl = `${origin}/view/${encodeURIComponent(slug)}`
 
+  const userAgent = request.headers.get('user-agent') ?? ''
+  const isSocialBot = SOCIAL_BOT.test(userAgent)
+
+  // Browsers do not consume Open Graph metadata. Redirect before contacting
+  // the backend so opening a shared link needs only the invitation request.
+  if (!isSocialBot) {
+    return Response.redirect(appUrl, 307)
+  }
+
   let metadata: Metadata = {}
   let status = 200
 
@@ -177,9 +186,6 @@ export default async function invitationMetadata(request: Request) {
     console.error('Could not load invitation metadata', error)
   }
 
-  const userAgent = request.headers.get('user-agent') ?? ''
-  const isSocialBot = SOCIAL_BOT.test(userAgent)
-
   const title = cleanText(metadata.shareTitle, FALLBACK_TITLE)
 
   const description = cleanText(metadata.shareDescription, FALLBACK_DESCRIPTION)
@@ -194,15 +200,14 @@ export default async function invitationMetadata(request: Request) {
     description,
     image,
     publicUrl,
-    appUrl: status === 200 ? appUrl : undefined,
-    redirect: status === 200 && !isSocialBot,
+    redirect: false,
   })
 
   return new Response(html, {
     status,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       Vary: 'User-Agent',
     },
   })
