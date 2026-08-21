@@ -365,5 +365,3 @@ export function CreateInvitationPage() {
     </AppLayout>
   )
 }
-import invitationWizardStyles from './styles/InvitationWizard.module.css'
-void invitationWizardStyles

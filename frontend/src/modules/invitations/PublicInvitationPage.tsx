@@ -87,5 +87,3 @@ export function PublicInvitationPage() {
     </main>
   )
 }
-import publicInvitationStyles from './styles/PublicInvitation.module.css'
-void publicInvitationStyles

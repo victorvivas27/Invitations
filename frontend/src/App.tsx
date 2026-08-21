@@ -3,6 +3,9 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import './styles/globals.css'
 import './shared/animation/reveal.css'
 import foundationStyles from './shared/styles/foundation.module.css'
+import templateStyles from './modules/templates/styles/Templates.module.css'
+import invitationWizardStyles from './modules/invitations/styles/InvitationWizard.module.css'
+import publicInvitationStyles from './modules/invitations/styles/PublicInvitation.module.css'
 import './styles/theme.css'
 import { FeedbackProvider } from './shared/components/feedback/FeedbackProvider'
 import { ScrollManager } from './shared/components/layout/ScrollManager'
@@ -22,6 +25,9 @@ function NotFoundPage() {
 
 const applicationStyles = {
   ...foundationStyles,
+  ...templateStyles,
+  ...invitationWizardStyles,
+  ...publicInvitationStyles,
 }
 
 const HomePage = lazy(() =>
