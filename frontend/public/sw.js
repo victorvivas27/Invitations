@@ -1,6 +1,6 @@
 /* global self, caches, URL, fetch, Response */
 
-const CACHE_NAME = 'mi-invitacion-shell-v2'
+const CACHE_NAME = 'mi-invitacion-shell-v4'
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
