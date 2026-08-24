@@ -99,10 +99,13 @@ export function ActivateAccountPage() {
   return (
     <main className="activation-shell">
       <section className="activation-card" aria-live="polite">
-        <span className="activation-brand">Invitation</span>
-        <span className="activation-icon" aria-hidden="true">
-          ✨
-        </span>
+        <span className="activation-brand">Mi Invitación</span>
+        <img
+          className="activation-icon"
+          src="/images/icon-invitacion.png"
+          alt=""
+          aria-hidden="true"
+        />
         {state === 'validating' && (
           <>
             <div className="loader" aria-hidden="true" />

@@ -1,7 +1,12 @@
 /* global self, caches, URL, fetch, Response */
 
-const CACHE_NAME = 'mi-invitacion-shell-v1'
-const APP_SHELL = ['/', '/manifest.webmanifest', '/images/love-letter-icon.png']
+const CACHE_NAME = 'mi-invitacion-shell-v2'
+const APP_SHELL = [
+  '/',
+  '/manifest.webmanifest',
+  '/images/icon-invitacion.png',
+  '/images/icon-invitacion-favicon.png',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

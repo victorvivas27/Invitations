@@ -798,9 +798,6 @@ body {
 .public-brand {
   color: var(--theme-text);
 }
-.public-brand > span {
-  color: var(--theme-red);
-}
 .desktop-links a:not(.nav-cta),
 .mobile-menu > a:not(.nav-cta) {
   color: var(--theme-muted);

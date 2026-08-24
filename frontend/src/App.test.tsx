@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import App from './App'
 
 describe('public routes', () => {
@@ -11,6 +11,19 @@ describe('public routes', () => {
         name: 'Crea invitaciones digitales que se sienten únicas',
       }),
     ).toBeInTheDocument()
+  })
+
+  it('moves the active navigation marker to Cómo funciona', async () => {
+    window.history.pushState({}, '', '/')
+    render(<App />)
+
+    const homeLink = await screen.findByRole('link', { name: 'Inicio' })
+    const howItWorksLink = screen.getByRole('link', { name: 'Cómo funciona' })
+
+    expect(homeLink).toHaveAttribute('aria-current', 'page')
+    fireEvent.click(howItWorksLink)
+    expect(howItWorksLink).toHaveAttribute('aria-current', 'location')
+    expect(homeLink).not.toHaveAttribute('aria-current')
   })
 
   it('keeps account activation public', async () => {

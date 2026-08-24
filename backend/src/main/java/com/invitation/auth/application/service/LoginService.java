@@ -40,9 +40,9 @@ public class LoginService implements LoginUseCase {
             throw new InvalidCredentialsException();
         }
         IssuedToken token = tokenGenerator.generate(new AuthenticatedUser(user.getPublicCode(),
-                user.getEmail(), user.getStatus()));
+                user.getEmail(), user.getStatus(), user.getRole()));
         PublicUser publicUser = new PublicUser(user.getPublicCode(), user.getFirstName(),
-                user.getLastName(), user.getEmail(), user.getStatus());
+                user.getLastName(), user.getEmail(), user.getStatus(), user.getRole());
         return new LoginResult(token.value(), "Bearer", token.expiresIn(), publicUser);
     }
 }

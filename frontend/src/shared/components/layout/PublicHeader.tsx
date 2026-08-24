@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   clearSession,
   getAccessToken,
@@ -11,7 +11,7 @@ import { ThemeToggle } from './ThemeToggle'
 export const APP_NAME = 'Mi Invitación'
 
 type NavIconName =
-  'home' | 'info' | 'templates' | 'invitations' | 'create' | 'login' | 'logout'
+  'home' | 'info' | 'templates' | 'invitations' | 'admin' | 'create' | 'login' | 'logout'
 
 function NavIcon({ name }: { name: NavIconName }) {
   const paths: Record<NavIconName, ReactNode> = {
@@ -32,6 +32,12 @@ function NavIcon({ name }: { name: NavIconName }) {
       <>
         <rect x="3" y="5" width="18" height="14" rx="2.5" />
         <path d="m4.5 7 7.5 6 7.5-6" />
+      </>
+    ),
+    admin: (
+      <>
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20a7 7 0 0 1 14 0M18.5 5.5l1 1 2-2" />
       </>
     ),
     create: <path d="M12 5v14M5 12h14" />,
@@ -69,13 +75,17 @@ function NavIcon({ name }: { name: NavIconName }) {
 export function PublicHeader({
   activePage,
 }: {
-  activePage?: 'home' | 'templates' | 'my-invitations'
+  activePage?: 'home' | 'templates' | 'my-invitations' | 'admin-users'
 }) {
   const [open, setOpen] = useState(false)
+  const [homeSection, setHomeSection] = useState<'home' | 'how-it-works'>('home')
   const authenticated = Boolean(getAccessToken())
   const [user, setUser] = useState(getSessionUser)
   const closeButton = useRef<HTMLButtonElement>(null)
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const howItWorksActive = pathname === '/' && homeSection === 'how-it-works'
+  const homeActive = activePage === 'home' && !howItWorksActive
   useEffect(() => {
     document.body.classList.toggle('menu-open', open)
     if (open) closeButton.current?.focus()
@@ -94,6 +104,33 @@ export function PublicHeader({
         if (loaded) setUser(loaded)
       })
   }, [authenticated, user])
+  useEffect(() => {
+    if (pathname !== '/') return
+
+    const updateActiveSection = () => {
+      const section = document.getElementById('como-funciona')
+      if (!section) {
+        setHomeSection('home')
+        return
+      }
+      const headerHeight =
+        document.querySelector<HTMLElement>('.public-header')?.offsetHeight ?? 72
+      setHomeSection(
+        window.scrollY > 0 &&
+          section.getBoundingClientRect().top <= headerHeight + 32
+          ? 'how-it-works'
+          : 'home',
+      )
+    }
+
+    updateActiveSection()
+    window.addEventListener('scroll', updateActiveSection, { passive: true })
+    window.addEventListener('resize', updateActiveSection)
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection)
+      window.removeEventListener('resize', updateActiveSection)
+    }
+  }, [pathname])
   const close = () => setOpen(false)
   const logout = () => {
     clearSession()
@@ -125,20 +162,33 @@ export function PublicHeader({
           className="public-brand"
           to="/"
           aria-label={`${APP_NAME}, inicio`}
+          onClick={() => setHomeSection('home')}
         >
-          <span aria-hidden="true">✦</span>
+          <img
+            className="public-brand-icon"
+            src="/images/icon-invitacion.png"
+            alt=""
+            aria-hidden="true"
+          />
           {APP_NAME}
         </Link>
         <div className="desktop-links">
           <div className="desktop-navigation">
             <Link
-              className={activePage === 'home' ? 'active' : undefined}
+              className={homeActive ? 'active' : undefined}
+              aria-current={homeActive ? 'page' : undefined}
               to="/"
+              onClick={() => setHomeSection('home')}
             >
               <NavIcon name="home" />
               Inicio
             </Link>
-            <Link to="/#como-funciona">
+            <Link
+              className={howItWorksActive ? 'active' : undefined}
+              aria-current={howItWorksActive ? 'location' : undefined}
+              to="/#como-funciona"
+              onClick={() => setHomeSection('how-it-works')}
+            >
               <NavIcon name="info" />
               Cómo funciona
             </Link>
@@ -164,6 +214,16 @@ export function PublicHeader({
                   <NavIcon name="invitations" />
                   Mis invitaciones
                 </Link>
+                {user?.role === 'ADMIN' && (
+                  <Link
+                    className={activePage === 'admin-users' ? 'active' : undefined}
+                    aria-current={activePage === 'admin-users' ? 'page' : undefined}
+                    to="/admin/users"
+                  >
+                    <NavIcon name="admin" />
+                    Usuarios
+                  </Link>
+                )}
               </>
             )}
           </div>
@@ -187,7 +247,7 @@ export function PublicHeader({
               </>
             ) : (
               <>
-                <Link className="nav-cta" to="/login">
+                <Link className="nav-login" to="/login">
                   <NavIcon name="login" />
                   Iniciar sesión
                 </Link>
@@ -216,19 +276,52 @@ export function PublicHeader({
             className="mobile-menu"
             onPointerDown={(event) => event.stopPropagation()}
           >
-            <button
-              ref={closeButton}
-              className="menu-close"
-              aria-label="Cerrar menú"
-              onClick={close}
+            <div className="mobile-menu-header">
+              <Link
+                className="public-brand"
+                to="/"
+                aria-label={`${APP_NAME}, inicio`}
+                onClick={() => {
+                  setHomeSection('home')
+                  close()
+                }}
+              >
+                <img
+                  className="public-brand-icon"
+                  src="/images/icon-invitacion.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                {APP_NAME}
+              </Link>
+              <button
+                ref={closeButton}
+                className="menu-close"
+                aria-label="Cerrar menú"
+                onClick={close}
+              >
+                ×
+              </button>
+            </div>
+            <Link
+              aria-current={homeActive ? 'page' : undefined}
+              to="/"
+              onClick={() => {
+                setHomeSection('home')
+                close()
+              }}
             >
-              ×
-            </button>
-            <Link to="/" onClick={close}>
               <NavIcon name="home" />
               Inicio
             </Link>
-            <Link to="/#como-funciona" onClick={close}>
+            <Link
+              aria-current={howItWorksActive ? 'location' : undefined}
+              to="/#como-funciona"
+              onClick={() => {
+                setHomeSection('how-it-works')
+                close()
+              }}
+            >
               <NavIcon name="info" />
               Cómo funciona
             </Link>
@@ -254,6 +347,16 @@ export function PublicHeader({
                   <NavIcon name="invitations" />
                   Mis invitaciones
                 </Link>
+                {user?.role === 'ADMIN' && (
+                  <Link
+                    aria-current={activePage === 'admin-users' ? 'page' : undefined}
+                    to="/admin/users"
+                    onClick={close}
+                  >
+                    <NavIcon name="admin" />
+                    Administrar usuarios
+                  </Link>
+                )}
                 <Link className="nav-cta" to="/templates" onClick={close}>
                   <NavIcon name="create" />
                   Crear invitación
@@ -268,7 +371,7 @@ export function PublicHeader({
                 </button>
               </>
             ) : (
-              <Link className="nav-cta" to="/login" onClick={close}>
+              <Link className="nav-login" to="/login" onClick={close}>
                 <NavIcon name="login" />
                 Iniciar sesión
               </Link>

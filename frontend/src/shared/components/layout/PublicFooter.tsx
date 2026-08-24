@@ -9,7 +9,12 @@ export function PublicFooter() {
     <footer className="public-footer">
       <div>
         <a className="public-brand" href="#inicio">
-          <span aria-hidden="true">✦</span>
+          <img
+            className="public-brand-icon"
+            src="/images/icon-invitacion.png"
+            alt=""
+            aria-hidden="true"
+          />
           {APP_NAME}
         </a>
         <p>Invitaciones digitales para celebrar momentos especiales.</p>

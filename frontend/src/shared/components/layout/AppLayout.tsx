@@ -13,7 +13,7 @@ export function AppLayout({
   withFooter = false,
   children,
 }: {
-  activePage?: 'home' | 'templates' | 'my-invitations'
+  activePage?: 'home' | 'templates' | 'my-invitations' | 'admin-users'
   className: string
   withFooter?: boolean
   children: ReactNode

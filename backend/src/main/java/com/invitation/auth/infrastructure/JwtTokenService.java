@@ -39,6 +39,7 @@ public class JwtTokenService implements TokenGenerator, TokenValidator {
                 .expiresAt(expiresAt)
                 .claim("email", user.email())
                 .claim("status", user.status().name())
+                .claim("role", user.role().name())
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         String value = encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
@@ -50,7 +51,8 @@ public class JwtTokenService implements TokenGenerator, TokenValidator {
         try {
             Jwt jwt = decoder.decode(token);
             return Optional.of(new AuthenticatedUser(jwt.getSubject(), jwt.getClaimAsString("email"),
-                    UserStatus.valueOf(jwt.getClaimAsString("status"))));
+                    UserStatus.valueOf(jwt.getClaimAsString("status")),
+                    com.invitation.user.domain.UserRole.valueOf(jwt.getClaimAsString("role"))));
         } catch (JwtException | IllegalArgumentException exception) {
             return Optional.empty();
         }

@@ -14,6 +14,7 @@ export function LoginPage() {
   const registrationUrl = `/register?returnTo=${encodeURIComponent(returnTo)}`
   const [email, setEmail] = useState(''),
     [password, setPassword] = useState('')
+  const [passwordVisible, setPasswordVisible] = useState(false)
   const [submitting, setSubmitting] = useState(false),
     [errors, setErrors] = useState<Errors>({})
   const refs = {
@@ -66,46 +67,88 @@ export function LoginPage() {
   }
   return (
     <AppLayout className="login-shell section-shell">
-      <section className="login-card">
+      <section className="login-card login-access-card">
         <span className="pill">Acceso seguro</span>
         <h1>Inicia sesión para crear tu invitación</h1>
         <p>
           Tu cuenta permite asociar y conservar las invitaciones que publiques.
         </p>
         <form onSubmit={submit} noValidate>
-          <label>
-            <span>Correo electrónico</span>
-            <input
-              ref={refs.email}
-              aria-label="Correo electrónico"
-              type="email"
-              autoComplete="email"
-              required
-              maxLength={254}
-              value={email}
-              onChange={(e) => update('email', e.target.value)}
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? 'login-email-error' : undefined}
-            />
-            <FieldError id="login-email-error" message={errors.email} />
-          </label>
-          <label>
-            <span>Contraseña</span>
-            <input
-              ref={refs.password}
-              type="password"
-              autoComplete="current-password"
-              required
-              maxLength={72}
-              value={password}
-              onChange={(e) => update('password', e.target.value)}
-              aria-invalid={Boolean(errors.password)}
-              aria-describedby={
-                errors.password ? 'login-password-error' : undefined
-              }
-            />
-            <FieldError id="login-password-error" message={errors.password} />
-          </label>
+          <div className="login-fields">
+            <div className="login-field">
+              <label htmlFor="login-email">Correo electrónico</label>
+              <div className="auth-input-shell">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="5" width="18" height="14" rx="3" />
+                  <path d="m4.5 7 7.5 6 7.5-6" />
+                </svg>
+                <input
+                  id="login-email"
+                  ref={refs.email}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="nombre@correo.com"
+                  required
+                  maxLength={254}
+                  value={email}
+                  onChange={(e) => update('email', e.target.value)}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={
+                    errors.email ? 'login-email-error' : undefined
+                  }
+                />
+              </div>
+              <FieldError id="login-email-error" message={errors.email} />
+            </div>
+            <div className="login-field">
+              <label htmlFor="login-password">Contraseña</label>
+              <div className="auth-input-shell auth-password-shell">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <rect x="5" y="10" width="14" height="10" rx="3" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" />
+                </svg>
+                <input
+                  id="login-password"
+                  ref={refs.password}
+                  type={passwordVisible ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="Tu contraseña"
+                  required
+                  maxLength={72}
+                  value={password}
+                  onChange={(e) => update('password', e.target.value)}
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={
+                    errors.password ? 'login-password-error' : undefined
+                  }
+                />
+                <button
+                  className="password-visibility"
+                  type="button"
+                  aria-label={
+                    passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                  aria-pressed={passwordVisible}
+                  onClick={() => setPasswordVisible((visible) => !visible)}
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                    {passwordVisible ? (
+                      <>
+                        <path d="M3 3l18 18" />
+                        <path d="M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.3A10.8 10.8 0 0 1 12 4c5.5 0 9 5.5 9 5.5a15 15 0 0 1-2.3 2.8M6.6 6.6C4.3 8.1 3 10.5 3 10.5S6.5 16 12 16c1 0 2-.2 2.9-.5" />
+                      </>
+                    ) : (
+                      <>
+                        <path d="M3 12s3.5-5.5 9-5.5 9 5.5 9 5.5-3.5 5.5-9 5.5S3 12 3 12Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </>
+                    )}
+                  </svg>
+                </button>
+              </div>
+              <FieldError id="login-password-error" message={errors.password} />
+            </div>
+          </div>
           {errors.form && (
             <p className="form-error" role="alert">
               {errors.form}

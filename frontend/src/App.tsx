@@ -7,6 +7,10 @@ import templateStyles from './modules/templates/styles/Templates.module.css'
 import invitationWizardStyles from './modules/invitations/styles/InvitationWizard.module.css'
 import publicInvitationStyles from './modules/invitations/styles/PublicInvitation.module.css'
 import './styles/theme.css'
+import './styles/navigation.css'
+import './styles/home-theme.css'
+import './styles/auth.css'
+import './styles/admin.css'
 import { FeedbackProvider } from './shared/components/feedback/FeedbackProvider'
 import { ScrollManager } from './shared/components/layout/ScrollManager'
 
@@ -75,6 +79,11 @@ const PublicInvitationPage = lazy(() =>
     default: module.PublicInvitationPage,
   })),
 )
+const AdminUsersPage = lazy(() =>
+  import('./modules/admin/AdminUsersPage').then((module) => ({
+    default: module.AdminUsersPage,
+  })),
+)
 
 function RouteFallback() {
   return <main className="public-state" aria-label="Cargando" />
@@ -101,6 +110,7 @@ export default function App() {
                 element={<CreateInvitationPage />}
               />
               <Route path="/my-invitations" element={<MyInvitationsPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route
                 path="/my-invitations/:slug/guests"
                 element={<InvitationGuestsPage />}

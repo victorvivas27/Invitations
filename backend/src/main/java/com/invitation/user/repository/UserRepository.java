@@ -4,6 +4,7 @@ import com.invitation.user.domain.User;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 /**
  * Persistence port for users.
@@ -21,4 +22,6 @@ public interface UserRepository {
     boolean existsByEmail(String email);
 
     boolean existsByPublicCode(String publicCode);
+
+    List<User> findAll();
 }

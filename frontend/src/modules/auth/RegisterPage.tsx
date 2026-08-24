@@ -27,6 +27,10 @@ export function RegisterPage() {
   })
   const [submitting, setSubmitting] = useState(false),
     [errors, setErrors] = useState<Errors>({})
+  const [visiblePasswords, setVisiblePasswords] = useState({
+    password: false,
+    confirmation: false,
+  })
   const refs = {
     firstName: useRef<HTMLInputElement>(null),
     lastName: useRef<HTMLInputElement>(null),
@@ -100,33 +104,96 @@ export function RegisterPage() {
     label: string,
     type = 'text',
     autocomplete?: string,
-  ) => (
-    <label>
-      <span>{label}</span>
-      <input
-        ref={refs[name]}
-        aria-label={label}
-        type={type}
-        autoComplete={autocomplete}
-        required
-        maxLength={
-          name === 'email'
-            ? 254
-            : name === 'password' || name === 'confirmation'
-              ? 72
-              : 100
-        }
-        value={form[name]}
-        onChange={(e) => update(name, e.target.value)}
-        aria-invalid={Boolean(errors[name])}
-        aria-describedby={errors[name] ? `register-${name}-error` : undefined}
-      />
-      <FieldError id={`register-${name}-error`} message={errors[name]} />
-    </label>
-  )
+  ) => {
+    const passwordField = name === 'password' || name === 'confirmation'
+    const passwordVisible = passwordField && visiblePasswords[name]
+    return (
+      <div className="login-field">
+        <label htmlFor={`register-${name}`}>{label}</label>
+        <div
+          className={`auth-input-shell${passwordField ? ' auth-password-shell' : ''}`}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            {name === 'email' ? (
+              <>
+                <rect x="3" y="5" width="18" height="14" rx="3" />
+                <path d="m4.5 7 7.5 6 7.5-6" />
+              </>
+            ) : passwordField ? (
+              <>
+                <rect x="5" y="10" width="14" height="10" rx="3" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" />
+              </>
+            ) : (
+              <>
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+              </>
+            )}
+          </svg>
+          <input
+            id={`register-${name}`}
+            ref={refs[name]}
+            type={passwordField && passwordVisible ? 'text' : type}
+            autoComplete={autocomplete}
+            placeholder={
+              name === 'email'
+                ? 'nombre@correo.com'
+                : name === 'password'
+                  ? 'Crea una contraseña'
+                  : name === 'confirmation'
+                    ? 'Repítela'
+                    : label
+            }
+            required
+            maxLength={
+              name === 'email'
+                ? 254
+                : passwordField
+                  ? 72
+                  : 100
+            }
+            value={form[name]}
+            onChange={(e) => update(name, e.target.value)}
+            aria-invalid={Boolean(errors[name])}
+            aria-describedby={errors[name] ? `register-${name}-error` : undefined}
+          />
+          {passwordField && (
+            <button
+              className="password-visibility"
+              type="button"
+              aria-label={`${passwordVisible ? 'Ocultar' : 'Mostrar'} ${label.toLocaleLowerCase('es')}`}
+              aria-pressed={passwordVisible}
+              onClick={() =>
+                setVisiblePasswords((current) => ({
+                  ...current,
+                  [name]: !current[name],
+                }))
+              }
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                {passwordVisible ? (
+                  <>
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.3A10.8 10.8 0 0 1 12 4c5.5 0 9 5.5 9 5.5a15 15 0 0 1-2.3 2.8M6.6 6.6C4.3 8.1 3 10.5 3 10.5S6.5 16 12 16c1 0 2-.2 2.9-.5" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M3 12s3.5-5.5 9-5.5 9 5.5 9 5.5-3.5 5.5-9 5.5S3 12 3 12Z" />
+                    <circle cx="12" cy="12" r="2.5" />
+                  </>
+                )}
+              </svg>
+            </button>
+          )}
+        </div>
+        <FieldError id={`register-${name}-error`} message={errors[name]} />
+      </div>
+    )
+  }
   return (
     <AppLayout className="login-shell section-shell">
-      <section className="login-card register-card">
+      <section className="login-card register-card register-access-card">
         <span className="pill">Nueva cuenta</span>
         <h1>Crea tu cuenta</h1>
         <p>Regístrate para guardar y publicar tus invitaciones.</p>
@@ -136,14 +203,18 @@ export function RegisterPage() {
             {input('lastName', 'Apellido', 'text', 'family-name')}
           </div>
           {input('email', 'Correo electrónico', 'email', 'email')}
-          {input('password', 'Contraseña', 'password', 'new-password')}
-          <small>Al menos 8 caracteres, una letra y un número.</small>
-          {input(
-            'confirmation',
-            'Confirmar contraseña',
-            'password',
-            'new-password',
-          )}
+          <div className="register-password-row">
+            {input('password', 'Contraseña', 'password', 'new-password')}
+            {input(
+              'confirmation',
+              'Confirmar contraseña',
+              'password',
+              'new-password',
+            )}
+          </div>
+          <small className="password-requirements">
+            Usa al menos 8 caracteres, una letra y un número.
+          </small>
           {errors.form && (
             <p className="form-error" role="alert">
               {errors.form}

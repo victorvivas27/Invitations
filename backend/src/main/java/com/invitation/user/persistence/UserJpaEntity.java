@@ -1,6 +1,7 @@
 package com.invitation.user.persistence;
 
 import com.invitation.user.domain.UserStatus;
+import com.invitation.user.domain.UserRole;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -32,6 +33,10 @@ public class UserJpaEntity {
     @Column(nullable = false, length = 32)
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
+    private UserRole role;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -48,7 +53,7 @@ public class UserJpaEntity {
     }
 
     public UserJpaEntity(UUID id, String publicCode, String firstName, String lastName,
-                         String email, String passwordHash, UserStatus status, Instant createdAt,
+                         String email, String passwordHash, UserStatus status, UserRole role, Instant createdAt,
                          Instant updatedAt, UUID createdBy, UUID updatedBy) {
         this.id = id;
         this.publicCode = publicCode;
@@ -57,6 +62,7 @@ public class UserJpaEntity {
         this.email = email;
         this.passwordHash = passwordHash;
         this.status = status;
+        this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.createdBy = createdBy;
@@ -89,6 +95,10 @@ public class UserJpaEntity {
 
     public UserStatus getStatus() {
         return status;
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 
     public Instant getCreatedAt() {

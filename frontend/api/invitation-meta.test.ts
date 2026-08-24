@@ -121,7 +121,7 @@ describe('invitation metadata function', () => {
     expect(response.status).toBe(200)
     expect(html).toContain('<title>Estás invitado</title>')
     expect(html).toContain(
-      'content="https://invitations.example/images/love-letter-icon.png"',
+      'content="https://invitations.example/images/icon-invitacion-favicon.png"',
     )
     expect(html).not.toContain('undefined')
     expect(html).not.toContain('null')
