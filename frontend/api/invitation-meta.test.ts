@@ -6,6 +6,12 @@ const request = (userAgent = 'WhatsApp/2.0') =>
     headers: { 'user-agent': userAgent },
   })
 
+const versionedRequest = (userAgent = 'WhatsApp/2.0') =>
+  new Request(
+    'https://invitations.example/i/fiesta-123?slug=fiesta-123&v=1724360000000',
+    { headers: { 'user-agent': userAgent } },
+  )
+
 describe('invitation metadata function', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
@@ -66,6 +72,42 @@ describe('invitation metadata function', () => {
       'https://invitations.example/view/fiesta-123',
     )
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('preserves the metadata version in redirects and Open Graph URLs', async () => {
+    vi.stubEnv('BACKEND_URL', 'https://backend.example')
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        shareTitle: 'Cumpleaños de Theo',
+        shareDescription: 'Ven a celebrar',
+        shareImageUrl: 'https://cdn.example/theo.jpg',
+        metadataVersion: '1724360000000',
+      }),
+    )
+
+    const socialResponse = await invitationMetadata(versionedRequest())
+    expect(await socialResponse.text()).toContain(
+      '<meta property="og:url" content="https://invitations.example/i/fiesta-123?v=1724360000000">',
+    )
+
+    const browserResponse = await invitationMetadata(
+      versionedRequest('Mozilla/5.0'),
+    )
+    expect(browserResponse.headers.get('Location')).toBe(
+      'https://invitations.example/view/fiesta-123?v=1724360000000',
+    )
+  })
+
+  it('uses the current backend version for legacy unversioned links', async () => {
+    vi.stubEnv('BACKEND_URL', 'https://backend.example')
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({ metadataVersion: '1724360000000' }),
+    )
+
+    const response = await invitationMetadata(request())
+    expect(await response.text()).toContain(
+      '<meta property="og:url" content="https://invitations.example/i/fiesta-123?v=1724360000000">',
+    )
   })
 
   it('uses safe fallbacks when the backend is unavailable', async () => {

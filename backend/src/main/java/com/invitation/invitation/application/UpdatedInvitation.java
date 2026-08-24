@@ -8,6 +8,7 @@ public record UpdatedInvitation(
         String publicSlug,
         String publicUrl,
         InvitationStatus status,
-        String eventName
+        String eventName,
+        String metadataVersion
 ) {
 }

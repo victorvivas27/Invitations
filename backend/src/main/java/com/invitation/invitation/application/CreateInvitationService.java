@@ -50,8 +50,10 @@ public class CreateInvitationService implements CreateInvitationUseCase {
                 command.shareTitle(), command.shareDescription(), command.shareImageUrl(),
                 InvitationStatus.PUBLISHED, now, now);
         Invitation saved = invitations.save(invitation);
-        return new CreatedInvitation(saved.publicSlug(), "/i/" + saved.publicSlug(),
-                saved.status(), saved.eventName());
+        String metadataVersion = Long.toString(saved.updatedAt().toEpochMilli());
+        return new CreatedInvitation(saved.publicSlug(),
+                "/i/" + saved.publicSlug() + "?v=" + metadataVersion,
+                saved.status(), saved.eventName(), metadataVersion);
     }
 
     private String uniqueSlug(String eventName) {

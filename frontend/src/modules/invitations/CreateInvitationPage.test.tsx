@@ -129,9 +129,10 @@ describe('CreateInvitationPage', () => {
         return new Response(
           JSON.stringify({
             publicSlug: 'cumpleanos-de-sofia-a8k3m2',
-            publicUrl: '/i/cumpleanos-de-sofia-a8k3m2',
+            publicUrl: '/i/cumpleanos-de-sofia-a8k3m2?v=1724360000000',
             status: 'PUBLISHED',
             eventName: 'Cumpleaños de Sofía',
+            metadataVersion: '1724360000000',
           }),
           { status: 201, headers: { 'Content-Type': 'application/json' } },
         )
@@ -156,7 +157,7 @@ describe('CreateInvitationPage', () => {
       'Te esperamos para celebrar.',
     )
     await next()
-    await userEvent.type(screen.getByLabelText('Fecha'), '2026-08-22')
+    await userEvent.type(screen.getByLabelText('Fecha'), '2027-08-22')
     await userEvent.selectOptions(screen.getByLabelText('Hora'), '17')
     await userEvent.selectOptions(screen.getByLabelText('Minutos'), '00')
     await userEvent.type(
@@ -219,7 +220,9 @@ describe('CreateInvitationPage', () => {
       await screen.findByRole('heading', { name: 'Tu invitación está lista' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByDisplayValue(/\/i\/cumpleanos-de-sofia-a8k3m2/),
+      screen.getByDisplayValue(
+        /\/i\/cumpleanos-de-sofia-a8k3m2\?v=1724360000000/,
+      ),
     ).toBeInTheDocument()
     const request = fetchMock.mock.calls.find(([url]) =>
       String(url).endsWith('/api/invitations'),
@@ -233,7 +236,7 @@ describe('CreateInvitationPage', () => {
         eventType: 'BIRTHDAY',
         eventName: 'Cumpleaños de Sofía',
         honoreeName: 'Sofía',
-        eventDate: '2026-08-22',
+        eventDate: '2027-08-22',
         eventTime: '17:00',
         venueName: 'Salón Central',
         address: 'Avenida Principal 123',

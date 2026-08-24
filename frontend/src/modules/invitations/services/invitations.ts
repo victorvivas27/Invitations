@@ -302,8 +302,15 @@ export async function deleteUploadedImage(url: string): Promise<void> {
   )
   if (!response.ok) throw await parseError(response)
 }
-export const getInvitationShareUrl = (publicSlug: string) =>
-  `/i/${encodeURIComponent(publicSlug)}`
+export const getInvitationShareUrl = (
+  publicSlug: string,
+  metadataVersion?: string,
+) => {
+  const path = `/i/${encodeURIComponent(publicSlug)}`
+  return metadataVersion
+    ? `${path}?v=${encodeURIComponent(metadataVersion)}`
+    : path
+}
 export async function confirmAttendance(
   publicSlug: string,
   input: {

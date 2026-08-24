@@ -5,6 +5,7 @@ import com.invitation.invitation.domain.InvitationViewMode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Instant;
 import java.util.List;
 
 public record PublicInvitation(String publicSlug, String templateId, InvitationViewMode viewMode, EventType eventType,
@@ -13,5 +14,6 @@ public record PublicInvitation(String publicSlug, String templateId, InvitationV
                                String heroImageUrl,
                                List<String> galleryImageUrls, String message, String sectionBackgrounds,
                                String contactInfo,
-                               String shareTitle, String shareDescription, String shareImageUrl) {
+                               String shareTitle, String shareDescription, String shareImageUrl,
+                               Instant updatedAt) {
 }

@@ -9,5 +9,6 @@ import java.time.LocalTime;
 
 public record OwnedInvitation(String publicSlug, String publicUrl, String templateId,
                               EventType eventType, String eventName, String honoreeName, LocalDate eventDate,
-                              LocalTime eventTime, String venueName, InvitationStatus status, Instant createdAt) {
+                              LocalTime eventTime, String venueName, InvitationStatus status, Instant createdAt,
+                              String metadataVersion) {
 }

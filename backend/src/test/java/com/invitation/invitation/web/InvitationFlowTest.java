@@ -66,6 +66,9 @@ class InvitationFlowTest {
                         jsonPath("$.eventName").value("Cumpleaños de Sofía"),
                         jsonPath("$.publicSlug").value(org.hamcrest.Matchers.matchesPattern(
                                 "cumpleanos-de-sofia-[a-z0-9]{8}")),
+                        jsonPath("$.metadataVersion").isNotEmpty(),
+                        jsonPath("$.publicUrl").value(org.hamcrest.Matchers.matchesPattern(
+                                "/i/cumpleanos-de-sofia-[a-z0-9]{8}\\?v=[0-9]+")),
                         header().string("Location", org.hamcrest.Matchers.startsWith(
                                 "/api/public/invitations/")))
                 .andReturn();
@@ -83,7 +86,9 @@ class InvitationFlowTest {
                         jsonPath("$.shareTitle").value("Cumpleaños de Sofía"),
                         jsonPath("$.shareDescription").value("Acompáñanos a celebrar."),
                         jsonPath("$.shareImageUrl").value("http://localhost/uploads/share.jpg"),
-                        jsonPath("$.publicUrl").value("http://localhost:5173/i/" + slug),
+                        jsonPath("$.publicUrl").value(org.hamcrest.Matchers.matchesPattern(
+                                "http://localhost:5173/i/" + slug + "\\?v=[0-9]+")),
+                        jsonPath("$.metadataVersion").value(org.hamcrest.Matchers.matchesPattern("[0-9]+")),
                         jsonPath("$").value(not(hasKey("ownerId"))));
     }
 

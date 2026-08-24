@@ -40,6 +40,7 @@ export type CreatedInvitation = {
   publicUrl: string
   status: 'PUBLISHED'
   eventName: string
+  metadataVersion: string
 }
 export type PublicInvitation = Omit<
   CreateInvitationInput,
@@ -63,6 +64,7 @@ export type OwnedInvitation = {
   venueName: string
   status: 'PUBLISHED'
   createdAt: string
+  metadataVersion: string
 }
 
 export type UpdateInvitationInput = CreateInvitationInput
@@ -100,4 +102,5 @@ export type UpdatedInvitation = {
   publicUrl: string
   status: 'PUBLISHED'
   eventName: string
+  metadataVersion: string
 }

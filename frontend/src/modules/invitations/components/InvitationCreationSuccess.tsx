@@ -9,7 +9,7 @@ export function InvitationCreationSuccess({
 }) {
   const [copyState, setCopyState] = useState('')
   const shareUrl = new URL(
-    getInvitationShareUrl(invitation.publicSlug),
+    getInvitationShareUrl(invitation.publicSlug, invitation.metadataVersion),
     window.location.origin,
   ).toString()
   const copy = async () => {
@@ -43,7 +43,10 @@ export function InvitationCreationSuccess({
         <div className="success-actions">
           <Link
             className="primary-cta"
-            to={getInvitationShareUrl(invitation.publicSlug)}
+            to={getInvitationShareUrl(
+              invitation.publicSlug,
+              invitation.metadataVersion,
+            )}
           >
             Ver invitación
           </Link>
