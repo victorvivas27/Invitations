@@ -24,6 +24,7 @@ public final class User {
     private final String email;
     private final String passwordHash;
     private final UserStatus status;
+    private final UserRole role;
     private final Instant createdAt;
     private final Instant updatedAt;
     private final UUID createdBy;
@@ -37,6 +38,7 @@ public final class User {
         email = requireEmail(data.email());
         passwordHash = requirePasswordHash(data.passwordHash(), data.status());
         status = Objects.requireNonNull(data.status(), "status is required");
+        role = Objects.requireNonNull(data.role(), "role is required");
         createdAt = Objects.requireNonNull(data.createdAt(), "createdAt is required");
         updatedAt = Objects.requireNonNull(data.updatedAt(), "updatedAt is required");
         createdBy = Objects.requireNonNull(data.createdBy(), "createdBy is required");
@@ -48,8 +50,15 @@ public final class User {
 
     public static User create(UUID id, String publicCode, String firstName, String lastName,
                               String email, String passwordHash, UUID actorId, Instant now) {
+        return create(id, publicCode, firstName, lastName, email, passwordHash, actorId, now,
+                UserRole.USER);
+    }
+
+    public static User create(UUID id, String publicCode, String firstName, String lastName,
+                              String email, String passwordHash, UUID actorId, Instant now,
+                              UserRole role) {
         return new User(new UserData(id, publicCode, firstName, lastName, email, passwordHash,
-                UserStatus.ACTIVE, now, now, actorId, actorId));
+                UserStatus.ACTIVE, role, now, now, actorId, actorId));
     }
 
     public static User restore(UserData data) {
@@ -59,7 +68,7 @@ public final class User {
     public static User createPending(UUID id, String publicCode, String firstName, String lastName,
                                      String email, UUID actorId, Instant now) {
         return new User(new UserData(id, publicCode, firstName, lastName, email, null,
-                UserStatus.PENDING_ACTIVATION, now, now, actorId, actorId));
+                UserStatus.PENDING_ACTIVATION, UserRole.USER, now, now, actorId, actorId));
     }
 
     private static String requirePasswordHash(String value, UserStatus userStatus) {
@@ -101,7 +110,17 @@ public final class User {
             throw new IllegalStateException("Only pending users can be activated");
         }
         return new User(new UserData(id, publicCode, firstName, lastName, email, newPasswordHash,
-                UserStatus.ACTIVE, createdAt, now, createdBy, id));
+                UserStatus.ACTIVE, role, createdAt, now, createdBy, id));
+    }
+
+    public User delete(UUID actorId, Instant now) {
+        return new User(new UserData(id, publicCode, firstName, lastName, email, passwordHash,
+                UserStatus.DELETED, role, createdAt, now, createdBy, actorId));
+    }
+
+    public User withRole(UserRole newRole, UUID actorId, Instant now) {
+        return new User(new UserData(id, publicCode, firstName, lastName, email, passwordHash,
+                status, newRole, createdAt, now, createdBy, actorId));
     }
 
     public UUID getId() {
@@ -132,6 +151,10 @@ public final class User {
         return status;
     }
 
+    public UserRole getRole() {
+        return role;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -152,7 +175,13 @@ public final class User {
      * Complete state used only to restore a persisted domain entity.
      */
     public record UserData(UUID id, String publicCode, String firstName, String lastName,
-                           String email, String passwordHash, UserStatus status, Instant createdAt,
+                           String email, String passwordHash, UserStatus status, UserRole role, Instant createdAt,
                            Instant updatedAt, UUID createdBy, UUID updatedBy) {
+        public UserData(UUID id, String publicCode, String firstName, String lastName,
+                        String email, String passwordHash, UserStatus status, Instant createdAt,
+                        Instant updatedAt, UUID createdBy, UUID updatedBy) {
+            this(id, publicCode, firstName, lastName, email, passwordHash, status, UserRole.USER,
+                    createdAt, updatedAt, createdBy, updatedBy);
+        }
     }
 }

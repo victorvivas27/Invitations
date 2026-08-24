@@ -23,6 +23,6 @@ public class CurrentUserService implements CurrentUserUseCase {
         User user = repository.findByPublicCode(principal.code())
                 .orElseThrow(InvalidCredentialsException::new);
         return new PublicUser(user.getPublicCode(), user.getFirstName(), user.getLastName(),
-                user.getEmail(), user.getStatus());
+                user.getEmail(), user.getStatus(), user.getRole());
     }
 }

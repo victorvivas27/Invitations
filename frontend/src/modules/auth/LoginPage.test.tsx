@@ -50,4 +50,24 @@ describe('LoginPage', () => {
       screen.getByRole('textbox', { name: 'Correo electrónico' }),
     ).toHaveValue('user@example.com')
   })
+
+  it('allows showing and hiding the password', async () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    )
+    const password = screen.getByLabelText('Contraseña')
+    expect(password).toHaveAttribute('type', 'password')
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Mostrar contraseña' }),
+    )
+    expect(password).toHaveAttribute('type', 'text')
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Ocultar contraseña' }),
+    )
+    expect(password).toHaveAttribute('type', 'password')
+  })
 })

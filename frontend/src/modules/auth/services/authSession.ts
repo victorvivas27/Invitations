@@ -7,6 +7,8 @@ export type SessionUser = {
   firstName: string
   lastName: string
   email: string
+  status?: string
+  role?: 'USER' | 'ADMIN'
 }
 
 export class LoginError extends Error {

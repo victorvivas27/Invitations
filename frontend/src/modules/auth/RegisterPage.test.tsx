@@ -48,6 +48,26 @@ describe('RegisterPage', () => {
     )
     expect(fetchMock).not.toHaveBeenCalled()
   })
+  it('shows each password independently', async () => {
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>,
+    )
+    const password = screen.getByLabelText('Contraseña')
+    const confirmation = screen.getByLabelText('Confirmar contraseña')
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Mostrar contraseña' }),
+    )
+    expect(password).toHaveAttribute('type', 'text')
+    expect(confirmation).toHaveAttribute('type', 'password')
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Mostrar confirmar contraseña' }),
+    )
+    expect(confirmation).toHaveAttribute('type', 'text')
+  })
   it('shows an existing-account error without clearing the form', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(null, { status: 409 }),

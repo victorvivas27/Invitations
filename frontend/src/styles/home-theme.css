@@ -1,0 +1,99 @@
+/* Contraste semántico de la Home para temas claro y oscuro. */
+.redesigned-home,
+.home-hero,
+.redesigned-home .home-section,
+.redesigned-home .section-intro h2,
+.redesigned-home .personalization-section h2,
+.redesigned-home .guest-section h2,
+.redesigned-home .category-card > a,
+.redesigned-home .category-card h3,
+.redesigned-home .step-card h3,
+.redesigned-home .guest-feature-list strong,
+.redesigned-home .home-template-card h3,
+.redesigned-home .wizard-mock strong {
+  color: var(--theme-text);
+}
+
+.redesigned-home .hero-copy > p,
+.redesigned-home .section-intro p,
+.redesigned-home .personalization-section > div > p,
+.redesigned-home .guest-section > div > p,
+.redesigned-home .category-card p,
+.redesigned-home .step-card p,
+.redesigned-home .home-template-card p,
+.redesigned-home .wizard-mock > div > span,
+.redesigned-home .wizard-mock label {
+  color: var(--theme-muted);
+}
+
+.redesigned-home .eyebrow,
+.redesigned-home .category-card .category-icon,
+.redesigned-home .home-template-card > div > span,
+.redesigned-home .home-template-card a {
+  color: var(--theme-red);
+}
+
+.redesigned-home .category-card,
+.redesigned-home .step-card,
+.redesigned-home .guest-feature-list article,
+.redesigned-home .home-template-card,
+.redesigned-home .wizard-mock > div {
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+  background-color: var(--theme-surface-raised);
+}
+
+/* El blanco se reserva para superficies que permanecen oscuras en ambos temas. */
+.redesigned-home .responsive-section,
+.redesigned-home .responsive-section h2,
+.redesigned-home .responsive-section .eyebrow,
+.redesigned-home .responsive-section > .responsive-copy > p,
+.redesigned-home .device,
+.redesigned-home .final-cta,
+.redesigned-home .final-cta h2,
+.redesigned-home .wizard-mock .mini-live-preview,
+.redesigned-home .wizard-mock .mini-live-preview > span,
+.redesigned-home .wizard-mock .mini-live-preview strong,
+.redesigned-home .wizard-mock .mini-live-preview small,
+.redesigned-home .step-card > span {
+  color: var(--theme-on-accent);
+}
+
+.redesigned-home .responsive-section > .responsive-copy > p,
+.redesigned-home .final-cta p {
+  color: #e8effa;
+}
+
+/* Todos los elementos visibles cambian juntos al alternar el tema. */
+.redesigned-home,
+.redesigned-home .home-section,
+.redesigned-home .hero-copy,
+.redesigned-home .section-intro,
+.redesigned-home .category-card,
+.redesigned-home .step-card,
+.redesigned-home .guest-feature-list article,
+.redesigned-home .home-template-card,
+.redesigned-home .wizard-mock > div,
+.redesigned-home h1,
+.redesigned-home h2,
+.redesigned-home h3,
+.redesigned-home p,
+.redesigned-home strong,
+.redesigned-home small,
+.redesigned-home a,
+.redesigned-home label,
+.redesigned-home input,
+.redesigned-home .detail-pills span {
+  transition:
+    color 0.28s ease,
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redesigned-home,
+  .redesigned-home * {
+    transition-duration: 0.01ms !important;
+  }
+}

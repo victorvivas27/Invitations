@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 @Repository
 public class JpaUserRepository implements UserRepository {
@@ -55,5 +56,12 @@ public class JpaUserRepository implements UserRepository {
     @Override
     public boolean existsByPublicCode(String publicCode) {
         return repository.existsByPublicCode(publicCode.trim().toUpperCase(Locale.ROOT));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return repository.findAll(org.springframework.data.domain.Sort.by(
+                        org.springframework.data.domain.Sort.Direction.DESC, "createdAt"))
+                .stream().map(mapper::toDomain).toList();
     }
 }

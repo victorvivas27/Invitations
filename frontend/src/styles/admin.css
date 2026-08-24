@@ -1,0 +1,37 @@
+.admin-users-page {
+  min-height: calc(100vh - 72px);
+  padding-block: 48px 80px;
+  color: var(--theme-text);
+}
+.admin-users-heading h1 { margin: 12px 0 6px; font-size: clamp(2.2rem, 5vw, 4rem); }
+.admin-users-heading p { color: var(--theme-muted); }
+.admin-user-create {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin: 30px 0;
+  padding: 18px;
+  border: 1px solid var(--theme-border);
+  border-radius: 18px;
+  background: var(--theme-surface-raised);
+  box-shadow: 0 12px 32px var(--theme-shadow);
+}
+.admin-user-create label { display: grid; gap: 7px; color: var(--theme-text); font-size: .8rem; font-weight: 800; }
+.admin-user-create input { min-height: 48px; padding: 0 13px; border: 1px solid var(--theme-border); border-radius: 11px; color: var(--theme-text); background: var(--theme-surface); font: inherit; }
+.admin-users-error { color: var(--theme-danger); }
+.admin-users-table-wrap { overflow-x: auto; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface-raised); }
+.admin-users-table { width: 100%; border-collapse: collapse; }
+.admin-users-table th, .admin-users-table td { padding: 14px 16px; border-bottom: 1px solid var(--theme-border); text-align: left; }
+.admin-users-table th { color: var(--theme-muted); background: var(--theme-surface-soft); font-size: .75rem; text-transform: uppercase; }
+.admin-users-table td { color: var(--theme-text); font-size: .84rem; }
+.admin-users-table td:first-child { display: grid; gap: 3px; }
+.admin-users-table td small { color: var(--theme-muted); }
+.admin-badge { display: inline-flex; padding: 5px 8px; border-radius: 8px; color: var(--theme-muted); background: var(--theme-surface-soft); font-size: .68rem; font-weight: 850; }
+.admin-badge.role-admin { color: var(--theme-red); background: color-mix(in srgb, var(--theme-red) 12%, var(--theme-surface)); }
+.admin-delete { min-height: 36px; padding: 0 11px; border: 1px solid var(--theme-border); border-radius: 9px; color: var(--theme-danger); background: var(--theme-surface); font-weight: 750; cursor: pointer; }
+.admin-delete:disabled { opacity: .42; cursor: not-allowed; }
+@media (max-width: 760px) {
+  .admin-user-create { grid-template-columns: 1fr; }
+  .admin-user-create .primary-cta { width: 100%; }
+}

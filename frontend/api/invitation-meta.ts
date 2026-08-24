@@ -120,7 +120,7 @@ export default async function invitationMetadata(request: Request) {
   const requestedVersion = safeVersion(requestUrl.searchParams.get('v'))
   const origin = requestUrl.origin
   const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, '')
-  const fallbackImage = `${origin}/images/love-letter-icon.png`
+  const fallbackImage = `${origin}/images/icon-invitacion-favicon.png`
 
   if (!slug) {
     return new Response(
