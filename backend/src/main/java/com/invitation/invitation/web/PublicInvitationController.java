@@ -57,9 +57,11 @@ public class PublicInvitationController {
     @GetMapping("/{slug}/metadata")
     public PublicInvitationMetadata metadata(@PathVariable String slug) {
         PublicInvitation invitation = useCase.get(slug);
+        String metadataVersion = Long.toString(invitation.updatedAt().toEpochMilli());
         return new PublicInvitationMetadata(invitation.publicSlug(), invitation.shareTitle(),
                 invitation.shareDescription(), publicImageUrl(invitation.shareImageUrl()),
-                frontendUrl + "/i/" + encodedSlug(slug));
+                frontendUrl + "/i/" + encodedSlug(slug) + "?v=" + metadataVersion,
+                metadataVersion);
     }
 
     @GetMapping(value = "/{slug}/share", produces = MediaType.TEXT_HTML_VALUE)

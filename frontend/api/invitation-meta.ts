@@ -11,6 +11,7 @@ type Metadata = {
   shareImageUrl?: string
   heroImageUrl?: string
   publicUrl?: string
+  metadataVersion?: string
 }
 
 const FALLBACK_TITLE = 'Estás invitado'
@@ -18,6 +19,9 @@ const FALLBACK_DESCRIPTION = 'Acompáñanos a celebrar un momento muy especial.'
 
 const SOCIAL_BOT =
   /facebookexternalhit|facebot|whatsapp|twitterbot|linkedinbot|telegrambot|discordbot|slackbot/i
+
+const safeVersion = (value: string | null | undefined) =>
+  value && /^[a-zA-Z0-9_-]{1,64}$/.test(value) ? value : ''
 
 const escapeHtml = (value: string) =>
   value
@@ -113,6 +117,7 @@ export default async function invitationMetadata(request: Request) {
   const requestUrl = new URL(request.url)
 
   const slug = requestUrl.searchParams.get('slug')?.trim()
+  const requestedVersion = safeVersion(requestUrl.searchParams.get('v'))
   const origin = requestUrl.origin
   const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, '')
   const fallbackImage = `${origin}/images/love-letter-icon.png`
@@ -136,8 +141,14 @@ export default async function invitationMetadata(request: Request) {
     )
   }
 
-  const publicUrl = `${origin}/i/${encodeURIComponent(slug)}`
-  const appUrl = `${origin}/view/${encodeURIComponent(slug)}`
+  let publicUrl = `${origin}/i/${encodeURIComponent(slug)}`
+  let appUrl = `${origin}/view/${encodeURIComponent(slug)}`
+
+  if (requestedVersion) {
+    const versionQuery = `?v=${encodeURIComponent(requestedVersion)}`
+    publicUrl += versionQuery
+    appUrl += versionQuery
+  }
 
   const userAgent = request.headers.get('user-agent') ?? ''
   const isSocialBot = SOCIAL_BOT.test(userAgent)
@@ -181,6 +192,13 @@ export default async function invitationMetadata(request: Request) {
       )
     } else {
       metadata = (await upstream.json()) as Metadata
+
+      if (!requestedVersion) {
+        const currentVersion = safeVersion(metadata.metadataVersion)
+        if (currentVersion) {
+          publicUrl += `?v=${encodeURIComponent(currentVersion)}`
+        }
+      }
     }
   } catch (error) {
     console.error('Could not load invitation metadata', error)

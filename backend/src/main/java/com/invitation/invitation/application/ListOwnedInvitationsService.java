@@ -26,11 +26,15 @@ public class ListOwnedInvitationsService implements ListOwnedInvitationsUseCase 
         User owner = users.findByPublicCode(principal.code())
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User not found"));
         return invitations.findAllByOwnerId(owner.getId()).stream()
-                .map(invitation -> new OwnedInvitation(invitation.publicSlug(),
-                        "/i/" + invitation.publicSlug(), invitation.templateId(), invitation.eventType(),
+                .map(invitation -> {
+                    String metadataVersion = Long.toString(invitation.updatedAt().toEpochMilli());
+                    return new OwnedInvitation(invitation.publicSlug(),
+                        "/i/" + invitation.publicSlug() + "?v=" + metadataVersion,
+                        invitation.templateId(), invitation.eventType(),
                         invitation.eventName(), invitation.honoreeName(), invitation.eventDate(),
                         invitation.eventTime(), invitation.venueName(), invitation.status(),
-                        invitation.createdAt()))
+                        invitation.createdAt(), metadataVersion);
+                })
                 .toList();
     }
 }

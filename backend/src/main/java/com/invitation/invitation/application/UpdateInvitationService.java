@@ -68,12 +68,14 @@ public class UpdateInvitationService implements UpdateInvitationUseCase {
         );
 
         Invitation saved = invitations.save(updated);
+        String metadataVersion = Long.toString(saved.updatedAt().toEpochMilli());
 
         return new UpdatedInvitation(
                 saved.publicSlug(),
-                "/i/" + saved.publicSlug(),
+                "/i/" + saved.publicSlug() + "?v=" + metadataVersion,
                 saved.status(),
-                saved.eventName()
+                saved.eventName(),
+                metadataVersion
         );
     }
 }
