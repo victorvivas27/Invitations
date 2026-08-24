@@ -18,6 +18,8 @@ import java.util.UUID;
 
 @Component
 public class AdminBootstrap implements ApplicationRunner {
+    private static final int MINIMUM_ADMIN_PASSWORD_LENGTH = 12;
+
     private final UserRepository users;
     private final PasswordHasher passwords;
     private final PublicUserCodeGenerator codes;
@@ -51,7 +53,7 @@ public class AdminBootstrap implements ApplicationRunner {
             return;
         }
         if (initialPassword.isBlank()) return;
-        if (initialPassword.length() < 12) {
+        if (initialPassword.length() < MINIMUM_ADMIN_PASSWORD_LENGTH) {
             throw new IllegalStateException(
                     "ADMIN_INITIAL_PASSWORD must contain at least 12 characters");
         }
