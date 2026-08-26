@@ -17,7 +17,7 @@ public class ListPublicInvitationGuestsService {
 
     public List<PublicInvitationGuest> list(String publicSlug) {
         var invitation = invitations.findByPublicSlug(publicSlug)
-                .filter(value -> value.status().name().equals("PUBLISHED"))
+                .filter(value -> "PUBLISHED".equals(value.status().name()))
                 .orElseThrow(InvitationNotFoundException::new);
 
         return rsvps.findAllByInvitationId(invitation.id()).stream()
