@@ -84,7 +84,9 @@ describe('PublicInvitationRenderer animations', () => {
       'group',
       'group',
       'group',
+      'group',
       'media',
+      'group',
       'group',
     ])
     // Ninguna sección completa se anima como bloque: eso movería su propio fondo

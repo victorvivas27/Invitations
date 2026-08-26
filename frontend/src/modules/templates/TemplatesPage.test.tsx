@@ -8,19 +8,23 @@ describe('TemplatesPage', () => {
   )
   afterEach(() => window.localStorage.clear())
 
-  it('offers one clear starting point without demo template cards', () => {
+  it('offers a ready birthday template and the customizable base', () => {
     render(
       <MemoryRouter>
         <TemplatesPage />
       </MemoryRouter>,
     )
     expect(
-      screen.getByRole('heading', { name: 'Crea una invitación especial' }),
+      screen.getByRole('heading', { name: 'Plantillas para tu celebración' }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Empezar' })).toHaveAttribute(
+    expect(
+      screen.getByRole('link', { name: 'Usar esta plantilla' }),
+    ).toHaveAttribute(
       'href',
-      '/invitations/create?template=birthday-urban',
+      '/invitations/create?template=birthday-heroes-ready',
     )
-    expect(screen.queryByText('Cumpleaños urbano')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Comenzar desde la base' }),
+    ).toHaveAttribute('href', '/invitations/create?template=birthday-urban')
   })
 })

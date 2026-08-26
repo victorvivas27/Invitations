@@ -195,6 +195,21 @@ export async function getPublicInvitation(
   )
   return invitation
 }
+
+export type PublicInvitationGuest = {
+  name: string
+  message: string
+}
+
+export async function getPublicInvitationGuests(
+  publicSlug: string,
+): Promise<PublicInvitationGuest[]> {
+  const response = await request(
+    `${apiBaseUrl}/api/public/invitations/${encodeURIComponent(publicSlug)}/rsvps`,
+  )
+  if (!response.ok) throw await parseError(response)
+  return response.json() as Promise<PublicInvitationGuest[]>
+}
 export async function getMyInvitations(): Promise<OwnedInvitation[]> {
   const token = getAccessToken()
   const response = await request(`${apiBaseUrl}/api/invitations`, {

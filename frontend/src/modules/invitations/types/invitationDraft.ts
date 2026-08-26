@@ -13,6 +13,9 @@ export type SectionBackground = {
   titleFontSize: number
   farewellText: string
   farewellTitle: string
+  surpriseTitle: string
+  surpriseMessage: string
+  favoriteThings: string[]
   customized: boolean
   type: 'solid' | 'gradient' | 'image'
   solidColor: string
@@ -63,6 +66,14 @@ export const defaultSectionBackground = (): SectionBackground => ({
   titleFontSize: 34,
   farewellText: 'Gracias por acompañarnos en este día tan especial.',
   farewellTitle: '¡Te esperamos!',
+  surpriseTitle: '¿Quieres saber más sobre mí?',
+  surpriseMessage: 'Tu presencia es nuestro mejor regalo 🎁',
+  favoriteThings: [
+    '🦸 Superhéroes',
+    '🎮 Juegos',
+    '🎨 Dibujar y crear',
+    '🚀 Aventuras',
+  ],
   customized: false,
   type: 'solid',
   solidColor: '#ffffff',

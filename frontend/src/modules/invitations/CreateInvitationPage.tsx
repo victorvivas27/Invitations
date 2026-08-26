@@ -27,10 +27,46 @@ import type {
   InvitationEventType,
 } from './types/invitation'
 import {
+  defaultSectionBackgrounds,
   emptyInvitationDraft,
   normalizeSectionBackgrounds,
   type InvitationDraft,
 } from './types/invitationDraft'
+
+const initialDraftForTemplate = (
+  templateId: string | null,
+): InvitationDraft => {
+  if (templateId !== 'birthday-heroes-ready') return emptyInvitationDraft
+
+  const sectionBackgrounds = defaultSectionBackgrounds()
+  sectionBackgrounds.basic.introText =
+    '¡Prepárate para una celebración increíble!'
+  sectionBackgrounds.basic.coverDescription = 'Cumplo años'
+  sectionBackgrounds.summary.farewellTitle = '¡Te espero para esta aventura!'
+  sectionBackgrounds.summary.farewellText =
+    'Gracias por ser parte de mi equipo en este día tan especial.'
+  sectionBackgrounds.summary.surpriseTitle = '¿Quieres saber más sobre mí?'
+  sectionBackgrounds.summary.surpriseMessage =
+    'Tu presencia es mi mejor regalo 🎁'
+  sectionBackgrounds.summary.favoriteThings = [
+    '🦸 Superhéroes',
+    '🎮 Juegos',
+    '🎨 Dibujar y crear',
+    '🚀 Aventuras',
+  ]
+
+  return {
+    ...emptyInvitationDraft,
+    eventType: 'Cumpleaños',
+    eventName: 'Mi cumpleaños',
+    message:
+      'Los grandes momentos se disfrutan más cuando los compartimos con personas especiales como tú.',
+    sectionBackgrounds,
+    shareTitle: '¡Estás invitado a mi cumpleaños!',
+    shareDescription:
+      'Acompáñame en una celebración llena de aventuras, juegos y sorpresas.',
+  }
+}
 
 const eventTypes: Record<string, InvitationEventType> = {
   Cumpleaños: 'BIRTHDAY',
@@ -70,7 +106,9 @@ export function CreateInvitationPage() {
   const [invitationId, setInvitationId] = useState<string>(() =>
     createDraftInvitationId(),
   )
-  const [draft, setDraft] = useState<InvitationDraft>(emptyInvitationDraft)
+  const [draft, setDraft] = useState<InvitationDraft>(() =>
+    initialDraftForTemplate(selectedTemplateId),
+  )
   const [loading, setLoading] = useState(editing)
   const [loadError, setLoadError] = useState('')
   const [submitting, setSubmitting] = useState(false)
