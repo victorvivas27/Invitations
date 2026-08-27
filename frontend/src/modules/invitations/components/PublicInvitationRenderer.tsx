@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { confirmAttendance, InvitationApiError } from '../services/invitations'
+import {
+  confirmAttendance,
+  getPublicInvitationGuests,
+  InvitationApiError,
+  type PublicInvitationGuest,
+} from '../services/invitations'
 import type { PublicInvitation } from '../types/invitation'
 import { SectionBackground } from './SectionBackground'
 import { InvitationFooter } from './InvitationFooter'
@@ -62,9 +67,11 @@ const countdown = (date: string, time: string) => {
 function RsvpForm({
   publicSlug,
   preview = false,
+  onConfirmed,
 }: {
   publicSlug: string
   preview?: boolean
+  onConfirmed?: () => void
 }) {
   const [form, setForm] = useState({
     firstName: '',
@@ -92,6 +99,7 @@ function RsvpForm({
         guestCount: form.attending ? Number(form.guestCount) : 1,
       })
       setState('sent')
+      onConfirmed?.()
     } catch (failure) {
       setState('error')
       setError(
@@ -232,6 +240,8 @@ export function PublicInvitationRenderer({
   const CoverHeading = preview ? 'h2' : 'h1'
   const experienceRef = useRef<HTMLDivElement>(null)
   const [activeChapter, setActiveChapter] = useState('portada')
+  const [guests, setGuests] = useState<PublicInvitationGuest[]>([])
+  const [surpriseOpen, setSurpriseOpen] = useState(false)
   const viewMode = selectedViewMode ?? 'scroll'
 
   // Memoizar el cálculo del countdown
@@ -241,6 +251,19 @@ export function PublicInvitationRenderer({
   )
 
   const [remaining, setRemaining] = useState(initialRemaining)
+
+  const loadGuests = useCallback(async () => {
+    if (preview) return
+    try {
+      setGuests(await getPublicInvitationGuests(invitation.publicSlug))
+    } catch {
+      // La invitacion sigue siendo util aunque la lista no este disponible.
+    }
+  }, [invitation.publicSlug, preview])
+
+  useEffect(() => {
+    void loadGuests()
+  }, [loadGuests])
 
   // Actualizar countdown de forma segura
   useEffect(() => {
@@ -394,7 +417,9 @@ export function PublicInvitationRenderer({
       ...(invitation.galleryImageUrls?.length
         ? [{ id: 'fotos', label: 'Fotos' }]
         : []),
+      { id: 'sorpresa', label: 'Sorpresa' },
       { id: 'final', label: 'Final' },
+      { id: 'invitados', label: 'Invitados' },
     ],
     [invitation.galleryImageUrls],
   )
@@ -563,7 +588,11 @@ export function PublicInvitationRenderer({
         >
           <span className="experience-number">04</span>
           <h2>Confirma tu presencia</h2>
-          <RsvpForm publicSlug={invitation.publicSlug} preview={preview} />
+          <RsvpForm
+            publicSlug={invitation.publicSlug}
+            preview={preview}
+            onConfirmed={loadGuests}
+          />
         </SectionBackground>
 
         {/* Fotos Section */}
@@ -602,6 +631,73 @@ export function PublicInvitationRenderer({
           </SectionBackground>
         )}
 
+        <section
+          id="sorpresa"
+          className={`experience-surprise experience-chapter${surpriseOpen ? ' is-open' : ''}`}
+          aria-labelledby="surprise-title"
+        >
+          <div className="surprise-confetti" aria-hidden="true">
+            {Array.from({ length: 20 }, (_, index) => (
+              <i key={index} />
+            ))}
+          </div>
+          <div className="experience-surprise-copy" data-reveal="group">
+            <span className="experience-number">06</span>
+            <h2 id="surprise-title">
+              {surpriseOpen
+                ? '¡Estas son mis cosas favoritas!'
+                : invitation.sectionBackgrounds?.summary?.surpriseTitle ||
+                  '¿Quieres saber más sobre mí?'}
+            </h2>
+            <button
+              type="button"
+              className="surprise-balloon"
+              aria-label={
+                surpriseOpen
+                  ? 'Volver a inflar el globo sorpresa'
+                  : 'Explotar el globo sorpresa'
+              }
+              aria-expanded={surpriseOpen}
+              onClick={() => setSurpriseOpen((open) => !open)}
+            >
+              <span aria-hidden="true">{surpriseOpen ? '✨' : '♥'}</span>
+            </button>
+            <div className="surprise-message" aria-live="polite">
+              {surpriseOpen && (
+                <div>
+                  <p>
+                    {invitation.sectionBackgrounds?.summary?.surpriseMessage ||
+                      'Tu presencia es nuestro mejor regalo 🎁'}
+                  </p>
+                  <strong>Pero si buscas una pista, me gustan...</strong>
+                  <ul aria-label="Ideas para un regalo">
+                    {(invitation.sectionBackgrounds?.summary?.favoriteThings?.filter(
+                      (favorite) => favorite.trim(),
+                    ).length
+                      ? invitation.sectionBackgrounds.summary.favoriteThings
+                          .map((favorite) => favorite.trim())
+                          .filter(Boolean)
+                      : [
+                          '🦸 Superhéroes',
+                          '🎮 Juegos',
+                          '🎨 Dibujar y crear',
+                          '🚀 Aventuras',
+                        ]
+                    ).map((favorite, index) => (
+                      <li key={`${favorite}-${index}`}>{favorite}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <small>
+              {surpriseOpen
+                ? 'Tócalo otra vez para volver a inflarlo'
+                : 'Toca el globo para descubrirlo'}
+            </small>
+          </div>
+        </section>
+
         {/* Final Section */}
         <SectionBackground
           id="final"
@@ -623,7 +719,7 @@ export function PublicInvitationRenderer({
               </div>
             )}
           <div className="experience-farewell-copy" data-reveal="group">
-            <span className="experience-number">06</span>
+            <span className="experience-number">07</span>
             <p>
               {invitation.sectionBackgrounds?.summary?.farewellText ||
                 'Gracias por acompañarnos en este día tan especial.'}
@@ -635,6 +731,45 @@ export function PublicInvitationRenderer({
             <span>✦</span>
           </div>
         </SectionBackground>
+
+        <section
+          id="invitados"
+          className="experience-guests experience-chapter"
+          aria-labelledby="invited-guests-title"
+        >
+          <div className="guest-balloons" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, index) => (
+              <i key={index} />
+            ))}
+          </div>
+          <div className="guest-confetti" aria-hidden="true">
+            {Array.from({ length: 24 }, (_, index) => (
+              <i key={index} />
+            ))}
+          </div>
+          <div className="experience-guests-copy" data-reveal="group">
+            <span className="experience-number">08</span>
+            <p className="experience-guests-kicker">La fiesta ya comienza</p>
+            <h2 id="invited-guests-title">Ellos ya dijeron que sí</h2>
+            {guests.length ? (
+              <div className="experience-guests-grid">
+                {guests.map((guest, index) => (
+                  <article key={`${guest.name}-${index}`}>
+                    <span aria-hidden="true">♥</span>
+                    <h3>{guest.name}</h3>
+                    <p>
+                      {guest.message?.trim() || '¡Nos vemos en la celebración!'}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="experience-guests-empty">
+                Sé el primero en confirmar y dejar un mensaje especial.
+              </p>
+            )}
+          </div>
+        </section>
       </div>
 
       <InvitationFooter contact={invitation.contactInfo} />

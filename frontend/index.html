@@ -144,10 +144,11 @@
       }
 
       .boot-loader__envelope {
-        width: 2.9rem;
-        height: 2.9rem;
-        color: #ef3340;
-        filter: drop-shadow(0 0.35rem 0.55rem rgba(239, 51, 64, 0.38));
+        display: block;
+        width: 4.35rem;
+        height: 4.35rem;
+        object-fit: contain;
+        filter: drop-shadow(0 0.45rem 0.7rem rgba(239, 51, 64, 0.28));
       }
 
       .boot-loader__title {
@@ -227,26 +228,11 @@
       >
         <div class="boot-loader__content">
           <div class="boot-loader__mark" aria-hidden="true">
-            <svg class="boot-loader__envelope" viewBox="0 0 48 48" fill="none">
-              <path
-                d="M7 14.5A3.5 3.5 0 0 1 10.5 11h27a3.5 3.5 0 0 1 3.5 3.5v19a3.5 3.5 0 0 1-3.5 3.5h-27A3.5 3.5 0 0 1 7 33.5v-19Z"
-                stroke="currentColor"
-                stroke-width="2.6"
-              />
-              <path
-                d="m9 14 12.7 10.1a3.7 3.7 0 0 0 4.6 0L39 14M9 34l10.1-9M39 34l-10.1-9"
-                stroke="currentColor"
-                stroke-width="2.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M33.5 7.5v5M31 10h5"
-                stroke="#195baa"
-                stroke-width="2.4"
-                stroke-linecap="round"
-              />
-            </svg>
+            <img
+              class="boot-loader__envelope"
+              src="/images/icon-invitacion.png"
+              alt=""
+            />
           </div>
           <p class="boot-loader__title">Mi Invitación</p>
           <p class="boot-loader__status">Preparando algo especial</p>

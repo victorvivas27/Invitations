@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Component
 public class InvitationTemplateCatalog {
-    private static final Set<String> AVAILABLE = Set.of("birthday-urban", "birthday-colorful",
+    private static final Set<String> AVAILABLE = Set.of("birthday-heroes-ready", "birthday-urban", "birthday-colorful",
             "baptism-sky", "baptism-classic", "wedding-elegant", "wedding-minimal",
             "baby-shower-modern", "kids-heroes", "kids-adventure", "graduation-modern");
     private static final Set<String> UPCOMING = Set.of("anniversary-night", "blank-canvas");

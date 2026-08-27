@@ -4,6 +4,27 @@ import { PublicInvitationRenderer } from './components/PublicInvitationRenderer'
 import { getPublicInvitation, InvitationApiError } from './services/invitations'
 import type { PublicInvitation } from './types/invitation'
 type State = 'loading' | 'ready' | 'not-found' | 'network' | 'unexpected'
+
+const prepareCoverImage = async (invitation: PublicInvitation) => {
+  const basicBackground = invitation.sectionBackgrounds?.basic
+  const imageUrl =
+    basicBackground?.customized && basicBackground.type === 'image'
+      ? basicBackground.imageUrl
+      : invitation.heroImageUrl
+
+  if (!imageUrl) return
+
+  const image = new Image()
+  image.src = imageUrl
+  if (typeof image.decode !== 'function') return
+
+  // Una imagen lenta no debe dejar al invitado atrapado en el loader.
+  await Promise.race([
+    image.decode().catch(() => undefined),
+    new Promise<void>((resolve) => window.setTimeout(resolve, 4500)),
+  ])
+}
+
 export function PublicInvitationPage() {
   const { slug = '' } = useParams()
   const location = useLocation()
@@ -24,8 +45,12 @@ export function PublicInvitationPage() {
   useEffect(() => {
     let active = true
     setState('loading')
+    const minimumLoaderTime = new Promise<void>((resolve) =>
+      window.setTimeout(resolve, 700),
+    )
     getPublicInvitation(slug)
-      .then((value) => {
+      .then(async (value) => {
+        await Promise.all([prepareCoverImage(value), minimumLoaderTime])
         if (!active) return
         setInvitation(value)
         setState('ready')
@@ -58,9 +83,24 @@ export function PublicInvitationPage() {
     )
   if (state === 'loading')
     return (
-      <main className="public-state" aria-live="polite">
-        <span className="loader" />
-        <h1>Cargando invitación...</h1>
+      <main
+        className="boot-loader"
+        aria-busy="true"
+        aria-live="polite"
+        aria-label="Cargando Mi Invitación"
+      >
+        <div className="boot-loader__content">
+          <div className="boot-loader__mark" aria-hidden="true">
+            <img
+              className="boot-loader__envelope"
+              src="/images/icon-invitacion.png"
+              alt=""
+            />
+          </div>
+          <h1 className="boot-loader__title">Cargando invitación...</h1>
+          <p className="boot-loader__status">Preparando algo especial</p>
+          <div className="boot-loader__progress" aria-hidden="true" />
+        </div>
       </main>
     )
   if (state === 'not-found')

@@ -94,30 +94,11 @@ function RouteFallback() {
     >
       <div className="boot-loader__content">
         <div className="boot-loader__mark" aria-hidden="true">
-          <svg
+          <img
             className="boot-loader__envelope"
-            viewBox="0 0 48 48"
-            fill="none"
-          >
-            <path
-              d="M7 14.5A3.5 3.5 0 0 1 10.5 11h27a3.5 3.5 0 0 1 3.5 3.5v19a3.5 3.5 0 0 1-3.5 3.5h-27A3.5 3.5 0 0 1 7 33.5v-19Z"
-              stroke="currentColor"
-              strokeWidth="2.6"
-            />
-            <path
-              d="m9 14 12.7 10.1a3.7 3.7 0 0 0 4.6 0L39 14M9 34l10.1-9M39 34l-10.1-9"
-              stroke="currentColor"
-              strokeWidth="2.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M33.5 7.5v5M31 10h5"
-              stroke="#195baa"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-          </svg>
+            src="/images/icon-invitacion.png"
+            alt=""
+          />
         </div>
         <p className="boot-loader__title">Mi Invitación</p>
         <p className="boot-loader__status">Preparando algo especial</p>

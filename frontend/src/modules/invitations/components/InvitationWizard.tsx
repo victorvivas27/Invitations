@@ -537,6 +537,74 @@ export function InvitationWizard({
                 Revisa la información antes de continuar en una próxima etapa.
               </p>
             </div>
+            <fieldset className="contact-editor surprise-editor">
+              <legend>Globo de gustos y regalos</legend>
+              <p>
+                Personaliza la sorpresa que aparece al explotar el globo. Los
+                gustos sirven como pistas opcionales para elegir un regalo.
+              </p>
+              <label>
+                Pregunta antes de explotar el globo
+                <input
+                  maxLength={80}
+                  value={draft.sectionBackgrounds.summary.surpriseTitle}
+                  placeholder="¿Quieres saber más sobre mí?"
+                  onChange={(event) =>
+                    update('sectionBackgrounds', {
+                      ...draft.sectionBackgrounds,
+                      summary: {
+                        ...draft.sectionBackgrounds.summary,
+                        surpriseTitle: event.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Mensaje al explotar
+                <textarea
+                  rows={2}
+                  maxLength={140}
+                  value={draft.sectionBackgrounds.summary.surpriseMessage}
+                  placeholder="Tu presencia es nuestro mejor regalo 🎁"
+                  onChange={(event) =>
+                    update('sectionBackgrounds', {
+                      ...draft.sectionBackgrounds,
+                      summary: {
+                        ...draft.sectionBackgrounds.summary,
+                        surpriseMessage: event.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Cosas que me gustan (una por línea, máximo 8)
+                <textarea
+                  rows={6}
+                  maxLength={320}
+                  value={draft.sectionBackgrounds.summary.favoriteThings.join(
+                    '\n',
+                  )}
+                  placeholder={'🦸 Superhéroes\n🎮 Juegos\n🎨 Dibujar y crear'}
+                  onChange={(event) =>
+                    update('sectionBackgrounds', {
+                      ...draft.sectionBackgrounds,
+                      summary: {
+                        ...draft.sectionBackgrounds.summary,
+                        favoriteThings: event.target.value
+                          .split('\n')
+                          .slice(0, 8),
+                      },
+                    })
+                  }
+                />
+                <small>
+                  Puedes usar emojis. Cada línea saldrá del globo como una
+                  tarjeta independiente.
+                </small>
+              </label>
+            </fieldset>
             <dl className="wizard-summary">
               <div>
                 <dt>Evento</dt>

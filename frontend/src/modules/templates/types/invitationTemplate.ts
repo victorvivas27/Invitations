@@ -20,4 +20,5 @@ export type InvitationTemplate = {
   previewVariant: string
   isFeatured?: boolean
   isAvailable: boolean
+  preset?: 'birthday-heroes'
 }

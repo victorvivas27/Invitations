@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PublicInvitationPage } from './PublicInvitationPage'
@@ -101,6 +101,12 @@ describe('PublicInvitationPage', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
+      .mockResolvedValue(
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
     renderPage()
     await userEvent.click(
       await screen.findByRole('button', { name: 'Reintentar' }),
@@ -108,6 +114,6 @@ describe('PublicInvitationPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Sofía' }),
     ).toBeInTheDocument()
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3))
   })
 })

@@ -24,6 +24,18 @@ export const styleLabels: Record<InvitationTemplateStyle, string> = {
 }
 export const invitationTemplates: InvitationTemplate[] = [
   {
+    id: 'birthday-heroes-ready',
+    name: 'Cumpleaños de héroes',
+    description:
+      'Una invitación de cumpleaños lista para usar, con globos, confites, confirmación, regalos y energía de superhéroes.',
+    category: 'birthday',
+    style: 'playful',
+    previewVariant: 'heroes',
+    isFeatured: true,
+    isAvailable: true,
+    preset: 'birthday-heroes',
+  },
+  {
     id: 'birthday-urban',
     name: 'Cumpleaños urbano',
     description:
