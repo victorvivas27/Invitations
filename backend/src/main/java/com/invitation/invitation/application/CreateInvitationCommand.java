@@ -14,5 +14,6 @@ public record CreateInvitationCommand(UUID invitationId, String templateId, Invi
                                       String venueName, String address, String mapsUrl, String heroImageUrl,
                                       List<String> galleryImageUrls, String message, String sectionBackgrounds,
                                       String contactInfo,
-                                      String shareTitle, String shareDescription, String shareImageUrl) {
+                                      String shareTitle, String shareDescription, String shareImageUrl,
+                                      boolean dateChangeNoticeEnabled) {
 }

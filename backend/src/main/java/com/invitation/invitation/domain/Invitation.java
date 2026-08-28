@@ -14,6 +14,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
                          String mapsUrl, String heroImageUrl, List<String> galleryImageUrls, String message,
                          String sectionBackgrounds, String contactInfo,
                          String shareTitle, String shareDescription, String shareImageUrl,
+                         boolean dateChangeNoticeEnabled,
                          InvitationStatus status, Instant createdAt, Instant updatedAt) {
 
     private static final String UPLOAD_PATH_PREFIX = "/uploads/";
@@ -71,6 +72,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
             String shareTitle,
             String shareDescription,
             String shareImageUrl,
+            boolean dateChangeNoticeEnabled,
             Instant updatedAt
     ) {
         return new Invitation(
@@ -96,6 +98,7 @@ public record Invitation(UUID id, String publicSlug, UUID ownerId, String templa
                 shareTitle,
                 shareDescription,
                 shareImageUrl,
+                dateChangeNoticeEnabled,
                 status,
                 createdAt,
                 updatedAt

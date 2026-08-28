@@ -47,7 +47,7 @@ public class InvitationController {
                 request.eventType(), request.eventName(), request.honoreeName(), request.honoreeAge(),
                 request.eventDate(), request.eventTime(), request.venueName(), request.address(),
                 request.mapsUrl(), request.heroImageUrl(), request.galleryImageUrls(), request.message(), request.sectionBackgrounds(), request.contactInfo(),
-                request.shareTitle(), request.shareDescription(), request.shareImageUrl()), user);
+                request.shareTitle(), request.shareDescription(), request.shareImageUrl(), Boolean.TRUE.equals(request.dateChangeNoticeEnabled())), user);
         return ResponseEntity.created(URI.create("/api/public/invitations/" + result.publicSlug())).body(result);
     }
 

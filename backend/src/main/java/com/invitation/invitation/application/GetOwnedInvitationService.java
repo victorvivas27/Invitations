@@ -43,6 +43,7 @@ public class GetOwnedInvitationService implements GetOwnedInvitationUseCase {
                 invitation.shareTitle(),
                 invitation.shareDescription(),
                 invitation.shareImageUrl(),
+                invitation.dateChangeNoticeEnabled(),
                 invitation.status(),
                 invitation.createdAt(),
                 invitation.updatedAt()

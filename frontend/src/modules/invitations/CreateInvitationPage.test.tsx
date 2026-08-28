@@ -160,6 +160,11 @@ describe('CreateInvitationPage', () => {
     await userEvent.type(screen.getByLabelText('Fecha'), '2027-08-22')
     await userEvent.selectOptions(screen.getByLabelText('Hora'), '17')
     await userEvent.selectOptions(screen.getByLabelText('Minutos'), '00')
+    await userEvent.click(
+      screen.getByRole('checkbox', {
+        name: /Avisar que cambió la fecha del evento/i,
+      }),
+    )
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Nombre del lugar' }),
       'Salón Central',
@@ -244,6 +249,7 @@ describe('CreateInvitationPage', () => {
         message: 'Te esperamos para celebrar.',
         shareTitle: 'Cumpleaños de Sofía',
         shareDescription: 'Acompáñanos a celebrar este día especial.',
+        dateChangeNoticeEnabled: true,
       }),
     )
     expect(

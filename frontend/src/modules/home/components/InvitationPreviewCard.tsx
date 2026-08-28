@@ -38,6 +38,7 @@ const example: InvitationDraft = {
   shareTitle: 'Cumpleaños de Emilia',
   shareDescription: 'Acompáñanos a celebrar',
   shareImageUrl: '',
+  dateChangeNoticeEnabled: false,
 }
 
 export function InvitationPreviewCard() {

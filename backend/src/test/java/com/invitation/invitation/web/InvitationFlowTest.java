@@ -77,6 +77,7 @@ class InvitationFlowTest {
         mockMvc.perform(get("/api/public/invitations/" + slug))
                 .andExpectAll(status().isOk(), jsonPath("$.templateId").value("birthday-urban"),
                         jsonPath("$.honoreeName").value("Sofía"),
+                        jsonPath("$.dateChangeNoticeEnabled").value(false),
                         jsonPath("$").value(not(hasKey("id"))),
                         jsonPath("$").value(not(hasKey("ownerId"))),
                         jsonPath("$").value(not(hasKey("status"))));
@@ -90,6 +91,46 @@ class InvitationFlowTest {
                                 "http://localhost:5173/i/" + slug + "\\?v=[0-9]+")),
                         jsonPath("$.metadataVersion").value(org.hamcrest.Matchers.matchesPattern("[0-9]+")),
                         jsonPath("$").value(not(hasKey("ownerId"))));
+    }
+
+    @Test
+    void exposesEnabledDateChangeNoticeAndUpdatesAnExistingRsvp() throws Exception {
+        String enabledBody = validBody().replace(
+                "\"shareImageUrl\":\"uploads/share.jpg\"",
+                "\"shareImageUrl\":\"uploads/share.jpg\",\"dateChangeNoticeEnabled\":true");
+        MvcResult creation = mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
+                        .contentType(MediaType.APPLICATION_JSON).content(enabledBody))
+                .andExpect(status().isCreated()).andReturn();
+        String slug = objectMapper.readTree(creation.getResponse().getContentAsString())
+                .get("publicSlug").asText();
+
+        mockMvc.perform(get("/api/invitations/" + slug).header(AUTHORIZATION, BEARER + token))
+                .andExpectAll(status().isOk(), jsonPath("$.dateChangeNoticeEnabled").value(true));
+        mockMvc.perform(get("/api/public/invitations/" + slug))
+                .andExpectAll(status().isOk(), jsonPath("$.dateChangeNoticeEnabled").value(true));
+
+        String firstResponse = """
+                {"firstName":"Ana","lastName":"Pérez","guestCount":3,
+                 "attending":true,"message":"Allí estaremos"}
+                """;
+        String correctedResponse = """
+                {"firstName":" Ana ","lastName":"Pérez","guestCount":1,
+                 "attending":false,"message":"Ya no podremos asistir"}
+                """;
+        String rsvpUrl = "/api/public/invitations/" + slug + "/rsvps";
+
+        mockMvc.perform(post(rsvpUrl).contentType(MediaType.APPLICATION_JSON).content(firstResponse))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(post(rsvpUrl).contentType(MediaType.APPLICATION_JSON).content(correctedResponse))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/invitations/" + slug + "/guests")
+                        .header(AUTHORIZATION, BEARER + token))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.length()").value(1),
+                        jsonPath("$[0].attending").value(false),
+                        jsonPath("$[0].guestCount").value(1),
+                        jsonPath("$[0].message").value("Ya no podremos asistir"));
     }
 
     @Test

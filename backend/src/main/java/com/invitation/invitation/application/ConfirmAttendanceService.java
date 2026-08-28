@@ -36,11 +36,11 @@ public class ConfirmAttendanceService {
                 .orElseThrow(InvitationNotFoundException::new);
         String guestName = firstName.trim() + " " + lastName.trim();
         String normalizedName = normalize(guestName);
-        if (rsvps.existsByInvitationIdAndGuestNameNormalized(invitation.id(), normalizedName)) {
-            throw new DuplicateInvitationGuestException();
-        }
         String normalizedMessage = message == null || message.isBlank() ? null : message.trim();
-        rsvps.save(new InvitationRsvp(UUID.randomUUID(), invitation.id(), guestName,
+        UUID responseId = rsvps.findByInvitationIdAndGuestNameNormalized(invitation.id(), normalizedName)
+                .map(InvitationRsvp::id)
+                .orElseGet(UUID::randomUUID);
+        rsvps.save(new InvitationRsvp(responseId, invitation.id(), guestName,
                 normalizedName, guestCount, attending, normalizedMessage, clock.instant()));
     }
 }

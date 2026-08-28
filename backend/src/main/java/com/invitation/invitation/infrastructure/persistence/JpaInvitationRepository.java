@@ -59,6 +59,7 @@ public class JpaInvitationRepository implements InvitationRepository {
                 value.eventDate(), value.eventTime(), value.venueName(), value.address(), value.mapsUrl(),
                 value.heroImageUrl(), String.join("\n", value.galleryImageUrls()), value.message(), value.sectionBackgrounds(), value.contactInfo(),
                 value.shareTitle(), value.shareDescription(), value.shareImageUrl(),
+                value.dateChangeNoticeEnabled(),
                 value.status(), value.createdAt(), value.updatedAt());
     }
 
@@ -68,6 +69,7 @@ public class JpaInvitationRepository implements InvitationRepository {
                 value.getEventDate(), value.getEventTime(), value.getVenueName(), value.getAddress(),
                 value.getMapsUrl(), value.getHeroImageUrl(), splitImages(value.getGalleryImageUrls()),
                 value.getMessage(), value.getSectionBackgrounds(), value.getContactInfo(), value.getShareTitle(), value.getShareDescription(), value.getShareImageUrl(),
+                value.isDateChangeNoticeEnabled(),
                 value.getStatus(), value.getCreatedAt(), value.getUpdatedAt());
     }
 }

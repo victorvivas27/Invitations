@@ -105,7 +105,10 @@ export function InvitationWizard({
   }
   type TextField = Exclude<
     keyof InvitationDraft,
-    'galleryImageUrls' | 'sectionBackgrounds' | 'contactInfo'
+    | 'galleryImageUrls'
+    | 'sectionBackgrounds'
+    | 'contactInfo'
+    | 'dateChangeNoticeEnabled'
   >
   const field = (
     name: TextField,
@@ -435,6 +438,23 @@ export function InvitationWizard({
                 )}
               </div>
             </div>
+            <label className="date-change-toggle">
+              <input
+                type="checkbox"
+                checked={draft.dateChangeNoticeEnabled}
+                onChange={(event) =>
+                  update('dateChangeNoticeEnabled', event.target.checked)
+                }
+              />
+              <span className="date-change-toggle__control" aria-hidden="true" />
+              <span className="date-change-toggle__copy">
+                <strong>Avisar que cambió la fecha del evento</strong>
+                <small>
+                  Los invitados verán un aviso antes de abrir la invitación.
+                  Las confirmaciones existentes se conservarán.
+                </small>
+              </span>
+            </label>
           </>
         )}
         {step === 3 && (

@@ -30,5 +30,6 @@ public record CreateInvitationRequest(
         @Size(max = 3000) String contactInfo,
         @NotBlank @Size(max = 70) String shareTitle,
         @NotBlank @Size(max = 160) String shareDescription,
-        @Size(max = 500) String shareImageUrl) {
+        @Size(max = 500) String shareImageUrl,
+        Boolean dateChangeNoticeEnabled) {
 }

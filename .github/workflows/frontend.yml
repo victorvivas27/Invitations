@@ -2,9 +2,9 @@ name: Frontend
 
 on:
   push:
-    paths: ['frontend/**', '.github/workflows/frontend.yml']
+    paths: ['frontend/**', '.github/workflows/frontend.yml', '.github/scripts/**']
   pull_request:
-    paths: ['frontend/**', '.github/workflows/frontend.yml']
+    paths: ['frontend/**', '.github/workflows/frontend.yml', '.github/scripts/**']
 
 jobs:
   validate:
@@ -25,5 +25,19 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec tsc -b
       - run: pnpm lint
-      - run: pnpm test
+      - name: Tests y cobertura
+        run: pnpm exec vitest run --coverage --reporter=default --reporter=json --outputFile=test-results.json
+      - name: Resumen visual
+        if: always()
+        run: node ../.github/scripts/write-quality-summary.mjs frontend "$PWD"
+      - name: Publicar reporte HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-quality-report
+          path: |
+            frontend/coverage
+            frontend/test-results.json
+          if-no-files-found: warn
+          retention-days: 14
       - run: pnpm build

@@ -26,6 +26,7 @@ public record UpdateInvitationCommand(
         String contactInfo,
         String shareTitle,
         String shareDescription,
-        String shareImageUrl
+        String shareImageUrl,
+        boolean dateChangeNoticeEnabled
 ) {
 }

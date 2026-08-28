@@ -48,6 +48,7 @@ public class CreateInvitationService implements CreateInvitationUseCase {
                 command.eventDate(), command.eventTime(), command.venueName(), command.address(),
                 command.mapsUrl(), command.heroImageUrl(), command.galleryImageUrls(), command.message(), command.sectionBackgrounds(), command.contactInfo(),
                 command.shareTitle(), command.shareDescription(), command.shareImageUrl(),
+                command.dateChangeNoticeEnabled(),
                 InvitationStatus.PUBLISHED, now, now);
         Invitation saved = invitations.save(invitation);
         String metadataVersion = Long.toString(saved.updatedAt().toEpochMilli());

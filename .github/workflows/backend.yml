@@ -2,9 +2,9 @@ name: Backend
 
 on:
   push:
-    paths: ['backend/**', '.github/workflows/backend.yml']
+    paths: ['backend/**', '.github/workflows/backend.yml', '.github/scripts/**']
   pull_request:
-    paths: ['backend/**', '.github/workflows/backend.yml']
+    paths: ['backend/**', '.github/workflows/backend.yml', '.github/scripts/**']
 
 jobs:
   validate:
@@ -20,5 +20,19 @@ jobs:
           java-version: '21'
           cache: gradle
       - run: chmod +x gradlew
-      - run: ./gradlew test
-      - run: ./gradlew check
+      - name: Tests, cobertura y calidad
+        run: ./gradlew check
+      - name: Resumen visual
+        if: always()
+        run: node ../.github/scripts/write-quality-summary.mjs backend "$PWD"
+      - name: Publicar reportes HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-quality-report
+          path: |
+            backend/build/reports/jacoco/test/html
+            backend/build/reports/tests/test
+            backend/build/reports/pmd
+          if-no-files-found: warn
+          retention-days: 14
