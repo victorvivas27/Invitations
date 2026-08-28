@@ -95,6 +95,23 @@
   box-shadow: none;
 }
 
+/* Conserva el fondo del contenedor cuando el navegador autocompleta el campo. */
+.login-card .auth-input-shell input:-webkit-autofill,
+.login-card .auth-input-shell input:-webkit-autofill:hover,
+.login-card .auth-input-shell input:-webkit-autofill:focus,
+.login-card .auth-input-shell input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--theme-text);
+  caret-color: var(--theme-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+  box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+}
+
+.login-card .auth-input-shell input:autofill {
+  color: var(--theme-text);
+  caret-color: var(--theme-text);
+  box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+}
+
 .auth-password-shell input {
   padding-right: 6px !important;
 }

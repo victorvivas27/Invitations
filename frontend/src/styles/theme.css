@@ -94,6 +94,21 @@ input::placeholder,
 textarea::placeholder {
   color: color-mix(in srgb, var(--theme-muted) 72%, transparent);
 }
+/* Evita el fondo impuesto por el navegador al completar datos guardados. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--theme-text);
+  caret-color: var(--theme-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+  box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+}
+input:autofill {
+  color: var(--theme-text);
+  caret-color: var(--theme-text);
+  box-shadow: 0 0 0 1000px var(--theme-surface) inset;
+}
 .login-card input:focus,
 .wizard-field input:focus,
 .wizard-field select:focus,

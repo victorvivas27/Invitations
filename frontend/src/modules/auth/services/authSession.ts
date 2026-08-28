@@ -1,6 +1,7 @@
 import { apiBaseUrl } from '../../../shared/config/api'
 const tokenKey = 'invitation_access_token'
 const userKey = 'invitation_session_user'
+const expirationKey = 'invitation_session_expires_at'
 
 export type SessionUser = {
   code: string
@@ -29,8 +30,45 @@ export class RegistrationError extends Error {
   }
 }
 
-export const getAccessToken = () => window.localStorage.getItem(tokenKey)
+const jwtExpiration = (token: string): number | null => {
+  const payload = token.split('.')[1]
+  if (!payload) return null
+
+  try {
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      '=',
+    )
+    const expiration = (JSON.parse(window.atob(padded)) as { exp?: unknown })
+      .exp
+    return typeof expiration === 'number' && Number.isFinite(expiration)
+      ? expiration * 1000
+      : null
+  } catch {
+    return null
+  }
+}
+
+const storedExpiration = (token: string): number | null => {
+  const stored = Number(window.localStorage.getItem(expirationKey))
+  return Number.isFinite(stored) && stored > 0 ? stored : jwtExpiration(token)
+}
+
+export const getAccessToken = () => {
+  const token = window.localStorage.getItem(tokenKey)
+  if (!token) return null
+
+  const expiration = storedExpiration(token)
+  if (expiration !== null && expiration <= Date.now()) {
+    clearSession()
+    return null
+  }
+
+  return token
+}
 export const getSessionUser = (): SessionUser | null => {
+  if (!getAccessToken()) return null
   const stored = window.localStorage.getItem(userKey)
   if (!stored) return null
   try {
@@ -46,6 +84,7 @@ export const loadSessionUser = async (): Promise<SessionUser | null> => {
     const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
+    if (response.status === 401) clearSession()
     if (!response.ok) return null
     const user = (await response.json()) as SessionUser
     if (!user.firstName || !user.lastName || !user.email || !user.code)
@@ -59,6 +98,7 @@ export const loadSessionUser = async (): Promise<SessionUser | null> => {
 export const clearSession = () => {
   window.localStorage.removeItem(tokenKey)
   window.localStorage.removeItem(userKey)
+  window.localStorage.removeItem(expirationKey)
 }
 
 export async function login(email: string, password: string): Promise<void> {
@@ -79,13 +119,27 @@ export async function login(email: string, password: string): Promise<void> {
     )
   if (!response.ok)
     throw new LoginError('unexpected', 'No fue posible iniciar sesión.')
-  const body = (await response.json()) as { token?: string; user?: SessionUser }
+  const body = (await response.json()) as {
+    token?: string
+    expiresIn?: number
+    user?: SessionUser
+  }
   if (!body.token)
     throw new LoginError(
       'unexpected',
       'La respuesta de inicio de sesión no es válida.',
     )
   window.localStorage.setItem(tokenKey, body.token)
+  if (
+    typeof body.expiresIn === 'number' &&
+    Number.isFinite(body.expiresIn) &&
+    body.expiresIn > 0
+  )
+    window.localStorage.setItem(
+      expirationKey,
+      String(Date.now() + body.expiresIn * 1000),
+    )
+  else window.localStorage.removeItem(expirationKey)
   if (body.user) window.localStorage.setItem(userKey, JSON.stringify(body.user))
 }
 
