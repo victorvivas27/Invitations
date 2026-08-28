@@ -36,8 +36,10 @@ const parseError = async (response: Response): Promise<InvitationApiError> => {
   } catch {
     /* controlled non-JSON response */
   }
-  if (response.status === 401)
+  if (response.status === 401) {
+    clearSession()
     return new InvitationApiError('unauthorized', 'Tu sesión ha vencido.')
+  }
   if (response.status === 403)
     return new InvitationApiError(
       'forbidden',
