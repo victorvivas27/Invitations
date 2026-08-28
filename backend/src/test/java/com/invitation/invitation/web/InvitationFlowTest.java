@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
 class InvitationFlowTest {
     private static final String CREATE = "/api/invitations";
+    private static final String PUBLIC_INVITATIONS = "/api/public/invitations/";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
     @Autowired
@@ -70,18 +71,18 @@ class InvitationFlowTest {
                         jsonPath("$.publicUrl").value(org.hamcrest.Matchers.matchesPattern(
                                 "/i/cumpleanos-de-sofia-[a-z0-9]{8}\\?v=[0-9]+")),
                         header().string("Location", org.hamcrest.Matchers.startsWith(
-                                "/api/public/invitations/")))
+                                PUBLIC_INVITATIONS)))
                 .andReturn();
         JsonNode result = objectMapper.readTree(creation.getResponse().getContentAsString());
         String slug = result.get("publicSlug").asText();
-        mockMvc.perform(get("/api/public/invitations/" + slug))
+        mockMvc.perform(get(PUBLIC_INVITATIONS + slug))
                 .andExpectAll(status().isOk(), jsonPath("$.templateId").value("birthday-urban"),
                         jsonPath("$.honoreeName").value("Sofía"),
                         jsonPath("$.dateChangeNoticeEnabled").value(false),
                         jsonPath("$").value(not(hasKey("id"))),
                         jsonPath("$").value(not(hasKey("ownerId"))),
                         jsonPath("$").value(not(hasKey("status"))));
-        mockMvc.perform(get("/api/public/invitations/" + slug + "/metadata"))
+        mockMvc.perform(get(PUBLIC_INVITATIONS + slug + "/metadata"))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.slug").value(slug),
                         jsonPath("$.shareTitle").value("Cumpleaños de Sofía"),
@@ -106,7 +107,7 @@ class InvitationFlowTest {
 
         mockMvc.perform(get("/api/invitations/" + slug).header(AUTHORIZATION, BEARER + token))
                 .andExpectAll(status().isOk(), jsonPath("$.dateChangeNoticeEnabled").value(true));
-        mockMvc.perform(get("/api/public/invitations/" + slug))
+        mockMvc.perform(get(PUBLIC_INVITATIONS + slug))
                 .andExpectAll(status().isOk(), jsonPath("$.dateChangeNoticeEnabled").value(true));
 
         String firstResponse = """
@@ -117,7 +118,7 @@ class InvitationFlowTest {
                 {"firstName":" Ana ","lastName":"Pérez","guestCount":1,
                  "attending":false,"message":"Ya no podremos asistir"}
                 """;
-        String rsvpUrl = "/api/public/invitations/" + slug + "/rsvps";
+        String rsvpUrl = PUBLIC_INVITATIONS + slug + "/rsvps";
 
         mockMvc.perform(post(rsvpUrl).contentType(MediaType.APPLICATION_JSON).content(firstResponse))
                 .andExpect(status().isNoContent());
@@ -137,9 +138,9 @@ class InvitationFlowTest {
     void creationRequiresAuthenticationButPublicLookupDoesNot() throws Exception {
         mockMvc.perform(post(CREATE).contentType(MediaType.APPLICATION_JSON).content(validBody()))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/api/public/invitations/does-not-exist"))
+        mockMvc.perform(get(PUBLIC_INVITATIONS + "does-not-exist"))
                 .andExpectAll(status().isNotFound(), jsonPath("$.error").value("INVITATION_NOT_FOUND"));
-        mockMvc.perform(get("/api/public/invitations/does-not-exist/metadata"))
+        mockMvc.perform(get(PUBLIC_INVITATIONS + "does-not-exist/metadata"))
                 .andExpect(status().isNotFound());
     }
 
