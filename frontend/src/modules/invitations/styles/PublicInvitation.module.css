@@ -252,7 +252,9 @@
   }
 }
 
-.invitation-experience:not(.is-preview) {
+/* Keep the dark experience shell painted while the invitation enters. Fading
+   the whole shell exposed the light app background for one frame on Safari. */
+.invitation-experience:not(.is-preview) .experience-chapters {
   animation: invitation-ready 0.55s ease-out both;
 }
 

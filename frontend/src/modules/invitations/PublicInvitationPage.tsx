@@ -91,12 +91,9 @@ export function PublicInvitationPage() {
   useEffect(() => {
     let active = true
     setState('loading')
-    const minimumLoaderTime = new Promise<void>((resolve) =>
-      window.setTimeout(resolve, 700),
-    )
     getPublicInvitation(slug)
       .then(async (value) => {
-        await Promise.all([prepareCoverImage(value), minimumLoaderTime])
+        await prepareCoverImage(value)
         if (!active) return
         setInvitation(value)
         setState(value.dateChangeNoticeEnabled ? 'notice' : 'ready')
