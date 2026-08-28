@@ -4,6 +4,7 @@ import { AppLayout } from '../../shared/components/layout/AppLayout'
 import { getAccessToken } from '../auth/services/authSession'
 import {
   deleteInvitation,
+  getInvitationViewUrl,
   getMyInvitations,
   InvitationApiError,
 } from './services/invitations'
@@ -147,14 +148,15 @@ export function MyInvitationsPage() {
                 </div>
               </dl>
               <div className="my-invitation-actions">
-                <a
+                <Link
                   className="primary-cta"
-                  href={invitation.publicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  to={getInvitationViewUrl(
+                    invitation.publicSlug,
+                    invitation.metadataVersion,
+                  )}
                 >
                   Ver invitación
-                </a>
+                </Link>
                 <Link
                   className="guest-button"
                   to={`/my-invitations/${invitation.publicSlug}/guests`}

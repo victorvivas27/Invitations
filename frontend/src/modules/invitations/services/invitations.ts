@@ -332,6 +332,16 @@ export const getInvitationShareUrl = (
     ? `${path}?v=${encodeURIComponent(metadataVersion)}`
     : path
 }
+
+export const getInvitationViewUrl = (
+  publicSlug: string,
+  metadataVersion?: string,
+) => {
+  const path = `/view/${encodeURIComponent(publicSlug)}`
+  return metadataVersion
+    ? `${path}?v=${encodeURIComponent(metadataVersion)}`
+    : path
+}
 export async function confirmAttendance(
   publicSlug: string,
   input: {
