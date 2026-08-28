@@ -671,7 +671,8 @@
   color: #eaf1fb;
 }
 
-.experience-section > :is(h1, h2, p, strong) {
+.experience-section > :is(h1, h2, p, strong),
+.experience-section .section-background-content > :is(h1, h2, p, strong) {
   width: 100%;
   max-width: 900px;
   margin-inline: auto;
@@ -757,11 +758,14 @@
 
 /* Cada sección conserva sus propios tamaños elegidos en el editor. */
 .experience-section > h2,
-.experience-section > strong {
+.experience-section > strong,
+.experience-section .section-background-content > h2,
+.experience-section .section-background-content > strong {
   font-size: var(--section-title-size, 34px) !important;
 }
 
-.experience-section > p {
+.experience-section > p,
+.experience-section .section-background-content > p {
   font-size: var(--section-body-size, 28px) !important;
 }
 
@@ -799,7 +803,8 @@
   }
 }
 
-.experience-when > strong {
+.experience-when > strong,
+.experience-when .section-background-content > strong {
   color: var(--secondary-dark);
   font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(1.65rem, 5vw, 3.2rem);
@@ -807,13 +812,16 @@
 }
 
 .experience-when > p,
-.experience-place > p {
+.experience-place > p,
+.experience-when .section-background-content > p,
+.experience-place .section-background-content > p {
   color: var(--text-muted);
   font-size: clamp(1rem, 2.6vw, 1.3rem);
 }
 
 /* La hora y la dirección son datos clave: se leen de lejos. */
-.experience-when > p {
+.experience-when > p,
+.experience-when .section-background-content > p {
   margin-top: 14px;
   color: var(--secondary-dark);
   font-size: clamp(1.28rem, 4vw, 1.95rem);
@@ -822,7 +830,8 @@
   line-height: 1.25;
 }
 
-.experience-place > p {
+.experience-place > p,
+.experience-place .section-background-content > p {
   margin-top: 12px;
   font-size: clamp(1.15rem, 3.4vw, 1.6rem);
   font-weight: 500;
