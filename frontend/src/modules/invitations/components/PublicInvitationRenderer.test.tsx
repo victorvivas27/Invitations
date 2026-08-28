@@ -24,6 +24,7 @@ const invitation: PublicInvitation = {
   shareTitle: 'Cumpleaños de Sofía',
   shareDescription: '¡Estás invitado!',
   shareImageUrl: 'https://example.test/share.jpg',
+  dateChangeNoticeEnabled: false,
 }
 
 type Callback = (

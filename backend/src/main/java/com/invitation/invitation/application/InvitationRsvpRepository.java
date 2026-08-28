@@ -11,6 +11,8 @@ public interface InvitationRsvpRepository {
 
     boolean existsByInvitationIdAndGuestNameNormalized(UUID invitationId, String normalizedName);
 
+    Optional<InvitationRsvp> findByInvitationIdAndGuestNameNormalized(UUID invitationId, String normalizedName);
+
     boolean existsByInvitationIdAndGuestNameNormalizedAndIdNot(UUID invitationId, String normalizedName, UUID id);
 
     Optional<InvitationRsvp> findById(UUID id);

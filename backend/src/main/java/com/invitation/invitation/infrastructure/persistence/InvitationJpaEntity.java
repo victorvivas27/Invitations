@@ -59,6 +59,8 @@ public class InvitationJpaEntity {
     private String shareDescription;
     @Column(name = "share_image_url", length = 500)
     private String shareImageUrl;
+    @Column(name = "date_change_notice_enabled", nullable = false)
+    private boolean dateChangeNoticeEnabled;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private InvitationStatus status;
@@ -75,6 +77,7 @@ public class InvitationJpaEntity {
                                LocalDate eventDate, LocalTime eventTime, String venueName, String address,
                                String mapsUrl, String heroImageUrl, String galleryImageUrls, String message, String sectionBackgrounds, String contactInfo,
                                String shareTitle, String shareDescription, String shareImageUrl,
+                               boolean dateChangeNoticeEnabled,
                                InvitationStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.publicSlug = publicSlug;
@@ -98,6 +101,7 @@ public class InvitationJpaEntity {
         this.shareTitle = shareTitle;
         this.shareDescription = shareDescription;
         this.shareImageUrl = shareImageUrl;
+        this.dateChangeNoticeEnabled = dateChangeNoticeEnabled;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -193,6 +197,10 @@ public class InvitationJpaEntity {
 
     public String getShareImageUrl() {
         return shareImageUrl;
+    }
+
+    public boolean isDateChangeNoticeEnabled() {
+        return dateChangeNoticeEnabled;
     }
 
     public Instant getCreatedAt() {

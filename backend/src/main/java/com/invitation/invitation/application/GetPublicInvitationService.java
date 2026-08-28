@@ -23,6 +23,7 @@ public class GetPublicInvitationService implements GetPublicInvitationUseCase {
                 invitation.venueName(), invitation.address(), invitation.mapsUrl(),
                 invitation.heroImageUrl(), invitation.galleryImageUrls(), invitation.message(), invitation.sectionBackgrounds(), invitation.contactInfo(),
                 invitation.shareTitle(), invitation.shareDescription(), invitation.shareImageUrl(),
+                invitation.dateChangeNoticeEnabled(),
                 invitation.updatedAt());
     }
 }

@@ -29,6 +29,35 @@ describe('PublicInvitationPage', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
+  it('shows the date change notice after the loader and before the invitation', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({ ...invitation, dateChangeNoticeEnabled: true }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    )
+
+    renderPage()
+
+    expect(
+      screen.getByRole('heading', { name: 'Cargando invitación...' }),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByRole('dialog', { name: /cambiamos la fecha/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'Sofía' }),
+    ).not.toBeInTheDocument()
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Entendido, ver invitación' }),
+    )
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sofía' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
   it('loads a public invitation by encoded slug and renders its template', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify(invitation), {

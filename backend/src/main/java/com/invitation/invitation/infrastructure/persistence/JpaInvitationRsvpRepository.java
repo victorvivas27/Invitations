@@ -30,6 +30,13 @@ public class JpaInvitationRsvpRepository implements InvitationRsvpRepository {
     }
 
     @Override
+    public Optional<InvitationRsvp> findByInvitationIdAndGuestNameNormalized(
+            UUID invitationId, String normalizedName) {
+        return repository.findByInvitationIdAndGuestNameNormalized(invitationId, normalizedName)
+                .map(this::toDomain);
+    }
+
+    @Override
     public boolean existsByInvitationIdAndGuestNameNormalizedAndIdNot(
             UUID invitationId, String normalizedName, UUID id) {
         return repository.existsByInvitationIdAndGuestNameNormalizedAndIdNot(invitationId, normalizedName, id);
@@ -37,9 +44,7 @@ public class JpaInvitationRsvpRepository implements InvitationRsvpRepository {
 
     @Override
     public Optional<InvitationRsvp> findById(UUID id) {
-        return repository.findById(id).map(value -> new InvitationRsvp(value.getId(), value.getInvitationId(),
-                value.getGuestName(), value.getGuestNameNormalized(), value.getGuestCount(),
-                value.isAttending(), value.getMessage(), value.getCreatedAt()));
+        return repository.findById(id).map(this::toDomain);
     }
 
     @Override
@@ -48,5 +53,11 @@ public class JpaInvitationRsvpRepository implements InvitationRsvpRepository {
                 .map(value -> new InvitationRsvp(value.getId(), value.getInvitationId(),
                         value.getGuestName(), value.getGuestNameNormalized(), value.getGuestCount(),
                         value.isAttending(), value.getMessage(), value.getCreatedAt())).toList();
+    }
+
+    private InvitationRsvp toDomain(InvitationRsvpJpaEntity value) {
+        return new InvitationRsvp(value.getId(), value.getInvitationId(),
+                value.getGuestName(), value.getGuestNameNormalized(), value.getGuestCount(),
+                value.isAttending(), value.getMessage(), value.getCreatedAt());
     }
 }

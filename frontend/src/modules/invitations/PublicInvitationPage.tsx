@@ -3,7 +3,53 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { PublicInvitationRenderer } from './components/PublicInvitationRenderer'
 import { getPublicInvitation, InvitationApiError } from './services/invitations'
 import type { PublicInvitation } from './types/invitation'
-type State = 'loading' | 'ready' | 'not-found' | 'network' | 'unexpected'
+type State =
+  | 'loading'
+  | 'notice'
+  | 'ready'
+  | 'not-found'
+  | 'network'
+  | 'unexpected'
+
+function DateChangeNotice({ onContinue }: { onContinue: () => void }) {
+  return (
+    <main className="date-change-notice">
+      <section
+        className="date-change-notice__card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="date-change-title"
+        aria-describedby="date-change-description"
+      >
+        <div className="date-change-notice__icon" aria-hidden="true">
+          <span>!</span>
+        </div>
+        <p className="date-change-notice__eyebrow">Actualización importante</p>
+        <h1 id="date-change-title">
+          Importante: cambiamos la fecha
+        </h1>
+        <div id="date-change-description" className="date-change-notice__body">
+          <p>Por fuerza mayor, el evento tiene una nueva fecha.</p>
+          <ul>
+            <li>
+              <strong>¿Podés asistir?</strong> No respondas otra vez.
+            </li>
+            <li>
+              <strong>¿No podés?</strong> Respondé nuevamente indicando que no
+              asistirás.
+            </li>
+          </ul>
+          <p className="date-change-notice__recommendation">
+            Revisá la nueva fecha.
+          </p>
+        </div>
+        <button type="button" autoFocus onClick={onContinue}>
+          Entendido, ver invitación
+        </button>
+      </section>
+    </main>
+  )
+}
 
 const prepareCoverImage = async (invitation: PublicInvitation) => {
   const basicBackground = invitation.sectionBackgrounds?.basic
@@ -53,7 +99,7 @@ export function PublicInvitationPage() {
         await Promise.all([prepareCoverImage(value), minimumLoaderTime])
         if (!active) return
         setInvitation(value)
-        setState('ready')
+        setState(value.dateChangeNoticeEnabled ? 'notice' : 'ready')
         document.title = `${value.eventName} | Mi Invitación`
       })
       .catch((error: unknown) => {
@@ -72,6 +118,8 @@ export function PublicInvitationPage() {
       document.title = 'Mi Invitación'
     }
   }, [slug, attempt])
+  if (state === 'notice' && invitation)
+    return <DateChangeNotice onContinue={() => setState('ready')} />
   if (state === 'ready' && invitation)
     return (
       <PublicInvitationRenderer

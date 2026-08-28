@@ -193,6 +193,8 @@ export async function getPublicInvitation(
   invitation.sectionBackgrounds = normalizeSectionBackgrounds(
     invitation.sectionBackgrounds,
   )
+  invitation.dateChangeNoticeEnabled =
+    invitation.dateChangeNoticeEnabled ?? false
   return invitation
 }
 
@@ -258,6 +260,8 @@ export async function getOwnedInvitation(
   invitation.sectionBackgrounds = normalizeSectionBackgrounds(
     invitation.sectionBackgrounds,
   )
+  invitation.dateChangeNoticeEnabled =
+    invitation.dateChangeNoticeEnabled ?? false
 
   return invitation
 }

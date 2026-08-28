@@ -165,6 +165,7 @@ export function CreateInvitationPage() {
           shareTitle: invitation.shareTitle,
           shareDescription: invitation.shareDescription,
           shareImageUrl: invitation.shareImageUrl ?? '',
+          dateChangeNoticeEnabled: invitation.dateChangeNoticeEnabled,
         })
       })
       .catch((error) => {
@@ -291,6 +292,7 @@ export function CreateInvitationPage() {
     shareTitle: draft.shareTitle.trim(),
     shareDescription: draft.shareDescription.trim(),
     shareImageUrl: draft.shareImageUrl,
+    dateChangeNoticeEnabled: draft.dateChangeNoticeEnabled,
   })
 
   const submit = async () => {

@@ -64,6 +64,7 @@ public class UpdateInvitationService implements UpdateInvitationUseCase {
                 command.shareTitle(),
                 command.shareDescription(),
                 command.shareImageUrl(),
+                command.dateChangeNoticeEnabled(),
                 clock.instant()
         );
 

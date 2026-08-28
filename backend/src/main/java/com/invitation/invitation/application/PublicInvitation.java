@@ -15,5 +15,6 @@ public record PublicInvitation(String publicSlug, String templateId, InvitationV
                                List<String> galleryImageUrls, String message, String sectionBackgrounds,
                                String contactInfo,
                                String shareTitle, String shareDescription, String shareImageUrl,
+                               boolean dateChangeNoticeEnabled,
                                Instant updatedAt) {
 }

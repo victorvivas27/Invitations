@@ -33,6 +33,7 @@ public record OwnedInvitationDetail(
         String shareTitle,
         String shareDescription,
         String shareImageUrl,
+        boolean dateChangeNoticeEnabled,
         InvitationStatus status,
         Instant createdAt,
         Instant updatedAt

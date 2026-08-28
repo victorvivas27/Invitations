@@ -229,6 +229,73 @@
   font-size: 0.82rem;
   font-weight: 800;
 }
+.date-change-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 24px;
+  padding: 16px;
+  border: 1px solid
+    color-mix(in srgb, var(--theme-blue-bright) 40%, var(--theme-border));
+  border-radius: 16px;
+  background: color-mix(
+    in srgb,
+    var(--theme-blue-bright) 7%,
+    var(--theme-surface-raised)
+  );
+  cursor: pointer;
+}
+.date-change-toggle > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.date-change-toggle__control {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--theme-border);
+  transition: background 0.2s ease;
+}
+.date-change-toggle__control::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--theme-on-accent);
+  box-shadow: 0 2px 6px var(--theme-shadow);
+  transition: transform 0.2s ease;
+}
+.date-change-toggle > input:checked + .date-change-toggle__control {
+  background: var(--theme-red);
+}
+.date-change-toggle > input:checked + .date-change-toggle__control::after {
+  transform: translateX(20px);
+}
+.date-change-toggle > input:focus-visible + .date-change-toggle__control {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
+}
+.date-change-toggle__copy {
+  display: grid;
+  gap: 4px;
+  color: var(--theme-text);
+  line-height: 1.4;
+}
+.date-change-toggle__copy strong {
+  color: var(--theme-red);
+  font-size: 0.9rem;
+}
+.date-change-toggle__copy small {
+  color: var(--theme-muted);
+  font-size: 0.76rem;
+}
 .wizard-time-selects {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;

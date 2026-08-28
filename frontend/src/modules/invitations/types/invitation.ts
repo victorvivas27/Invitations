@@ -34,6 +34,7 @@ export type CreateInvitationInput = {
   shareTitle: string
   shareDescription: string
   shareImageUrl: string
+  dateChangeNoticeEnabled: boolean
 }
 export type CreatedInvitation = {
   publicSlug: string
@@ -92,6 +93,7 @@ export type OwnedInvitationDetail = {
   shareTitle: string
   shareDescription: string
   shareImageUrl: string | null
+  dateChangeNoticeEnabled: boolean
   status: 'PUBLISHED'
   createdAt: string
   updatedAt: string

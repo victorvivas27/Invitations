@@ -148,6 +148,7 @@ export type InvitationDraft = {
   shareTitle: string
   shareDescription: string
   shareImageUrl: string
+  dateChangeNoticeEnabled: boolean
 }
 
 export const emptyInvitationDraft: InvitationDraft = {
@@ -174,4 +175,5 @@ export const emptyInvitationDraft: InvitationDraft = {
   shareTitle: '',
   shareDescription: '',
   shareImageUrl: '',
+  dateChangeNoticeEnabled: false,
 }
