@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -132,6 +133,32 @@ class InvitationFlowTest {
                         jsonPath("$[0].attending").value(false),
                         jsonPath("$[0].guestCount").value(1),
                         jsonPath("$[0].message").value("Ya no podremos asistir"));
+    }
+
+    @Test
+    void ownerCanDeleteAnInvitationGuest() throws Exception {
+        MvcResult creation = mockMvc.perform(post(CREATE).header(AUTHORIZATION, BEARER + token)
+                        .contentType(MediaType.APPLICATION_JSON).content(validBody()))
+                .andExpect(status().isCreated()).andReturn();
+        String slug = objectMapper.readTree(creation.getResponse().getContentAsString())
+                .get("publicSlug").asText();
+        String guestsUrl = "/api/invitations/" + slug + "/guests";
+
+        mockMvc.perform(post(PUBLIC_INVITATIONS + slug + "/rsvps")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"firstName":"Ana","lastName":"Pérez","guestCount":2,
+                                 "attending":true,"message":"Nos vemos"}
+                                """))
+                .andExpect(status().isNoContent());
+        MvcResult guests = mockMvc.perform(get(guestsUrl).header(AUTHORIZATION, BEARER + token))
+                .andExpectAll(status().isOk(), jsonPath("$.length()").value(1)).andReturn();
+        String guestId = objectMapper.readTree(guests.getResponse().getContentAsString()).get(0).get("id").asText();
+
+        mockMvc.perform(delete(guestsUrl + "/" + guestId).header(AUTHORIZATION, BEARER + token))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get(guestsUrl).header(AUTHORIZATION, BEARER + token))
+                .andExpectAll(status().isOk(), jsonPath("$.length()").value(0));
     }
 
     @Test

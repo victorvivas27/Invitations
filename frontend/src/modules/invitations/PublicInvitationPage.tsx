@@ -3,13 +3,9 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { PublicInvitationRenderer } from './components/PublicInvitationRenderer'
 import { getPublicInvitation, InvitationApiError } from './services/invitations'
 import type { PublicInvitation } from './types/invitation'
+import { hideBootLoaderAfterRender } from '../../shared/utils/bootLoader'
 type State =
-  | 'loading'
-  | 'notice'
-  | 'ready'
-  | 'not-found'
-  | 'network'
-  | 'unexpected'
+  'loading' | 'notice' | 'ready' | 'not-found' | 'network' | 'unexpected'
 
 function DateChangeNotice({ onContinue }: { onContinue: () => void }) {
   return (
@@ -25,9 +21,7 @@ function DateChangeNotice({ onContinue }: { onContinue: () => void }) {
           <span>!</span>
         </div>
         <p className="date-change-notice__eyebrow">Actualización importante</p>
-        <h1 id="date-change-title">
-          Importante: cambiamos la fecha
-        </h1>
+        <h1 id="date-change-title">Importante: cambiamos la fecha</h1>
         <div id="date-change-description" className="date-change-notice__body">
           <p>Por fuerza mayor, el evento tiene una nueva fecha.</p>
           <ul>
@@ -115,6 +109,10 @@ export function PublicInvitationPage() {
       document.title = 'Mi Invitación'
     }
   }, [slug, attempt])
+  useEffect(() => {
+    if (state === 'loading') return
+    return hideBootLoaderAfterRender()
+  }, [state])
   if (state === 'notice' && invitation)
     return <DateChangeNotice onContinue={() => setState('ready')} />
   if (state === 'ready' && invitation)

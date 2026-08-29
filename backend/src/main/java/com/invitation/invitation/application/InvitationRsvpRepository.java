@@ -18,4 +18,6 @@ public interface InvitationRsvpRepository {
     Optional<InvitationRsvp> findById(UUID id);
 
     List<InvitationRsvp> findAllByInvitationId(UUID invitationId);
+
+    void deleteById(UUID id);
 }

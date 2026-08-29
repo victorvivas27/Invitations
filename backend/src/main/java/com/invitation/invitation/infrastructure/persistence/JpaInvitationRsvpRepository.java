@@ -55,6 +55,11 @@ public class JpaInvitationRsvpRepository implements InvitationRsvpRepository {
                         value.isAttending(), value.getMessage(), value.getCreatedAt())).toList();
     }
 
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
+    }
+
     private InvitationRsvp toDomain(InvitationRsvpJpaEntity value) {
         return new InvitationRsvp(value.getId(), value.getInvitationId(),
                 value.getGuestName(), value.getGuestNameNormalized(), value.getGuestCount(),

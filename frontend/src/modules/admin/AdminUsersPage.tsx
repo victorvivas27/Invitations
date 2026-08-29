@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../shared/components/layout/AppLayout'
 import { apiBaseUrl } from '../../shared/config/api'
+import { hideBootLoaderAfterRender } from '../../shared/utils/bootLoader'
 import {
   clearSession,
   getAccessToken,
@@ -43,7 +44,8 @@ export function AdminUsersPage() {
       navigate('/login', { replace: true })
       throw new Error('Tu sesión expiró.')
     }
-    if (response.status === 403) throw new Error('No tienes permisos de administrador.')
+    if (response.status === 403)
+      throw new Error('No tienes permisos de administrador.')
     if (!response.ok) throw new Error('No fue posible completar la operación.')
     return response
   }
@@ -60,7 +62,11 @@ export function AdminUsersPage() {
       setUsers((await response.json()) as AdminUser[])
       setError('')
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'No fue posible cargar usuarios.')
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : 'No fue posible cargar usuarios.',
+      )
     } finally {
       setLoading(false)
     }
@@ -69,6 +75,11 @@ export function AdminUsersPage() {
   useEffect(() => {
     void load()
   }, [])
+
+  useEffect(() => {
+    if (loading) return
+    return hideBootLoaderAfterRender()
+  }, [loading])
 
   const create = async (event: FormEvent) => {
     event.preventDefault()
@@ -82,24 +93,40 @@ export function AdminUsersPage() {
       setEmail('')
       await load()
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'No fue posible crear el usuario.')
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : 'No fue posible crear el usuario.',
+      )
     } finally {
       setCreating(false)
     }
   }
 
   const remove = async (user: AdminUser) => {
-    if (!window.confirm(`¿Eliminar la cuenta de ${user.firstName} ${user.lastName}?`)) return
+    if (
+      !window.confirm(
+        `¿Eliminar la cuenta de ${user.firstName} ${user.lastName}?`,
+      )
+    )
+      return
     try {
       await request(`/${encodeURIComponent(user.code)}`, { method: 'DELETE' })
       await load()
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'No fue posible eliminar el usuario.')
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : 'No fue posible eliminar el usuario.',
+      )
     }
   }
 
   return (
-    <AppLayout activePage="admin-users" className="admin-users-page section-shell">
+    <AppLayout
+      activePage="admin-users"
+      className="admin-users-page section-shell"
+    >
       <header className="admin-users-heading">
         <span className="pill">Administración</span>
         <h1>Usuarios</h1>
@@ -109,32 +136,78 @@ export function AdminUsersPage() {
       <form className="admin-user-create" onSubmit={create}>
         <label>
           Nombre completo
-          <input value={name} onChange={(event) => setName(event.target.value)} required />
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
         </label>
         <label>
           Correo electrónico
-          <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
         </label>
         <button className="primary-cta" disabled={creating}>
           {creating ? 'Creando…' : 'Crear usuario'}
         </button>
       </form>
 
-      {error && <p className="admin-users-error" role="alert">{error}</p>}
+      {error && (
+        <p className="admin-users-error" role="alert">
+          {error}
+        </p>
+      )}
       {loading ? (
         <p>Cargando usuarios…</p>
       ) : (
         <div className="admin-users-table-wrap">
           <table className="admin-users-table">
-            <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Creación</th><th>Acciones</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Creación</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.code}>
-                  <td><strong>{user.firstName} {user.lastName}</strong><small>{user.email}</small></td>
-                  <td><span className={`admin-badge role-${user.role.toLowerCase()}`}>{user.role}</span></td>
-                  <td><span className="admin-badge">{user.status}</span></td>
-                  <td>{new Intl.DateTimeFormat('es-CL').format(new Date(user.createdAt))}</td>
-                  <td><button className="admin-delete" disabled={user.role === 'ADMIN'} onClick={() => void remove(user)}>Eliminar</button></td>
+                  <td>
+                    <strong>
+                      {user.firstName} {user.lastName}
+                    </strong>
+                    <small>{user.email}</small>
+                  </td>
+                  <td>
+                    <span
+                      className={`admin-badge role-${user.role.toLowerCase()}`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="admin-badge">{user.status}</span>
+                  </td>
+                  <td>
+                    {new Intl.DateTimeFormat('es-CL').format(
+                      new Date(user.createdAt),
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      className="admin-delete"
+                      disabled={user.role === 'ADMIN'}
+                      onClick={() => void remove(user)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

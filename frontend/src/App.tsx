@@ -1,5 +1,11 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom'
 import './styles/globals.css'
 import './shared/animation/reveal.css'
 import foundationStyles from './shared/styles/foundation.module.css'
@@ -13,6 +19,7 @@ import './styles/auth.css'
 import './styles/admin.css'
 import { FeedbackProvider } from './shared/components/feedback/FeedbackProvider'
 import { ScrollManager } from './shared/components/layout/ScrollManager'
+import { hideBootLoaderAfterRender } from './shared/utils/bootLoader'
 
 function NotFoundPage() {
   return (
@@ -86,6 +93,7 @@ const AdminUsersPage = lazy(() =>
 )
 
 function RouteFallback() {
+  if (document.getElementById('boot-loader')) return null
   return (
     <main
       className="boot-loader"
@@ -106,6 +114,22 @@ function RouteFallback() {
       </div>
     </main>
   )
+}
+
+function BootLoaderReady() {
+  const { pathname, search } = useLocation()
+
+  useEffect(() => {
+    if (
+      pathname.startsWith('/i/') ||
+      pathname.startsWith('/view/') ||
+      pathname === '/admin/users'
+    )
+      return
+    return hideBootLoaderAfterRender()
+  }, [pathname, search])
+
+  return null
 }
 
 export default function App() {
@@ -144,6 +168,7 @@ export default function App() {
                 element={<CreateInvitationPage />}
               />
             </Routes>
+            <BootLoaderReady />
           </Suspense>
         </div>
       </BrowserRouter>
