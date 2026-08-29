@@ -2,7 +2,10 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#050b16" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -43,6 +46,12 @@
       href="/images/icon-invitacion.png"
     />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link
+      rel="preload"
+      href="/images/icon-invitacion.png"
+      as="image"
+      fetchpriority="high"
+    />
     <style>
       :root {
         color-scheme: dark;
@@ -57,6 +66,11 @@
         background: #050b16;
       }
 
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
       #root {
         min-height: 100vh;
         min-height: 100dvh;
@@ -69,7 +83,12 @@
         display: grid;
         place-items: center;
         overflow: hidden;
-        padding: 2rem;
+        padding: max(2rem, env(safe-area-inset-top))
+          max(2rem, env(safe-area-inset-right))
+          max(2rem, env(safe-area-inset-bottom))
+          max(2rem, env(safe-area-inset-left));
+        opacity: 1;
+        visibility: visible;
         color: #ffffff;
         background:
           radial-gradient(
@@ -91,9 +110,51 @@
           BlinkMacSystemFont,
           'Segoe UI',
           sans-serif;
+        transition:
+          opacity 300ms ease,
+          visibility 300ms ease;
+        will-change: opacity;
+      }
+
+      .boot-loader--hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .boot-loader__ambient {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .boot-loader__orb {
+        position: absolute;
+        width: min(44rem, 86vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        opacity: 0.2;
+        filter: blur(3rem);
+        animation: boot-orb 7s ease-in-out infinite alternate;
+      }
+
+      .boot-loader__orb--one {
+        top: -28%;
+        left: -24%;
+        background: #d71920;
+      }
+
+      .boot-loader__orb--two {
+        right: -28%;
+        bottom: -32%;
+        background: #1e70d6;
+        animation-delay: -3.5s;
       }
 
       .boot-loader__content {
+        position: relative;
+        z-index: 1;
         display: grid;
         justify-items: center;
         gap: 1rem;
@@ -209,37 +270,58 @@
         }
       }
 
+      @keyframes boot-orb {
+        to {
+          opacity: 0.28;
+          transform: translate3d(4%, -3%, 0) scale(1.08);
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .boot-loader__mark,
         .boot-loader__mark::before,
-        .boot-loader__progress::after {
-          animation-duration: 3s;
+        .boot-loader__mark::after,
+        .boot-loader__progress::after,
+        .boot-loader__orb {
+          animation: none !important;
+        }
+
+        .boot-loader {
+          transition-duration: 100ms;
         }
       }
     </style>
     <title>Mi Invitación</title>
   </head>
   <body>
-    <div id="root">
-      <main
-        class="boot-loader"
-        aria-busy="true"
-        aria-label="Cargando Mi Invitación"
-      >
-        <div class="boot-loader__content">
-          <div class="boot-loader__mark" aria-hidden="true">
-            <img
-              class="boot-loader__envelope"
-              src="/images/icon-invitacion.png"
-              alt=""
-            />
-          </div>
-          <p class="boot-loader__title">Mi Invitación</p>
-          <p class="boot-loader__status">Preparando algo especial</p>
-          <div class="boot-loader__progress" aria-hidden="true"></div>
+    <div
+      id="boot-loader"
+      class="boot-loader"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Cargando Mi Invitación"
+    >
+      <div class="boot-loader__ambient" aria-hidden="true">
+        <span class="boot-loader__orb boot-loader__orb--one"></span>
+        <span class="boot-loader__orb boot-loader__orb--two"></span>
+      </div>
+      <div class="boot-loader__content">
+        <div class="boot-loader__mark" aria-hidden="true">
+          <img
+            class="boot-loader__envelope"
+            src="/images/icon-invitacion.png"
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
         </div>
-      </main>
+        <p class="boot-loader__title">Mi Invitación</p>
+        <p class="boot-loader__status">Preparando algo especial</p>
+        <div class="boot-loader__progress" aria-hidden="true"></div>
+      </div>
     </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

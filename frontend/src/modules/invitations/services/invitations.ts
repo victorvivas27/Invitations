@@ -406,3 +406,18 @@ export async function updateInvitationGuest(
   if (!response.ok) throw await parseError(response)
   return response.json() as Promise<InvitationGuest>
 }
+
+export async function deleteInvitationGuest(
+  publicSlug: string,
+  guestId: string,
+): Promise<void> {
+  const token = getAccessToken()
+  const response = await request(
+    `${apiBaseUrl}/api/invitations/${encodeURIComponent(publicSlug)}/guests/${encodeURIComponent(guestId)}`,
+    {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  )
+  if (!response.ok) throw await parseError(response)
+}
